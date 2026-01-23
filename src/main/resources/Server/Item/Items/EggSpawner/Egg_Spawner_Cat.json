@@ -1,0 +1,48 @@
+{
+  "TranslationProperties": {
+    "Name": "cats.items.egg_spawner.name"
+  },
+  "Quality": "Rare",
+  "PlayerAnimationsId": "Item",
+  "Interactions": {
+    "Primary": {
+      "Interactions": [
+        {
+          "Type": "SpawnNPC",
+          "EntityId": "Cat",
+          "RoleId": "Cat",
+          "State": "Wild",
+          "Next": {
+            "Type": "ModifyInventory",
+            "AdjustHeldItemQuantity": -1
+          },
+          "SpawnOffset": {
+            "X": 0,
+            "Y": 0.5,
+            "Z": 0
+          }
+        }
+      ]
+    }
+  },
+  "Model": "Items/SpawnEggs/CatSpawnEgg.blockymodel",
+  "Texture": "NPC/Pets/Cat/Models/CatModel_Calico.png",
+  "Icon": "Icons/ItemsGenerated/Food_Egg.png",
+  "IconProperties": {
+    "Rotation": [
+      22.5,
+      45,
+      22.5
+    ],
+    "Scale": 0.7,
+    "Translation": [
+      0,
+      -5.4
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Pet_Spawner"
+    ]
+  }
+}

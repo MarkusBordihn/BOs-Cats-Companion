@@ -1,0 +1,7 @@
+{
+  "$Comment": "Main interaction for cats - opens menu for owner, shows message for others",
+  "Type": "OpenCustomUI",
+  "Page": {
+    "Id": "CatMenu"
+  }
+}

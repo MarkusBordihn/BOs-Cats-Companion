@@ -1,0 +1,35 @@
+cats.cat.name=Katze
+cats.calico.name=Calico Katze
+cats.black.name=Schwarze Katze
+cats.browntabby.name=Braune Tabby Katze
+cats.gray.name=Graue Katze
+cats.graytabby.name=Graue Tabby Katze
+cats.ocelot.name=Ozelot Katze
+cats.orangetabby.name=Orange Tabby Katze
+cats.siamese.name=Siamkatze
+cats.tortie.name=Schildpatt Katze
+cats.tuxedo.name=Smoking Katze
+cats.white.name=Weiße Katze
+
+cats.items.egg_spawner.name=Katzen Spawner Ei
+cats.items.egg_spawner_black.name=Schwarze Katze Spawner Ei
+cats.items.egg_spawner_browntabby.name=Braune Tabby Katze Spawner Ei
+cats.items.egg_spawner_calico.name=Calico Katze Spawner Ei
+cats.items.egg_spawner_gray.name=Graue Katze Spawner Ei
+cats.items.egg_spawner_graytabby.name=Graue Tabby Katze Spawner Ei
+cats.items.egg_spawner_ocelot.name=Ozelot Katze Spawner Ei
+cats.items.egg_spawner_orangetabby.name=Orange Tabby Katze Spawner Ei
+cats.items.egg_spawner_siamese.name=Siamkatze Spawner Ei
+cats.items.egg_spawner_tortie.name=Schildpatt Katze Spawner Ei
+cats.items.egg_spawner_tuxedo.name=Smoking Katze Spawner Ei
+cats.items.egg_spawner_white.name=Weiße Katze Spawner Ei
+
+cats.commands.sit.success=✓ Katze sitzt jetzt
+cats.commands.sleep.success=✓ Katze schläft jetzt
+cats.commands.follow.success=✓ Katze folgt jetzt
+cats.commands.wait.success=✓ Katze wartet
+cats.commands.play.success=✓ Katze spielt!
+cats.commands.search.success=✓ Katze sucht!
+cats.commands.name.success=✓ Katze wurde benannt: %s
+cats.commands.error.no_cat=Keine Katze im Blickfeld
+cats.commands.error.not_owned=Diese Katze hat keinen Besitzer

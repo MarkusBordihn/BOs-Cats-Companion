@@ -1,0 +1,144 @@
+plugins {
+  id 'java'
+  id 'maven-publish'
+  id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
+}
+
+// Apply external configuration
+apply from: 'gradle/hytale-config.gradle'
+
+group = project.group
+version = project.version
+
+base {
+  archivesName = "${project.mod_id}-hytale-${project.version}"
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+  withSourcesJar()
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation platform('org.junit:junit-bom:5.10.0')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+
+  // Hytale Server dependency
+  implementation files(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
+}
+
+if (!file("$projectDir/run").exists()) {
+  file("$projectDir/run").mkdirs()
+}
+
+// Extract Hytale API class list for reference
+tasks.register('extractHytaleApi') {
+  group = 'hytale'
+  description = 'Extracts Hytale API class files to hytale-api/ for reference'
+
+  def hytaleJar = file(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
+  def outputDir = file("$projectDir/hytale-api")
+
+  doLast {
+    if (!hytaleJar.exists()) {
+      throw new GradleException("HytaleServer.jar not found at: ${hytaleJar}")
+    }
+
+    delete outputDir
+    outputDir.mkdirs()
+
+    println "Extracting from ${hytaleJar.name}..."
+
+    copy {
+      from zipTree(hytaleJar)
+      into outputDir
+      include 'com/hypixel/hytale/**/*.class'
+    }
+
+    // Create index file
+    def indexFile = new File(outputDir, 'API_INDEX.txt')
+    def classes = []
+    outputDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.class')) {
+        def className = file.absolutePath
+            .replace(outputDir.absolutePath + File.separator, '')
+            .replace(File.separator, '.')
+            .replace('.class', '')
+        classes << className
+      }
+    }
+
+    // Sort and group by package
+    def sortedClasses = classes.sort()
+    def grouped = [:]
+    sortedClasses.each { className ->
+      def pkg = className.substring(0, className.lastIndexOf('.'))
+      if (!grouped.containsKey(pkg)) {
+        grouped[pkg] = []
+      }
+      grouped[pkg] << className.substring(className.lastIndexOf('.') + 1)
+    }
+
+    // Write index with grouping
+    indexFile.text = "Hytale API Classes (${classes.size()} total)\n"
+    indexFile.text += "=" * 80 + "\n"
+    grouped.each { pkg, classList ->
+      indexFile.text += "\n${pkg}:\n"
+      classList.each { cls ->
+        indexFile.text += "  - ${cls}\n"
+      }
+    }
+
+    println "✅ Extracted ${classes.size()} Hytale classes"
+    println "📁 Output: ${outputDir}"
+    println "📄 Index: ${indexFile}"
+  }
+}
+
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = 'UTF-8'
+  options.incremental = true
+  options.fork = true
+  options.forkOptions.memoryMaximumSize = '2g'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+jar {
+  manifest {
+    attributes([
+        'Specification-Title'   : project.mod_name,
+        'Specification-Vendor'  : project.vendor_name,
+        'Specification-Version' : project.version,
+        'Implementation-Title'  : project.mod_name,
+        'Implementation-Version': project.version,
+        'Implementation-Vendor' : project.vendor_name,
+    ])
+  }
+}
+
+// IntelliJ IDEA run configuration
+def serverRunDir = file("$projectDir/run")
+
+idea.project.settings.runConfigurations {
+  'HytaleServer'(org.jetbrains.gradle.ext.Application) {
+    mainClass = 'com.hypixel.hytale.Main'
+    moduleName = project.idea.module.name + '.main'
+
+    def hytaleHome = project.findProperty('hytaleHome') ?: 'G:/Hytale/install/release'
+    def patchline = project.findProperty('patchline') ?: 'package/game/latest'
+    def assetsPath = "${hytaleHome}/${patchline}/Assets.zip"
+    def modsPath = file("src/main/").absolutePath
+
+    programParameters = "--allow-op --assets=${assetsPath} --mods=${modsPath}"
+    workingDirectory = serverRunDir.absolutePath
+  }
+}

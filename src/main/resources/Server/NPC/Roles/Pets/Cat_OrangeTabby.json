@@ -1,0 +1,18 @@
+{
+  "Type": "Variant",
+  "Reference": "Cat",
+  "Modify": {
+    "Appearance": "Cat_OrangeTabby",
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "NameTranslationKey": {
+      "Value": "cats.orangetabby.name"
+    },
+    "SpawnerEggItem": {
+      "Value": "Egg_Spawner_Cat_OrangeTabby"
+    }
+  }
+}

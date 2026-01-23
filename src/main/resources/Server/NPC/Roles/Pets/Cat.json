@@ -1,0 +1,446 @@
+{
+  "Type": "Generic",
+  "StartState": "Wild",
+  "DefaultSubState": "Default",
+  "Appearance": {
+    "Compute": "Appearance"
+  },
+  "MotionControllerList": [
+    {
+      "Type": "Walk",
+      "MaxWalkSpeed": 6,
+      "RunThreshold": 0.7,
+      "RunThresholdRange": 0.1,
+      "Gravity": 10,
+      "MaxFallSpeed": 20,
+      "Acceleration": 12
+    }
+  ],
+  "MaxHealth": 20,
+  "Instructions": [
+    {
+      "Instructions": [
+        {
+          "$Comment": "Cat is not tamed yet and wanders around looking for food",
+          "Sensor": {
+            "Type": "State",
+            "State": "Wild"
+          },
+          "Instructions": [
+            {
+              "$Comment": "Follow player with fish or cat food in hand",
+              "Sensor": {
+                "Type": "Player",
+                "Range": 8,
+                "Filters": [
+                  {
+                    "Type": "ItemInHand",
+                    "Items": [
+                      "Food_Fish_Raw",
+                      "Food_Fish_Raw_Uncommon",
+                      "Food_Fish_Raw_Rare",
+                      "Food_Fish_Raw_Epic",
+                      "Food_Fish_Raw_Legendary",
+                      "Food_Fish_Grilled",
+                      "Fish_Salmon_Item",
+                      "Fish_Catfish_Item",
+                      "Fish_Trout_Rainbow_Item",
+                      "Fish_Pike_Item",
+                      "Fish_Bluegill_Item",
+                      "Fish_Minnow_Item"
+                    ]
+                  }
+                ]
+              },
+              "BodyMotion": {
+                "Type": "Seek",
+                "SlowDownDistance": 4,
+                "StopDistance": 2,
+                "RelativeSpeed": 0.6
+              }
+            },
+            {
+              "$Comment": "Natural behavior with pauses, sitting, and sleeping for targetability",
+              "Sensor": {
+                "Type": "Any"
+              },
+              "Type": "Random",
+              "ExecuteFor": [15, 20],
+              "Instructions": [
+                {
+                  "$Comment": "Regular wander with pauses",
+                  "Weight": 20,
+                  "BodyMotion": {
+                    "Type": "Sequence",
+                    "Looped": true,
+                    "Motions": [
+                      {
+                        "Type": "Timer",
+                        "Time": [2, 5],
+                        "Motion": {
+                          "Type": "WanderInCircle",
+                          "Radius": 8,
+                          "MaxHeadingChange": 60,
+                          "RelativeSpeed": 0.3
+                        }
+                      },
+                      {
+                        "Type": "Timer",
+                        "Time": [4, 10],
+                        "Motion": {
+                          "Type": "Nothing"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "$Comment": "Sit and rest",
+                  "Weight": 5,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sit",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [5, 10]
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Sleep/nap",
+                  "Weight": 3,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sleep",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [8, 15]
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$Comment": "Cat is tamed - use substates for different behaviors",
+          "Sensor": {
+            "Type": "State",
+            "State": "Pet"
+          },
+          "Instructions": [
+            {
+              "$Comment": "Sitting behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Sitting"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Sit",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Sleeping behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Sleeping"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Sleep",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Playing behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Playing"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Attack",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Searching behavior with movement",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Searching"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Search",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Wander",
+                "RelativeSpeed": 0.3
+              }
+            },
+            {
+              "$Comment": "Waiting behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Waiting"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Idle",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Wandering behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Wandering"
+              },
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Idle",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Wander",
+                "RelativeSpeed": 0.5
+              }
+            },
+            {
+              "$Comment": "Default following behavior",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Default"
+              },
+              "Instructions": [
+                {
+                  "Sensor": {
+                    "Type": "Player",
+                    "Range": 40,
+                    "LockOnTarget": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Seek",
+                    "SlowDownDistance": 5,
+                    "StopDistance": 3,
+                    "RelativeSpeed": 1
+                  }
+                },
+                {
+                  "$Comment": "Teleport to player if too far away",
+                  "Sensor": {
+                    "Type": "Target"
+                  },
+                  "BodyMotion": {
+                    "Type": "Teleport"
+                  }
+                }
+              ]
+            },
+            {
+              "$Comment": "State setter declarations for validation - never executed",
+              "Sensor": {
+                "Type": "Flag",
+                "Name": "_VALIDATION_ONLY_NEVER_SET"
+              },
+              "Actions": [
+                {"Type": "State", "State": ".Default"},
+                {"Type": "State", "State": ".Sitting"},
+                {"Type": "State", "State": ".Sleeping"},
+                {"Type": "State", "State": ".Playing"},
+                {"Type": "State", "State": ".Searching"},
+                {"Type": "State", "State": ".Waiting"},
+                {"Type": "State", "State": ".Wandering"}
+              ]
+            }
+          ]
+        },
+        {
+          "$Comment": "Cat despawns and drops spawner egg",
+          "Sensor": {
+            "Type": "State",
+            "State": "Despawn"
+          },
+          "ActionsAtomic": true,
+          "Instructions": [
+            {
+              "Sensor": {
+                "Type": "Any",
+                "Once": true
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "Despawn"
+                },
+                {
+                  "Type": "DropItem",
+                  "Item": {
+                    "Compute": "SpawnerEggItem"
+                  },
+                  "Distance": [
+                    0,
+                    0
+                  ],
+                  "ThrowSpeed": 8,
+                  "Once": true
+                }
+              ]
+            },
+            {
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "Despawn"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "InteractionInstruction": {
+    "Instructions": [
+      {
+        "$Comment": "Always allow interaction",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any"
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true
+          }
+        ]
+      },
+      {
+        "$Comment": "When player interacts (feeds fish), tame the cat",
+        "Sensor": {
+          "Type": "HasInteracted"
+        },
+        "Instructions": [
+          {
+            "$Comment": "Only tame if not already tamed",
+            "Sensor": {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "State",
+                "State": "Pet"
+              }
+            },
+            "Actions": [
+              {
+                "Type": "LockOnInteractionTarget"
+              },
+              {
+                "Type": "State",
+                "State": "Pet"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "IsMemory": true,
+  "MemoriesCategory": "Cat",
+  "DropList": "Drop_Cat",
+  "NameTranslationKey": {
+    "Compute": "NameTranslationKey"
+  },
+  "Parameters": {
+    "AttractiveItems": {
+      "Value": [
+        "Food_Fish_Raw",
+        "Food_Fish_Raw_Uncommon",
+        "Food_Fish_Raw_Rare",
+        "Food_Fish_Raw_Epic",
+        "Food_Fish_Raw_Legendary",
+        "Food_Fish_Grilled",
+        "Fish_Salmon_Item",
+        "Fish_Catfish_Item",
+        "Fish_Trout_Rainbow_Item",
+        "Fish_Pike_Item",
+        "Fish_Bluegill_Item",
+        "Fish_Minnow_Item"
+      ],
+      "Description": "Items that attract cats and make them follow players"
+    },
+    "LovedItems": {
+      "Value": [
+        "Food_Fish_Raw",
+        "Food_Fish_Grilled",
+        "Fish_Salmon_Item",
+        "Fish_Catfish_Item"
+      ],
+      "Description": "Items that cats love and will befriend for"
+    },
+    "Timid": {
+      "Value": false,
+      "Description": "Whether cats are timid or not"
+    },
+    "Appearance": {
+      "Value": "Cat",
+      "Description": "The cat's model appearance"
+    },
+    "NameTranslationKey": {
+      "Value": "cats.cat.name",
+      "Description": "Translation key for cat name display"
+    },
+    "SpawnerEggItem": {
+      "Value": "Egg_Spawner_Cat",
+      "Description": "The spawner egg item ID for this cat breed"
+    }
+  }
+}

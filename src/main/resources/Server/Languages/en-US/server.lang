@@ -1,0 +1,35 @@
+cats.cat.name=Cat
+cats.calico.name=Calico Cat
+cats.black.name=Black Cat
+cats.browntabby.name=Brown Tabby Cat
+cats.gray.name=Gray Cat
+cats.graytabby.name=Gray Tabby Cat
+cats.ocelot.name=Ocelot Cat
+cats.orangetabby.name=Orange Tabby Cat
+cats.siamese.name=Siamese Cat
+cats.tortie.name=Tortoiseshell Cat
+cats.tuxedo.name=Tuxedo Cat
+cats.white.name=White Cat
+
+cats.items.egg_spawner.name=Cat Spawner Egg
+cats.items.egg_spawner_black.name=Black Cat Spawner Egg
+cats.items.egg_spawner_browntabby.name=Brown Tabby Cat Spawner Egg
+cats.items.egg_spawner_calico.name=Calico Cat Spawner Egg
+cats.items.egg_spawner_gray.name=Gray Cat Spawner Egg
+cats.items.egg_spawner_graytabby.name=Gray Tabby Cat Spawner Egg
+cats.items.egg_spawner_ocelot.name=Ocelot Cat Spawner Egg
+cats.items.egg_spawner_orangetabby.name=Orange Tabby Cat Spawner Egg
+cats.items.egg_spawner_siamese.name=Siamese Cat Spawner Egg
+cats.items.egg_spawner_tortie.name=Tortoiseshell Cat Spawner Egg
+cats.items.egg_spawner_tuxedo.name=Tuxedo Cat Spawner Egg
+cats.items.egg_spawner_white.name=White Cat Spawner Egg
+
+cats.commands.sit.success=✓ Cat is now sitting
+cats.commands.sleep.success=✓ Cat is now sleeping
+cats.commands.follow.success=✓ Cat is now following
+cats.commands.wait.success=✓ Cat is waiting
+cats.commands.play.success=✓ Cat is playing!
+cats.commands.search.success=✓ Cat is searching!
+cats.commands.name.success=✓ Cat has been named: %s
+cats.commands.error.no_cat=No cat in view
+cats.commands.error.not_owned=This cat doesn't have an owner

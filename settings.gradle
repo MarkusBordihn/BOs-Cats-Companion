@@ -1,0 +1,20 @@
+// Plugin management must be first
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+  }
+}
+
+// Dependency resolution management
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+  repositories {
+    mavenCentral()
+  }
+}
+
+rootProject.name = 'Cats (Hytale)'
+
+// Enable configuration cache for better build performance
+enableFeaturePreview('STABLE_CONFIGURATION_CACHE')

@@ -1,0 +1,20 @@
+{
+  "Group": "markusbordihn",
+  "Name": "Cats",
+  "Version": "1.0.0",
+  "Description": "Adds new cat breeds to bringing more variety, personality, and cuteness to your worlds.",
+  "Authors": [
+    {
+      "Name": "Markus Bordihn"
+    }
+  ],
+  "Website": "website",
+  "ServerVersion": "*",
+  "Dependencies": {
+    "Hytale:EntityModule": "*"
+  },
+  "OptionalDependencies": {},
+  "DisabledByDefault": false,
+  "Main": "de.markusbordihn.cats.Main",
+  "IncludesAssetPack": true
+}
