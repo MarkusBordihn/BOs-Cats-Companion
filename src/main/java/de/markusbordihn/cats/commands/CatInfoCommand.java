@@ -34,7 +34,7 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-public class CatInfoCommand extends AbstractWorldCommand {
+final class CatInfoCommand extends AbstractWorldCommand {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatInfoCommand() {
@@ -80,15 +80,16 @@ public class CatInfoCommand extends AbstractWorldCommand {
       CatStateComponent stateComponent =
           store.getComponent(entityRef, Main.getInstance().catStateComponentType);
       if (stateComponent != null) {
-        String stateColor = switch (stateComponent.getState()) {
-          case SITTING -> "#FFA500";
-          case SLEEPING -> "#9370DB";
-          case FOLLOWING -> "#00FF00";
-          case PLAYING -> "#FF69B4";
-          case SEARCHING -> "#FFD700";
-          case WAITING -> "#87CEEB";
-          default -> "#FFFF00";
-        };
+        String stateColor =
+            switch (stateComponent.getState()) {
+              case SITTING -> "#FFA500";
+              case SLEEPING -> "#9370DB";
+              case FOLLOWING -> "#00FF00";
+              case PLAYING -> "#FF69B4";
+              case SEARCHING -> "#FFD700";
+              case WAITING -> "#87CEEB";
+              default -> "#FFFF00";
+            };
         context.sendMessage(Message.raw("State: " + stateComponent.getState()).color(stateColor));
       }
 

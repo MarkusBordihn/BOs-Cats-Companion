@@ -32,37 +32,59 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 Use the NPC spawn command to create cats:
 
-```
-/npc spawn Cat_Black
-/npc spawn Cat_Calico
-/npc spawn Cat_GrayTabby
-/npc spawn Cat_OrangeTabby
-/npc spawn Cat_Siamese
+```unix
+/npc spawn Cats_Black
+/npc spawn Cats_Calico
+/npc spawn Cats_GrayTabby
+/npc spawn Cats_OrangeTabby
+/npc spawn Cats_Siamese
 ```
 
 #### Option 2: Spawn Eggs
 
 Each breed also has a spawn egg:
 
-* `Egg_Spawner_Cat_Black` – Black Cat
-* `Egg_Spawner_Cat_Calico` – Calico Cat
-* `Egg_Spawner_Cat_GrayTabby` – Gray Tabby
-* `Egg_Spawner_Cat_OrangeTabby` – Orange Tabby
-* `Egg_Spawner_Cat_Siamese` – Siamese Cat
+* `Egg_Spawner_Cats_Black` – Black Cat
+* `Egg_Spawner_Cats_Calico` – Calico Cat
+* `Egg_Spawner_Cats_GrayTabby` – Gray Tabby
+* `Egg_Spawner_Cats_OrangeTabby` – Orange Tabby
+* `Egg_Spawner_Cats_Siamese` – Siamese Cat
 
 ### How to Tame a Cat
 
-1. Obtain fish
+1. **Switch to Survival or Adventure mode**
+   ⚠️ Cats cannot be tamed while in Creative mode! They will ignore all interaction attempts.
+
+2. Obtain fish
    Supported types: Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, Minnow
-2. Spawn a wild cat
-3. Hold fish in your hand
-4. The cat will approach you
-5. Right-click the cat while holding fish
-6. The cat is now tamed and belongs to you
+
+3. Spawn a wild cat using `/npc spawn Cat_Black` or spawn eggs
+
+4. Approach the wild cat with fish in your hand
+   The cat will notice you're holding food
+
+5. Press F (interact key) on the cat while holding fish
+   The cat will enter a taming animation and become yours
+
+6. Success! The cat is now tamed and will follow you
+
+**Important Interaction Rules:**
+
+* **Wrong items** – Offering non-food items to wild cats may upset them (*hiss!*)
+* **Feeding** – Tamed cats can be fed fish to keep them happy
+* **Petting** – Press F (interact) with your tamed cat using an empty hand to pet them
+* **Creative mode block** – Players in Creative mode cannot tame or interact with cats to prevent exploits
 
 ### Available Commands
 
-Commands work by looking at your cat or by providing its entity ID:
+#### General Commands
+
+* `/cat info` – Show detailed cat information (works on any cat)
+* `/cat owner` – Admin command to change ownership
+
+#### Tamed Cat Commands
+
+Commands work by looking at your tamed cat or by providing its entity ID:
 
 * `/cat sit` – Make the cat sit and stay
 * `/cat sleep` – Put the cat to sleep
@@ -72,11 +94,8 @@ Commands work by looking at your cat or by providing its entity ID:
 * `/cat play` – Enable playful behavior
 * `/cat search` – Send the cat roaming and hunting
 * `/cat name <name>` – Set a custom name
-* `/cat info` – Show detailed cat information
-* `/cat owner` – Admin command to view or change ownership
-* `/cat menu` – Shows a WIP message (menu UI planned)
 
-Tip: For best results, look directly at your cat when using commands.
+**Tip:** For best results, look directly at your cat when using commands.
 
 ## ⚠️ Known Limitations
 

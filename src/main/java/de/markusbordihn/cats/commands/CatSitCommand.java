@@ -33,7 +33,7 @@ import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-public class CatSitCommand extends AbstractWorldCommand implements CatCommandHelper {
+final class CatSitCommand extends AbstractWorldCommand implements CatCommandHelper {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatSitCommand() {
@@ -53,21 +53,18 @@ public class CatSitCommand extends AbstractWorldCommand implements CatCommandHel
         return;
       }
 
-      // Update component
       CatStateComponent stateComponent = new CatStateComponent(CatStateComponent.CatState.SITTING);
       store.putComponent(entityRef, Main.getInstance().catStateComponentType, stateComponent);
 
-      // Change NPC substate to Sitting
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Sitting", store);
-        context.sendMessage(Message.raw("✓ Cat is now sitting").color("#00FF00"));
+        context.sendMessage(Message.translation("cats.commands.sit.success").color("#00FF00"));
       } else {
-        context.sendMessage(
-            Message.raw("✓ Cat state updated (entity not found for animation)").color("#FFFF00"));
+        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }
     } else {
-      context.sendMessage(Message.raw("No cat in view").color("#FF0000"));
+      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
     }
   }
 }

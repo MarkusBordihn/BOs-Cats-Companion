@@ -8,13 +8,13 @@
       "Name": "Markus Bordihn"
     }
   ],
-  "Website": "website",
+  "Website": "https://www.curseforge.com/hytale/mods/cats",
+  "Main": "de.markusbordihn.cats.Main",
   "ServerVersion": "*",
   "Dependencies": {
     "Hytale:EntityModule": "*"
   },
   "OptionalDependencies": {},
   "DisabledByDefault": false,
-  "Main": "de.markusbordihn.cats.Main",
   "IncludesAssetPack": true
 }

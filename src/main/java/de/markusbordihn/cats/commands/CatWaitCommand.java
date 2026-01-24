@@ -33,7 +33,7 @@ import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-public class CatWaitCommand extends AbstractWorldCommand {
+final class CatWaitCommand extends AbstractWorldCommand {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatWaitCommand() {
@@ -52,13 +52,12 @@ public class CatWaitCommand extends AbstractWorldCommand {
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Waiting", store);
-        context.sendMessage(Message.raw("✓ Cat is waiting").color("#87CEEB"));
+        context.sendMessage(Message.translation("cats.commands.wait.success").color("#87CEEB"));
       } else {
-        context.sendMessage(Message.raw("✗ Not a cat NPC").color("#FF0000"));
+        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
       }
     } else {
-      context.sendMessage(Message.raw("No entity in view.").color("#FF0000"));
-      context.sendMessage(Message.raw("Look at a cat and use: /cat wait").color("#808080"));
+      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
     }
   }
 }

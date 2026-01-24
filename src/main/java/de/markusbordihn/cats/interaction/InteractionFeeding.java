@@ -17,47 +17,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.component;
+package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.Serializable;
+import com.hypixel.hytale.server.npc.role.Role;
 
-public class CatStateComponent implements Component<EntityStore>, Serializable {
-  private CatState state;
+public class InteractionFeeding {
 
-  public CatStateComponent() {
-    this.state = CatState.FOLLOWING;
-  }
+  public static boolean handle(
+      Ref<EntityStore> entityRef,
+      Role role,
+      Store<EntityStore> store,
+      Player player,
+      ItemStack heldItem,
+      boolean isOwner) {
+    String itemName = heldItem != null ? heldItem.getItemId() : null;
+    String interactionType = isOwner ? "FEEDING: By Owner" : "FEEDING: By Stranger";
+    InteractionLogger.logInteraction(interactionType, entityRef, role, store, player, itemName);
 
-  public CatStateComponent(CatState state) {
-    this.state = state;
-  }
+    // Trigger Feeding animation state (auto-returns to Pet state after 2 seconds)
+    role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
 
-  public CatState getState() {
-    return state;
-  }
+    // TODO: Heal cat, increase happiness, consume item
 
-  public void setState(CatState state) {
-    this.state = state;
-  }
-
-  @Override
-  public CatStateComponent clone() {
-    try {
-      return (CatStateComponent) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AssertionError("Clone not supported", e);
-    }
-  }
-
-  public enum CatState {
-    SITTING,
-    SLEEPING,
-    FOLLOWING,
-    WANDERING,
-    PLAYING,
-    SEARCHING,
-    WAITING
+    return false;
   }
 }

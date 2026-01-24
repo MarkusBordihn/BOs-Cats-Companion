@@ -17,47 +17,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.component;
+package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.Serializable;
+import com.hypixel.hytale.server.npc.role.Role;
 
-public class CatStateComponent implements Component<EntityStore>, Serializable {
-  private CatState state;
+public class InteractionWild {
 
-  public CatStateComponent() {
-    this.state = CatState.FOLLOWING;
-  }
-
-  public CatStateComponent(CatState state) {
-    this.state = state;
-  }
-
-  public CatState getState() {
-    return state;
-  }
-
-  public void setState(CatState state) {
-    this.state = state;
-  }
-
-  @Override
-  public CatStateComponent clone() {
-    try {
-      return (CatStateComponent) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AssertionError("Clone not supported", e);
-    }
-  }
-
-  public enum CatState {
-    SITTING,
-    SLEEPING,
-    FOLLOWING,
-    WANDERING,
-    PLAYING,
-    SEARCHING,
-    WAITING
+  public static boolean handle(
+      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+    InteractionLogger.logInteraction(
+        "WILD CAT: Basic Interaction", entityRef, role, store, player, null);
+    return false;
   }
 }

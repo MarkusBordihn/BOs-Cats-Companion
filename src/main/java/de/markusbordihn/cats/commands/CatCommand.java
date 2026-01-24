@@ -21,7 +21,7 @@ package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
 
-public class CatCommand extends AbstractCommandCollection {
+public final class CatCommand extends AbstractCommandCollection {
   public CatCommand() {
     super("cat", "Cat management commands");
     this.addAliases("cats");

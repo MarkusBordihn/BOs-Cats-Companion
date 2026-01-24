@@ -33,7 +33,7 @@ import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-public class CatSearchCommand extends AbstractWorldCommand {
+final class CatSearchCommand extends AbstractWorldCommand {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatSearchCommand() {
@@ -53,13 +53,12 @@ public class CatSearchCommand extends AbstractWorldCommand {
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Default", store);
-        context.sendMessage(Message.raw("✓ Cat is searching!").color("#FFA500"));
+        context.sendMessage(Message.translation("cats.commands.search.success").color("#FFA500"));
       } else {
-        context.sendMessage(Message.raw("✗ Not a cat NPC").color("#FF0000"));
+        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
       }
     } else {
-      context.sendMessage(Message.raw("No entity in view.").color("#FF0000"));
-      context.sendMessage(Message.raw("Look at a cat and use: /cat search").color("#808080"));
+      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
     }
   }
 }

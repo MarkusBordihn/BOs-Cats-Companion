@@ -1,0 +1,9 @@
+# Item Interactions
+item.unknown=The cat doesn't know what to do with that.
+item.unknown.named={catName} doesn't know what to do with that.
+wild.reject=*hiss* The wild cat doesn't like that!
+
+# Taming
+taming.success=You tamed the cat with {item}!
+taming.companion=Purr! Your new companion will follow you
+taming.help=Use /cat name <name> to give your tamed cat a name or /cat to see a list of available commands

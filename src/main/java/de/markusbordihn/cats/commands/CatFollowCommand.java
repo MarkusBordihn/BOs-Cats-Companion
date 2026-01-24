@@ -33,7 +33,7 @@ import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-public class CatFollowCommand extends AbstractWorldCommand implements CatCommandHelper {
+final class CatFollowCommand extends AbstractWorldCommand implements CatCommandHelper {
 
   @Nonnull private final EntityWrappedArg entityArg;
 
@@ -53,29 +53,23 @@ public class CatFollowCommand extends AbstractWorldCommand implements CatCommand
         return;
       }
 
-      // Update component
       CatStateComponent stateComponent =
           new CatStateComponent(CatStateComponent.CatState.FOLLOWING);
       store.putComponent(entityRef, Main.getInstance().catStateComponentType, stateComponent);
 
-      // Change NPC substate to Default for following behavior
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         try {
           npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Default", store);
-          context.sendMessage(Message.raw("✓ Cat is now following you").color("#00FF00"));
+          context.sendMessage(Message.translation("cats.commands.follow.success").color("#00FF00"));
         } catch (Exception e) {
-          context.sendMessage(
-              Message.raw("⚠ Cat state updated but animation failed: " + e.getMessage())
-                  .color("#FFFF00"));
+          context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
         }
       } else {
-        context.sendMessage(
-            Message.raw("⚠ Cat state updated but entity not found for animation").color("#FFFF00"));
+        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }
     } else {
-      context.sendMessage(
-          Message.raw("✗ No cat in view - look at a cat and try again").color("#FF0000"));
+      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
     }
   }
 }

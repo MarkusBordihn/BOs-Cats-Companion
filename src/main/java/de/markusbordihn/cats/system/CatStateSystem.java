@@ -80,6 +80,6 @@ public class CatStateSystem extends RefSystem<EntityStore> {
       @Nonnull CatState state) {
     CatStateComponent component = new CatStateComponent(state);
     buffer.putComponent(catRef, componentType, component);
-    LOGGER.at(Level.INFO).log("Cat state changed to %s", state);
+    LOGGER.at(Level.FINE).log("Cat state changed to %s", state);
   }
 }

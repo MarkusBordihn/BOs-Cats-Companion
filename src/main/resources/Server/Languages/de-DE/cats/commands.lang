@@ -1,0 +1,14 @@
+# Cat Commands
+sit.success=Katze sitzt jetzt
+sleep.success=Katze schläft jetzt
+follow.success=Katze folgt dir jetzt
+wait.success=Katze wartet jetzt
+wander.success=Katze wandert jetzt frei umher
+play.success=Katze spielt jetzt!
+search.success=Katze sucht!
+name.success=Katze wurde umbenannt: %name%
+
+# Error Messages
+error.no_cat=Keine Katze in Sicht
+error.not_owned=Diese Katze hat keinen Besitzer
+error.not_owner=Diese Katze gehört %owner%

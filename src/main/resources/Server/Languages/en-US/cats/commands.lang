@@ -1,0 +1,14 @@
+# Cat Commands
+sit.success=Cat is now sitting
+sleep.success=Cat is now sleeping
+follow.success=Cat is now following you
+wait.success=Cat is waiting
+wander.success=Cat is now wandering freely
+play.success=Cat is playing!
+search.success=Cat is searching!
+name.success=Cat has been named: %name%
+
+# Error Messages
+error.no_cat=No cat in view
+error.not_owned=This cat doesn't have an owner
+error.not_owner=This cat belongs to %owner%

@@ -17,47 +17,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.component;
+package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.Serializable;
+import com.hypixel.hytale.server.npc.role.Role;
 
-public class CatStateComponent implements Component<EntityStore>, Serializable {
-  private CatState state;
+public class InteractionOwner {
 
-  public CatStateComponent() {
-    this.state = CatState.FOLLOWING;
-  }
+  public static boolean handle(
+      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+    InteractionLogger.logInteraction(
+        "OWNER: Petting Interaction", entityRef, role, store, player, null);
 
-  public CatStateComponent(CatState state) {
-    this.state = state;
-  }
+    // Trigger Petting animation state (purring, happy animation)
+    role.getStateSupport().setState(entityRef, "Petting", "Default", store);
 
-  public CatState getState() {
-    return state;
-  }
+    // TODO: Add purring sound effect
 
-  public void setState(CatState state) {
-    this.state = state;
-  }
-
-  @Override
-  public CatStateComponent clone() {
-    try {
-      return (CatStateComponent) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AssertionError("Clone not supported", e);
-    }
-  }
-
-  public enum CatState {
-    SITTING,
-    SLEEPING,
-    FOLLOWING,
-    WANDERING,
-    PLAYING,
-    SEARCHING,
-    WAITING
+    return false;
   }
 }

@@ -61,7 +61,6 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
       return;
     }
 
-    // Get the NPC entity to access state support
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity == null || npcEntity.getRole() == null) {
       return;
@@ -73,31 +72,31 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
       switch (state) {
         case SITTING:
           stateSupport.setState(entityRef, "Pet", "Sitting", store);
-          LOGGER.at(Level.INFO).log("Synced cat to SITTING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to SITTING substate");
           break;
         case SLEEPING:
           stateSupport.setState(entityRef, "Pet", "Sleeping", store);
-          LOGGER.at(Level.INFO).log("Synced cat to SLEEPING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to SLEEPING substate");
           break;
         case PLAYING:
           stateSupport.setState(entityRef, "Pet", "Playing", store);
-          LOGGER.at(Level.INFO).log("Synced cat to PLAYING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to PLAYING substate");
           break;
         case SEARCHING:
           stateSupport.setState(entityRef, "Pet", "Searching", store);
-          LOGGER.at(Level.INFO).log("Synced cat to SEARCHING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to SEARCHING substate");
           break;
         case WAITING:
           stateSupport.setState(entityRef, "Pet", "Waiting", store);
-          LOGGER.at(Level.INFO).log("Synced cat to WAITING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to WAITING substate");
           break;
         case WANDERING:
           stateSupport.setState(entityRef, "Pet", "Wandering", store);
-          LOGGER.at(Level.INFO).log("Synced cat to WANDERING substate");
+          LOGGER.at(Level.FINE).log("Synced cat to WANDERING substate");
           break;
         case FOLLOWING:
           stateSupport.setState(entityRef, "Pet", "Default", store);
-          LOGGER.at(Level.INFO).log("Synced cat to FOLLOWING (Default) substate");
+          LOGGER.at(Level.FINE).log("Synced cat to FOLLOWING (Default) substate");
           break;
         default:
           LOGGER.at(Level.WARNING).log("Unknown cat state: " + state);

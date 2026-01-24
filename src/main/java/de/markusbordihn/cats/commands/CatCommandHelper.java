@@ -49,19 +49,18 @@ public interface CatCommandHelper {
     // Try to get the executing player's username from context
     String executingPlayer = getExecutingPlayerName(context);
     if (executingPlayer == null) {
-      // Can't determine player - allow for admin/console commands
       return true;
     }
 
-    // Check if this player owns the cat
     String ownerName = ownerComp.getOwnerName();
     if (ownerName != null && ownerName.equals(executingPlayer)) {
       return true;
     }
 
-    // Player doesn't own this cat
-    context.sendMessage(Message.raw("✗ This cat belongs to " + ownerName).color("#FF0000"));
-    context.sendMessage(Message.raw("You can only control your own cats!").color("#FFFF00"));
+    context.sendMessage(
+        Message.translation("cats.commands.error.not_owner")
+            .param("owner", ownerName)
+            .color("#FF0000"));
     return false;
   }
 

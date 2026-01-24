@@ -1,3 +1,12 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.guardsquare:proguard-gradle:7.8.2'
+  }
+}
+
 plugins {
   id 'java'
   id 'maven-publish'
@@ -30,7 +39,7 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter'
 
   // Hytale Server dependency
-  implementation files(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
+  compileOnly files(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
 }
 
 if (!file("$projectDir/run").exists()) {
@@ -99,6 +108,61 @@ tasks.register('extractHytaleApi') {
     println "📁 Output: ${outputDir}"
     println "📄 Index: ${indexFile}"
   }
+}
+
+tasks.register('proguard', proguard.gradle.ProGuardTask) {
+  dependsOn tasks.jar
+
+  // Input JAR
+  injars(tasks.named('jar', Jar).flatMap { it.archiveFile })
+
+  // Output JAR
+  outjars(layout.buildDirectory.file("libs/${project.mod_id}-hytale-${project.version}-minified.jar"))
+
+  // Library JARs - Java runtime and Hytale Server
+  libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+
+  // Hytale Server JAR
+  def hytaleJar = file(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
+  if (hytaleJar.exists()) {
+    libraryjars hytaleJar
+  }
+
+  // ProGuard configuration - Maximum obfuscation with precise keeps
+  dontoptimize()
+
+  // Keep only essential runtime attributes
+  keepattributes 'Signature,Exceptions,*Annotation*'
+  keepattributes 'Manifest'
+
+  // Keep main plugin class and components/systems
+  keep 'public class de.markusbordihn.cats.Main extends com.hypixel.hytale.server.core.plugin.JavaPlugin { public protected *; }'
+  keep 'public class de.markusbordihn.cats.component.CatOwnerComponent { public protected *; }'
+  keep 'public class de.markusbordihn.cats.component.CatStateComponent { public protected *; }'
+  keep 'public class de.markusbordihn.cats.component.CatStateComponent$CatState { *; }'
+  keep 'public class de.markusbordihn.cats.system.CatOwnershipSystem { public <init>(...); }'
+  keep 'public class de.markusbordihn.cats.system.CatStateSystem { public <init>(...); }'
+  keep 'public class de.markusbordihn.cats.system.CatStateSyncSystem { public <init>(...); }'
+
+  // Keep Action builders (referenced in JSON files and registered via reflection)
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionWild { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger { public <init>(); public protected *; }'
+
+  // Keep enum structure
+  keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
+
+  // Interaction classes, Commands, and Handlers will be obfuscated (only used internally)
+
+  // Don't print notes about potential issues
+  dontnote
+
+  // Don't warn about Hytale runtime dependencies
+  dontwarn 'com.hypixel.hytale.**'
+  dontwarn 'javax.annotation.**'
+
+  verbose
 }
 
 tasks.withType(JavaCompile).configureEach {

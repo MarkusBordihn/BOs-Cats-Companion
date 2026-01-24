@@ -21,14 +21,20 @@ package de.markusbordihn.cats;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.plugin.event.PluginSetupEvent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
+import com.hypixel.hytale.server.npc.instructions.Action;
+import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
+import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
+import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
+import de.markusbordihn.cats.actions.BuilderActionCatInteractionWild;
 import de.markusbordihn.cats.commands.CatCommand;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
-import de.markusbordihn.cats.handler.CatTamingHandler;
 import de.markusbordihn.cats.system.CatOwnershipSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
@@ -38,10 +44,18 @@ import java.util.logging.Level;
 public class Main extends JavaPlugin {
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-  private static Main instance;
 
+  private static final Class<? extends BuilderActionCatInteractionBase>[] CAT_INTERACTION_BUILDERS =
+      new Class[] {
+        BuilderActionCatInteractionWild.class,
+        BuilderActionCatInteractionOwner.class,
+        BuilderActionCatInteractionStranger.class
+      };
+
+  private static Main instance;
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
+  private boolean actionsRegistered = false;
 
   public Main(JavaPluginInit init) {
     super(init);
@@ -50,6 +64,44 @@ public class Main extends JavaPlugin {
 
   public static Main getInstance() {
     return instance;
+  }
+
+  private void registerCatInteractionActions(NPCPlugin npcPlugin) {
+    if (actionsRegistered) {
+      LOGGER.at(Level.INFO).log("Custom actions already registered - skipping");
+      return;
+    }
+
+    LOGGER.at(Level.INFO).log("NPC Plugin setup detected - registering custom actions");
+
+    BuilderFactory<Action> actionFactory = npcPlugin.getBuilderManager().getFactory(Action.class);
+
+    int registeredCount = 0;
+    for (Class<? extends BuilderActionCatInteractionBase> builderClass : CAT_INTERACTION_BUILDERS) {
+      try {
+        BuilderActionCatInteractionBase builder =
+            builderClass.getDeclaredConstructor().newInstance();
+        String builderId = builder.getBuilderId();
+        actionFactory.add(
+            builderId,
+            () -> {
+              try {
+                return builderClass.getDeclaredConstructor().newInstance();
+              } catch (Exception e) {
+                throw new RuntimeException(
+                    "Failed to instantiate action builder: " + builderClass.getSimpleName(), e);
+              }
+            });
+        registeredCount++;
+        LOGGER.at(Level.INFO).log("Registered action: %s", builderId);
+      } catch (Exception e) {
+        LOGGER.at(Level.SEVERE).log(
+            "Failed to register action builder: %s", builderClass.getSimpleName(), e);
+      }
+    }
+
+    LOGGER.at(Level.INFO).log("Registered %d cat interaction actions", registeredCount);
+    actionsRegistered = true;
   }
 
   @Override
@@ -74,29 +126,37 @@ public class Main extends JavaPlugin {
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
 
+    // Try to register custom actions early (for client worlds)
+    NPCPlugin npcPlugin = NPCPlugin.get();
+    if (npcPlugin != null) {
+      LOGGER.at(Level.INFO).log("Registering NPC Plugin ...");
+      registerCatInteractionActions(npcPlugin);
+    } else {
+      LOGGER.at(Level.INFO).log("Registering NPC Plugin setup listener...");
+      getEventRegistry()
+          .registerGlobal(
+              PluginSetupEvent.class,
+              event -> {
+                if (event.getPlugin() instanceof NPCPlugin) {
+                  registerCatInteractionActions((NPCPlugin) event.getPlugin());
+                }
+              });
+    }
+
     // Register commands
     LOGGER.at(Level.INFO).log("Registering commands...");
     this.getCommandRegistry().registerCommand(new CatCommand());
-
-    // Register event handlers
-    LOGGER.at(Level.INFO).log("Registering event handlers...");
-    getEventRegistry()
-        .registerGlobal(PlayerInteractEvent.class, CatTamingHandler::onPlayerInteract);
-
-    LOGGER.at(Level.INFO).log("Cat systems ready - components handle persistence automatically");
   }
 
   @Override
   protected void start() {
     super.start();
     LOGGER.at(Level.INFO).log("Starting Cats Plugin...");
-    LOGGER.at(Level.INFO).log("Cats Plugin started successfully!");
   }
 
   @Override
   protected void shutdown() {
     super.shutdown();
     LOGGER.at(Level.INFO).log("Shutting down Cats Plugin...");
-    LOGGER.at(Level.INFO).log("Cats Plugin shutdown complete - components saved automatically");
   }
 }

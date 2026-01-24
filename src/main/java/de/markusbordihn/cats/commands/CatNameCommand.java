@@ -34,7 +34,7 @@ import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
-public class CatNameCommand extends AbstractWorldCommand {
+final class CatNameCommand extends AbstractWorldCommand {
   @Nonnull private final EntityWrappedArg entityArg;
   @Nonnull private final RequiredArg<String> nameArg;
 
@@ -62,12 +62,15 @@ public class CatNameCommand extends AbstractWorldCommand {
         Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
         nameplate.setText(catName);
 
-        context.sendMessage(Message.raw("✓ Cat has been named: " + catName).color("#00FF00"));
+        context.sendMessage(
+            Message.translation("cats.commands.name.success")
+                .param("name", catName)
+                .color("#00FF00"));
       } else {
-        context.sendMessage(Message.raw("This cat doesn't have an owner").color("#FF0000"));
+        context.sendMessage(Message.translation("cats.commands.error.not_owned").color("#FF0000"));
       }
     } else {
-      context.sendMessage(Message.raw("No cat in view").color("#FF0000"));
+      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
     }
   }
 }

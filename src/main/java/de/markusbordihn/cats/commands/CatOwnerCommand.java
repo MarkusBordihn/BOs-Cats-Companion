@@ -35,7 +35,7 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
-public class CatOwnerCommand extends AbstractWorldCommand {
+final class CatOwnerCommand extends AbstractWorldCommand {
   @Nonnull private final EntityWrappedArg entityArg;
   @Nonnull private final RequiredArg<String> ownerArg;
 
