@@ -31,7 +31,7 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatStateComponent;
-import de.markusbordihn.cats.component.CatStateComponent.CatState;
+import de.markusbordihn.cats.data.CatState;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 

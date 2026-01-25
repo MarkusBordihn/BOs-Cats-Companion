@@ -29,8 +29,8 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatState;
 import javax.annotation.Nonnull;
 
 final class CatSleepCommand extends AbstractWorldCommand implements CatCommandHelper {
@@ -53,8 +53,8 @@ final class CatSleepCommand extends AbstractWorldCommand implements CatCommandHe
         return;
       }
 
-      CatStateComponent stateComponent = new CatStateComponent(CatStateComponent.CatState.SLEEPING);
-      store.putComponent(entityRef, Main.getInstance().catStateComponentType, stateComponent);
+      CatStateComponent stateComponent = new CatStateComponent(CatState.SLEEPING);
+      store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
 
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {

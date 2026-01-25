@@ -19,45 +19,74 @@
 
 package de.markusbordihn.cats.component;
 
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.Serializable;
+import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.CatStateData;
+import javax.annotation.Nonnull;
 
-public class CatStateComponent implements Component<EntityStore>, Serializable {
-  private CatState state;
+public class CatStateComponent implements Component<EntityStore> {
+
+  public static final String STATE_TAG = "State";
+
+  private static final EnumCodec<CatState> STATE_CODEC = new EnumCodec<>(CatState.class);
+
+  @Nonnull
+  public static final BuilderCodec<CatStateComponent> CODEC =
+      BuilderCodec.builder(CatStateComponent.class, CatStateComponent::new)
+          .append(
+              new KeyedCodec<>(STATE_TAG, STATE_CODEC),
+              (component, value) -> component.data = component.data.withState(value),
+              component -> component.data.state())
+          .documentation("The current state of the cat (SITTING, SLEEPING, FOLLOWING, etc.).")
+          .add()
+          .build();
+  @Nonnull private CatStateData data;
 
   public CatStateComponent() {
-    this.state = CatState.FOLLOWING;
+    this.data = CatStateData.defaultState();
   }
 
-  public CatStateComponent(CatState state) {
-    this.state = state;
+  public CatStateComponent(@Nonnull CatStateData data) {
+    this.data = data;
   }
 
+  public CatStateComponent(@Nonnull CatState state) {
+    this.data = CatStateData.of(state);
+  }
+
+  public static ComponentType<EntityStore, CatStateComponent> getComponentType() {
+    return Main.getInstance().catStateComponentType;
+  }
+
+  @Nonnull
+  public CatStateData getData() {
+    return data;
+  }
+
+  public void setData(@Nonnull CatStateData data) {
+    this.data = data;
+  }
+
+  @Nonnull
   public CatState getState() {
-    return state;
+    return data.state();
   }
 
-  public void setState(CatState state) {
-    this.state = state;
+  public void setState(@Nonnull CatState state) {
+    this.data = data.withState(state);
   }
 
   @Override
+  @Nonnull
   public CatStateComponent clone() {
-    try {
-      return (CatStateComponent) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AssertionError("Clone not supported", e);
-    }
-  }
-
-  public enum CatState {
-    SITTING,
-    SLEEPING,
-    FOLLOWING,
-    WANDERING,
-    PLAYING,
-    SEARCHING,
-    WAITING
+    CatStateComponent cloned = new CatStateComponent();
+    cloned.data = this.data;
+    return cloned;
   }
 }

@@ -25,7 +25,6 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -38,11 +37,11 @@ public interface CatCommandHelper {
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandContext context) {
 
-    CatOwnerComponent ownerComp =
-        store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 
     // If cat has no owner, allow command (for initial taming scenarios)
-    if (ownerComp == null || !ownerComp.hasOwner()) {
+    if (ownerComponent == null || !ownerComponent.hasOwner()) {
       return true;
     }
 
@@ -52,7 +51,7 @@ public interface CatCommandHelper {
       return true;
     }
 
-    String ownerName = ownerComp.getOwnerName();
+    String ownerName = ownerComponent.getOwnerName();
     if (ownerName != null && ownerName.equals(executingPlayer)) {
       return true;
     }

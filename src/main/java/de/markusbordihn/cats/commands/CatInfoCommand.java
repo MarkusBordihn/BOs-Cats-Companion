@@ -29,7 +29,6 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
@@ -61,7 +60,7 @@ final class CatInfoCommand extends AbstractWorldCommand {
 
       // Display owner information
       CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       if (ownerComponent != null && ownerComponent.hasOwner()) {
         context.sendMessage(
             Message.raw("Owner: " + ownerComponent.getOwnerName()).color("#00FF00"));
@@ -78,7 +77,7 @@ final class CatInfoCommand extends AbstractWorldCommand {
 
       // Display state information
       CatStateComponent stateComponent =
-          store.getComponent(entityRef, Main.getInstance().catStateComponentType);
+          store.getComponent(entityRef, CatStateComponent.getComponentType());
       if (stateComponent != null) {
         String stateColor =
             switch (stateComponent.getState()) {

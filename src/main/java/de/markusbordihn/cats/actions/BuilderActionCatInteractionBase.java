@@ -33,7 +33,6 @@ import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.EntityPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.IPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
@@ -71,7 +70,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
 
     protected boolean isCatTamed(Ref<EntityStore> entityRef, Store<EntityStore> store) {
       CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       return ownerComponent != null && ownerComponent.hasOwner();
     }
 
@@ -133,7 +132,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
         return false;
       }
       CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       return ownerComponent != null && playerUuid.equals(ownerComponent.getOwnerId());
     }
   }

@@ -17,37 +17,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.interaction;
+package de.markusbordihn.cats.inventory;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.role.Role;
-import de.markusbordihn.cats.inventory.InventoryHelper;
+import java.util.logging.Level;
 
-public class InteractionFeeding {
+public class InventoryHelper {
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-  public static boolean handle(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem,
-      boolean isOwner) {
+  public static void consumeActiveHotbarItem(Player player, ItemStack heldItem) {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
-    String interactionType = isOwner ? "FEEDING: By Owner" : "FEEDING: By Stranger";
-    InteractionLogger.logInteraction(interactionType, entityRef, role, store, player, itemName);
+    if (player == null) {
+      LOGGER.at(Level.WARNING).log("Cannot consume item: player is null");
+      return;
+    }
 
-    // Trigger Feeding animation state (auto-returns to Pet state after 2 seconds)
-    role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
+    Inventory inventory = player.getInventory();
+    if (inventory == null) {
+      LOGGER.at(Level.WARNING).log("Cannot consume item: player inventory is null");
+      return;
+    }
 
-    // TODO: Heal cat, increase happiness
-
-    // Consume item from inventory
-    InventoryHelper.consumeActiveHotbarItem(player, heldItem);
-
-    return false;
+    byte activeSlot = inventory.getActiveHotbarSlot();
+    inventory.getHotbar().removeItemStackFromSlot((short) activeSlot, 1);
+    LOGGER.at(Level.FINE).log(
+        "Consumed 1x %s from player inventory at slot %d", itemName, activeSlot);
   }
 }

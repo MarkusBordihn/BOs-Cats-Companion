@@ -25,7 +25,6 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import java.util.logging.Level;
@@ -41,9 +40,9 @@ public class InteractionLogger {
       Player player,
       String itemName) {
     CatOwnerComponent ownerComponent =
-        store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     CatStateComponent stateComponent =
-        store.getComponent(entityRef, Main.getInstance().catStateComponentType);
+        store.getComponent(entityRef, CatStateComponent.getComponentType());
 
     LOGGER.at(Level.FINE).log("=== CAT INTERACTION: %s ===", interactionType);
     LOGGER.at(Level.FINE).log("Entity: %s", entityRef);

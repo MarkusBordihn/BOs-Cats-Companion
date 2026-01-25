@@ -24,13 +24,13 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.inventory.InventoryHelper;
 import java.util.logging.Level;
 
 public class InteractionTaming {
@@ -76,10 +76,10 @@ public class InteractionTaming {
     }
 
     CatOwnerComponent ownerComponent = new CatOwnerComponent(playerUUID, username);
-    store.putComponent(entityRef, Main.getInstance().catOwnerComponentType, ownerComponent);
+    store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
 
-    CatStateComponent stateComponent = new CatStateComponent(CatStateComponent.CatState.FOLLOWING);
-    store.putComponent(entityRef, Main.getInstance().catStateComponentType, stateComponent);
+    CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
+    store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
 
     // Trigger Taming animation state (auto-transitions to Pet state after 3 seconds)
     role.getStateSupport().setState(entityRef, "Taming", "Default", store);
@@ -93,27 +93,9 @@ public class InteractionTaming {
     player.sendMessage(Message.translation("cats.interactions.taming.help").color("#FFFF00"));
 
     // Consume item from inventory
-    consumeItemFromInventory(player, heldItem);
+    InventoryHelper.consumeActiveHotbarItem(player, heldItem);
 
     LOGGER.at(Level.INFO).log(
         "Cat successfully tamed by player %s with item %s", username, itemName);
-  }
-
-  /** Consume one item from player's active hotbar slot */
-  private static void consumeItemFromInventory(Player player, ItemStack heldItem) {
-    String itemName = heldItem != null ? heldItem.getItemId() : null;
-    if (player == null) {
-      return;
-    }
-
-    Inventory inventory = player.getInventory();
-    if (inventory == null) {
-      LOGGER.at(Level.WARNING).log("Cannot consume item - player inventory is null");
-      return;
-    }
-
-    // TODO: Implement item consumption
-    // inventory.consumeActiveHotbarItem(1);
-    LOGGER.at(Level.FINE).log("Item consumption not yet implemented: %s", itemName);
   }
 }

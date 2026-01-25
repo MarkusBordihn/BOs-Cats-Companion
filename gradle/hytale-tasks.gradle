@@ -1,0 +1,112 @@
+tasks.register('extractHytaleApi') {
+  group = 'hytale'
+  description = 'Extracts Hytale API class files to hytale-api/ for reference'
+
+  def hytaleJar = file(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
+  def outputDir = file("$projectDir/hytale-api")
+
+  doLast {
+    if (!hytaleJar.exists()) {
+      throw new GradleException("HytaleServer.jar not found at: ${hytaleJar}")
+    }
+
+    delete outputDir
+    outputDir.mkdirs()
+
+    println "Extracting from ${hytaleJar.name}..."
+
+    copy {
+      from zipTree(hytaleJar)
+      into outputDir
+      include 'com/hypixel/hytale/**/*.class'
+    }
+
+    // Create index file
+    def indexFile = new File(outputDir, 'API_INDEX.txt')
+    def classes = []
+    outputDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.class')) {
+        def className = file.absolutePath
+            .replace(outputDir.absolutePath + File.separator, '')
+            .replace(File.separator, '.')
+            .replace('.class', '')
+        classes << className
+      }
+    }
+
+    // Sort and group by package
+    def sortedClasses = classes.sort()
+    def grouped = [:]
+    sortedClasses.each { className ->
+      def pkg = className.substring(0, className.lastIndexOf('.'))
+      if (!grouped.containsKey(pkg)) {
+        grouped[pkg] = []
+      }
+      grouped[pkg] << className.substring(className.lastIndexOf('.') + 1)
+    }
+
+    // Write index with grouping
+    indexFile.text = "Hytale API Classes (${classes.size()} total)\n"
+    indexFile.text += "=" * 80 + "\n"
+    grouped.each { pkg, classList ->
+      indexFile.text += "\n${pkg}:\n"
+      classList.each { cls ->
+        indexFile.text += "  - ${cls}\n"
+      }
+    }
+
+    println "✅ Extracted ${classes.size()} Hytale classes"
+    println "📁 Output: ${outputDir}"
+    println "📄 Index: ${indexFile}"
+  }
+}
+
+tasks.register('extractHytaleResources') {
+  group = 'hytale'
+  description = 'Extracts Hytale Assets to hytale-resources/ for reference'
+
+  def assetsZip = file(getHytaleAssetsPath())
+  def outputDir = file("$projectDir/hytale-resources")
+
+  doLast {
+    if (!assetsZip.exists()) {
+      throw new GradleException("Hytale Assets.zip not found at: ${assetsZip}")
+    }
+
+    // Clean output directory
+    delete outputDir
+    outputDir.mkdirs()
+
+    println "Extracting from ${assetsZip.name}..."
+
+    // Extract all assets
+    copy {
+      from zipTree(assetsZip)
+      into outputDir
+    }
+
+    // Count extracted files
+    def fileCount = 0
+    outputDir.eachFileRecurse { file ->
+      if (file.isFile()) {
+        fileCount++
+      }
+    }
+
+    println "✅ Extracted ${fileCount} Hytale resource files"
+    println "📁 Output: ${outputDir}"
+  }
+}
+
+tasks.register('decompile') {
+  group = 'hytale'
+  description = 'Decompile Hytale developer resources for reference'
+
+  dependsOn extractHytaleApi, extractHytaleResources
+
+  doLast {
+    println "\n✅ Hytale extraction complete!"
+    println "   - API classes available in hytale-api/"
+    println "   - Resources available in hytale-resources/"
+  }
+}

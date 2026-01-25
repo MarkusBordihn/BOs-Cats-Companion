@@ -27,7 +27,6 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import java.util.Set;
 
@@ -64,7 +63,7 @@ public class ItemInteractionOwner {
 
     if (player != null) {
       CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       String catName = ownerComponent != null ? ownerComponent.getCatName() : null;
 
       if (catName != null && !catName.isEmpty()) {

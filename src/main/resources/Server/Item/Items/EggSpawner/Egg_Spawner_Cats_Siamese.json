@@ -10,8 +10,6 @@
         {
           "Type": "SpawnNPC",
           "EntityId": "Cats_Siamese",
-          "RoleId": "Cats_Siamese",
-          "State": "Wild",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1
@@ -27,7 +25,7 @@
   },
   "Model": "Items/SpawnEggs/CatsSpawnEgg.blockymodel",
   "Texture": "NPC/Pets/Cats/Models/CatModel_Siamese.png",
-  "Icon": "Icons/ItemsGenerated/Food_Egg_White.png",
+  "Icon": "Icons/ItemsGenerated/Egg_Spawner_Cats_Siamese.png",
   "IconProperties": {
     "Rotation": [
       22.5,
@@ -37,7 +35,7 @@
     "Scale": 0.7,
     "Translation": [
       0,
-      -5.4
+      -12
     ]
   },
   "Tags": {

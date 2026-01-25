@@ -116,9 +116,11 @@ public class Main extends JavaPlugin {
     // Register components
     LOGGER.at(Level.INFO).log("Registering cat components...");
     catOwnerComponentType =
-        getEntityStoreRegistry().registerComponent(CatOwnerComponent.class, CatOwnerComponent::new);
+        getEntityStoreRegistry()
+            .registerComponent(CatOwnerComponent.class, "CatOwner", CatOwnerComponent.CODEC);
     catStateComponentType =
-        getEntityStoreRegistry().registerComponent(CatStateComponent.class, CatStateComponent::new);
+        getEntityStoreRegistry()
+            .registerComponent(CatStateComponent.class, "CatState", CatStateComponent.CODEC);
 
     // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
@@ -126,12 +128,11 @@ public class Main extends JavaPlugin {
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
 
-    // Try to register custom actions early (for client worlds)
-    NPCPlugin npcPlugin = NPCPlugin.get();
-    if (npcPlugin != null) {
+    // Try to register custom actions early (for client and server worlds)
+    if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin ...");
       registerCatInteractionActions(npcPlugin);
-    } else {
+    } else if (getEventRegistry() != null) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin setup listener...");
       getEventRegistry()
           .registerGlobal(
@@ -141,6 +142,9 @@ public class Main extends JavaPlugin {
                   registerCatInteractionActions((NPCPlugin) event.getPlugin());
                 }
               });
+    } else {
+      LOGGER.at(Level.SEVERE).log(
+          "Event registry is not available, cannot register NPC Plugin setup listener");
     }
 
     // Register commands

@@ -1,5 +1,4 @@
 {
-  "Id": "Cats",
   "Type": "Generic",
   "StartState": "Wild",
   "DefaultSubState": "Default",
@@ -144,18 +143,18 @@
                   ]
                 },
                 {
-                  "$Comment": "Sit and rest",
-                  "Weight": 2,
+                  "$Comment": "Stretch and groom",
+                  "Weight": 5,
                   "ActionsBlocking": true,
                   "Actions": [
                     {
                       "Type": "PlayAnimation",
-                      "Animation": "Sit",
+                      "Animation": "Stretch",
                       "Slot": "Action"
                     },
                     {
                       "Type": "Timeout",
-                      "Delay": [4, 8]
+                      "Delay": [3, 5]
                     },
                     {
                       "Type": "PlayAnimation",
@@ -168,18 +167,66 @@
                   }
                 },
                 {
-                  "$Comment": "Sleep/nap",
-                  "Weight": 1,
+                  "$Comment": "Lick and clean",
+                  "Weight": 5,
                   "ActionsBlocking": true,
                   "Actions": [
                     {
                       "Type": "PlayAnimation",
-                      "Animation": "Sleep",
+                      "Animation": "Lick",
                       "Slot": "Action"
                     },
                     {
                       "Type": "Timeout",
-                      "Delay": [6, 12]
+                      "Delay": [2, 4]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Playful pouncing",
+                  "Weight": 3,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Swing_Left",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [2, 4]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Searching and hunting",
+                  "Weight": 8,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Search",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [4, 7]
                     },
                     {
                       "Type": "PlayAnimation",
@@ -242,6 +289,62 @@
                   "Slot": "Action"
                 },
                 {
+                  "Type": "PlaySound",
+                  "SoundEventId": "SFX_Wolf_Sleep"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [15, 30],
+                  "Action": {
+                    "Type": "State",
+                    "State": ".Waiting"
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Stretching behavior - auto switches to waiting after timeout",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Stretching"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Stretch",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [10, 20],
+                  "Action": {
+                    "Type": "State",
+                    "State": ".Waiting"
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Licking behavior - auto switches to waiting after timeout",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Licking"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Lick",
+                  "Slot": "Action"
+                },
+                {
                   "Type": "Timeout",
                   "Delay": [15, 30],
                   "Action": {
@@ -264,7 +367,7 @@
               "Actions": [
                 {
                   "Type": "PlayAnimation",
-                  "Animation": "Attack",
+                  "Animation": "Swing_Left",
                   "Slot": "Action"
                 },
                 {
@@ -354,6 +457,10 @@
                       "Type": "PlayAnimation",
                       "Animation": "Idle",
                       "Slot": "Action"
+                    },
+                    {
+                      "Type": "PlaySound",
+                      "SoundEventId": "SFX_Chicken_Walk"
                     }
                   ]
                 },
@@ -376,7 +483,7 @@
               ]
             },
             {
-              "$Comment": "Default following behavior",
+              "$Comment": "Default following behavior with pauses",
               "Sensor": {
                 "Type": "State",
                 "State": ".Default"
@@ -397,24 +504,75 @@
                   ]
                 },
                 {
+                  "$Comment": "Random following behavior - sometimes with pauses, sometimes continuous",
                   "Sensor": {
-                    "Type": "Player",
-                    "Range": 40,
-                    "LockOnTarget": true
+                    "Type": "Any"
                   },
-                  "Actions": [
+                  "Type": "Random",
+                  "ExecuteFor": [8, 12],
+                  "Instructions": [
                     {
-                      "Type": "PlayAnimation",
-                      "Animation": "Idle",
-                      "Slot": "Action"
+                      "$Comment": "Active following with short pauses",
+                      "Weight": 40,
+                      "Sensor": {
+                        "Type": "Player",
+                        "Range": 40,
+                        "LockOnTarget": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ],
+                      "BodyMotion": {
+                        "Type": "Sequence",
+                        "Looped": true,
+                        "Motions": [
+                          {
+                            "Type": "Timer",
+                            "Time": [4, 6],
+                            "Motion": {
+                              "Type": "Seek",
+                              "SlowDownDistance": 5,
+                              "StopDistance": 3,
+                              "RelativeSpeed": 0.8
+                            }
+                          },
+                          {
+                            "Type": "Timer",
+                            "Time": [0.5, 1.5],
+                            "Motion": {
+                              "Type": "Nothing"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "$Comment": "Continuous following without pauses",
+                      "Weight": 60,
+                      "Sensor": {
+                        "Type": "Player",
+                        "Range": 40,
+                        "LockOnTarget": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ],
+                      "BodyMotion": {
+                        "Type": "Seek",
+                        "SlowDownDistance": 5,
+                        "StopDistance": 3,
+                        "RelativeSpeed": 0.8
+                      }
                     }
-                  ],
-                  "BodyMotion": {
-                    "Type": "Seek",
-                    "SlowDownDistance": 5,
-                    "StopDistance": 3,
-                    "RelativeSpeed": 1
-                  }
+                  ]
                 },
                 {
                   "$Comment": "Teleport to player if too far away",
@@ -428,6 +586,28 @@
               ]
             },
             {
+              "$Comment": "Dying behavior - plays death animation",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Dying"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Death",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [2, 2]
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
               "$Comment": "State setter declarations for validation - never executed",
               "Sensor": {
                 "Type": "Flag",
@@ -437,10 +617,13 @@
                 {"Type": "State", "State": ".Default"},
                 {"Type": "State", "State": ".Sitting"},
                 {"Type": "State", "State": ".Sleeping"},
+                {"Type": "State", "State": ".Stretching"},
+                {"Type": "State", "State": ".Licking"},
                 {"Type": "State", "State": ".Playing"},
                 {"Type": "State", "State": ".Searching"},
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
+                {"Type": "State", "State": ".Dying"},
                 {"Type": "State", "State": "Taming"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "Petting"},
@@ -464,6 +647,10 @@
               "Slot": "Action"
             },
             {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Fox_Alerted"
+            },
+            {
               "Type": "SpawnParticles",
               "Offset": [0, 0.8, 0],
               "ParticleSystem": "Hearts"
@@ -473,7 +660,8 @@
               "Delay": [3, 3],
               "Action": {
                 "Type": "State",
-                "State": "Pet"
+                "State": "Pet",
+                "SubState": "Default"
               }
             }
           ],
@@ -495,9 +683,18 @@
               "Slot": "Action"
             },
             {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Fox_Sleep"
+            },
+            {
               "Type": "SpawnParticles",
               "Offset": [0, 0.5, 0],
               "ParticleSystem": "Food_Eat"
+            },
+            {
+              "Type": "SpawnParticles",
+              "Offset": [0, 0.5, 0],
+              "ParticleSystem": "Hearts_Subtle"
             },
             {
               "Type": "Timeout",
@@ -524,6 +721,10 @@
               "Type": "PlayAnimation",
               "Animation": "Sit",
               "Slot": "Action"
+            },
+            {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Leopard_Snow_Run"
             },
             {
               "Type": "SpawnParticles",
@@ -555,6 +756,10 @@
               "Type": "PlayAnimation",
               "Animation": "Alerted",
               "Slot": "Action"
+            },
+            {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Leopard_Snow_Alerted"
             },
             {
               "Type": "SpawnParticles",

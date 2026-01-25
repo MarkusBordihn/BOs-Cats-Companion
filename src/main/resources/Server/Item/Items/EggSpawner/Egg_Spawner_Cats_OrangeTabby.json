@@ -10,8 +10,6 @@
         {
           "Type": "SpawnNPC",
           "EntityId": "Cats_OrangeTabby",
-          "RoleId": "Cats_OrangeTabby",
-          "State": "Wild",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1
@@ -27,7 +25,7 @@
   },
   "Model": "Items/SpawnEggs/CatsSpawnEgg.blockymodel",
   "Texture": "NPC/Pets/Cats/Models/CatModel_OrangeTabby.png",
-  "Icon": "Icons/ItemsGenerated/Food_Egg.png",
+  "Icon": "Icons/ItemsGenerated/Egg_Spawner_Cats_OrangeTabby.png",
   "IconProperties": {
     "Rotation": [
       22.5,
@@ -37,7 +35,7 @@
     "Scale": 0.7,
     "Translation": [
       0,
-      -5.4
+      -12
     ]
   },
   "Tags": {

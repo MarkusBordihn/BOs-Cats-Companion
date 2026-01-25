@@ -19,105 +19,138 @@
 
 package de.markusbordihn.cats.component;
 
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.UUIDBinaryCodec;
+import com.hypixel.hytale.codec.codecs.simple.LongCodec;
+import com.hypixel.hytale.codec.codecs.simple.StringCodec;
 import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import java.io.Serializable;
+import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.data.CatOwnerData;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CatOwnerComponent implements Component<EntityStore>, Serializable {
-  @Nullable private UUID ownerId;
-  @Nullable private String ownerName;
-  @Nullable private String catName;
-  private long tamedTimestamp;
+public class CatOwnerComponent implements Component<EntityStore> {
+
+  public static final String OWNER_ID_TAG = "OwnerId";
+  public static final String OWNER_NAME_TAG = "OwnerName";
+  public static final String CAT_NAME_TAG = "CatName";
+  public static final String TAMED_TIMESTAMP_TAG = "TamedTimestamp";
+
+  @Nonnull
+  public static final BuilderCodec<CatOwnerComponent> CODEC =
+      BuilderCodec.builder(CatOwnerComponent.class, CatOwnerComponent::new)
+          .append(
+              new KeyedCodec<>(OWNER_ID_TAG, new UUIDBinaryCodec()),
+              (component, value) -> component.data = component.data.withOwnerId(value),
+              component -> component.data.ownerId())
+          .documentation("The UUID of the cat's owner.")
+          .add()
+          .append(
+              new KeyedCodec<>(OWNER_NAME_TAG, new StringCodec()),
+              (component, value) -> component.data = component.data.withOwnerName(value),
+              component -> component.data.ownerName())
+          .documentation("The name of the cat's owner.")
+          .add()
+          .append(
+              new KeyedCodec<>(CAT_NAME_TAG, new StringCodec()),
+              (component, value) -> component.data = component.data.withCatName(value),
+              component -> component.data.catName())
+          .documentation("The custom name of the cat.")
+          .add()
+          .append(
+              new KeyedCodec<>(TAMED_TIMESTAMP_TAG, new LongCodec()),
+              (component, value) -> component.data = component.data.withTamedTimestamp(value),
+              component -> component.data.tamedTimestamp())
+          .documentation("The timestamp when the cat was tamed.")
+          .add()
+          .build();
+  @Nonnull private CatOwnerData data;
 
   public CatOwnerComponent() {
-    this.ownerId = null;
-    this.ownerName = null;
-    this.catName = null;
-    this.tamedTimestamp = 0;
+    this.data = CatOwnerData.empty();
+  }
+
+  public CatOwnerComponent(@Nonnull CatOwnerData data) {
+    this.data = data;
   }
 
   public CatOwnerComponent(UUID ownerId, String ownerName) {
-    this.ownerId = ownerId;
-    this.ownerName = ownerName;
-    this.catName = null;
-    this.tamedTimestamp = System.currentTimeMillis();
+    this.data = CatOwnerData.create(ownerId, ownerName);
   }
 
   public CatOwnerComponent(UUID ownerId, String ownerName, String catName) {
-    this.ownerId = ownerId;
-    this.ownerName = ownerName;
-    this.catName = catName;
-    this.tamedTimestamp = System.currentTimeMillis();
+    this.data = CatOwnerData.create(ownerId, ownerName, catName);
+  }
+
+  public static ComponentType<EntityStore, CatOwnerComponent> getComponentType() {
+    return Main.getInstance().catOwnerComponentType;
+  }
+
+  @Nonnull
+  public CatOwnerData getData() {
+    return data;
+  }
+
+  public void setData(@Nonnull CatOwnerData data) {
+    this.data = data;
   }
 
   public boolean hasOwner() {
-    return ownerId != null;
+    return data.hasOwner();
   }
 
   @Nullable
   public UUID getOwnerId() {
-    return ownerId;
+    return data.ownerId();
   }
 
   public void setOwnerId(@Nullable UUID ownerId) {
-    this.ownerId = ownerId;
+    this.data = data.withOwnerId(ownerId);
   }
 
   @Nullable
   public String getOwnerName() {
-    return ownerName;
+    return data.ownerName();
   }
 
   public void setOwnerName(@Nullable String ownerName) {
-    this.ownerName = ownerName;
+    this.data = data.withOwnerName(ownerName);
   }
 
   public long getTamedTimestamp() {
-    return tamedTimestamp;
+    return data.tamedTimestamp();
   }
 
   @Nullable
   public String getCatName() {
-    return catName;
+    return data.catName();
   }
 
   public void setCatName(@Nullable String catName) {
-    this.catName = catName;
+    this.data = data.withCatName(catName);
   }
 
   public void setOwner(UUID ownerId, String ownerName) {
-    this.ownerId = ownerId;
-    this.ownerName = ownerName;
-    this.tamedTimestamp = System.currentTimeMillis();
+    this.data = data.withOwner(ownerId, ownerName);
   }
 
   public void setOwner(UUID ownerId, String ownerName, String catName) {
-    this.ownerId = ownerId;
-    this.ownerName = ownerName;
-    this.catName = catName;
-    this.tamedTimestamp = System.currentTimeMillis();
+    this.data = new CatOwnerData(ownerId, ownerName, catName, System.currentTimeMillis());
   }
 
   public void clearOwner() {
-    this.ownerId = null;
-    this.ownerName = null;
-    this.catName = null;
-    this.tamedTimestamp = 0;
+    this.data = CatOwnerData.empty();
   }
 
   @Override
+  @Nonnull
   public CatOwnerComponent clone() {
-    try {
-      return (CatOwnerComponent) super.clone();
-    } catch (CloneNotSupportedException e) {
-      CatOwnerComponent copy = new CatOwnerComponent();
-      copy.ownerId = this.ownerId;
-      copy.ownerName = this.ownerName;
-      copy.catName = this.catName;
-      copy.tamedTimestamp = this.tamedTimestamp;
-      return copy;
-    }
+    CatOwnerComponent cloned = new CatOwnerComponent();
+    cloned.data = this.data;
+    return cloned;
   }
 }

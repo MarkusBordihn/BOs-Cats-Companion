@@ -30,7 +30,6 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -60,7 +59,7 @@ final class CatOwnerCommand extends AbstractWorldCommand {
       // Set the owner, for now, we'll create a dummy UUID based on the name
       UUID ownerId = UUID.nameUUIDFromBytes(("player:" + ownerName).getBytes());
       CatOwnerComponent ownerComponent = new CatOwnerComponent(ownerId, ownerName);
-      store.putComponent(entityRef, Main.getInstance().catOwnerComponentType, ownerComponent);
+      store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
 
       context.sendMessage(Message.raw(""));
       context.sendMessage(Message.raw("✓ Owner set to: " + ownerName).color("#00FF00"));

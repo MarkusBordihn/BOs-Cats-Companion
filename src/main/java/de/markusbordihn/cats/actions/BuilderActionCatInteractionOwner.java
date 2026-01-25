@@ -57,7 +57,6 @@ public class BuilderActionCatInteractionOwner extends BuilderActionCatInteractio
     return "Custom action that logs when the owner interacts with their tamed cat NPC";
   }
 
-  /** Action implementation for owner cat interactions */
   public static class ActionCatInteractionOwner extends ActionCatInteractionBase {
 
     public ActionCatInteractionOwner(

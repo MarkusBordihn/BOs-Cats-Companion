@@ -29,11 +29,11 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatState;
 import javax.annotation.Nonnull;
 
-final class CatSearchCommand extends AbstractWorldCommand {
+final class CatSearchCommand extends AbstractWorldCommand implements CatCommandHelper {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatSearchCommand() {
@@ -44,18 +44,24 @@ final class CatSearchCommand extends AbstractWorldCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> entityRef = this.entityArg.get(store, context);
-    if (entityRef != null && entityRef.isValid()) {
-      CatStateComponent stateComponent =
-          new CatStateComponent(CatStateComponent.CatState.SEARCHING);
-      store.putComponent(entityRef, Main.getInstance().catStateComponentType, stateComponent);
+    var entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
+
+    if (entityRefOpt.isPresent()) {
+      Ref<EntityStore> entityRef = entityRefOpt.get();
+
+      if (!checkOwnership(entityRef, store, context)) {
+        return;
+      }
+
+      CatStateComponent stateComponent = new CatStateComponent(CatState.SEARCHING);
+      store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
 
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Default", store);
+        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Searching", store);
         context.sendMessage(Message.translation("cats.commands.search.success").color("#FFA500"));
       } else {
-        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }
     } else {
       context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));

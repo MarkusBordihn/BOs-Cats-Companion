@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.cats.egg_spawner_black.name"
+    "Name": "server.items.cats.egg_spawner_tuxedo.name"
   },
   "Quality": "Rare",
   "PlayerAnimationsId": "Item",
@@ -9,7 +9,7 @@
       "Interactions": [
         {
           "Type": "SpawnNPC",
-          "EntityId": "Cats_Black",
+          "EntityId": "Cats_Tuxedo",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1
@@ -24,8 +24,8 @@
     }
   },
   "Model": "Items/SpawnEggs/CatsSpawnEgg.blockymodel",
-  "Texture": "NPC/Pets/Cats/Models/CatModel_Black.png",
-  "Icon": "Icons/ItemsGenerated/Egg_Spawner_Cats_Black.png",
+  "Texture": "NPC/Pets/Cats/Models/CatModel_Tuxedo.png",
+  "Icon": "Icons/ItemsGenerated/Egg_Spawner_Cats_Tuxedo.png",
   "IconProperties": {
     "Rotation": [
       22.5,

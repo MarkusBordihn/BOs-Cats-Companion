@@ -10,7 +10,7 @@
 
 Bring tameable cat companions into your Hytale world.
 
-This plugin adds five different cat breeds that can be tamed, named, and commanded.
+This plugin adds multiple cat breeds that can be tamed, named, and commanded.
 Cats can follow you on your adventures or stay at home as a cozy companion.
 Each cat supports multiple behavior states and animations, making them feel alive and responsive.
 
@@ -18,13 +18,15 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 ### Working Features
 
-* Five cat breeds: Black Cat, Calico, Gray Tabby, Orange Tabby, Siamese
+* Six cat breeds: Black Cat, Calico, Gray Tabby, Orange Tabby, Siamese, Tuxedo
 * Taming system using fish
 * Full command-based interaction via `/cat`
 * Custom cat names
 * Multiple behavior states: sitting, following, waiting, wandering, sleeping, playing, searching
 * Matching animations for each behavior
-* Owner tracking for each tamed cat
+* Cat sounds
+* Item consumption for taming and feeding (items are consumed from the player's inventory)
+* Persistent component data for owner + state (component CODECs)
 
 ### How to Get a Cat
 
@@ -38,6 +40,7 @@ Use the NPC spawn command to create cats:
 /npc spawn Cats_GrayTabby
 /npc spawn Cats_OrangeTabby
 /npc spawn Cats_Siamese
+/npc spawn Cats_Tuxedo
 ```
 
 #### Option 2: Spawn Eggs
@@ -49,6 +52,7 @@ Each breed also has a spawn egg:
 * `Egg_Spawner_Cats_GrayTabby` – Gray Tabby
 * `Egg_Spawner_Cats_OrangeTabby` – Orange Tabby
 * `Egg_Spawner_Cats_Siamese` – Siamese Cat
+* `Egg_Spawner_Cats_Tuxedo` – Tuxedo Cat
 
 ### How to Tame a Cat
 
@@ -58,22 +62,23 @@ Each breed also has a spawn egg:
 2. Obtain fish
    Supported types: Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, Minnow
 
-3. Spawn a wild cat using `/npc spawn Cat_Black` or spawn eggs
+3. Spawn a wild cat using `/npc spawn Cats_Black` (or other breeds) or spawn eggs
 
 4. Approach the wild cat with fish in your hand
    The cat will notice you're holding food
 
 5. Press F (interact key) on the cat while holding fish
-   The cat will enter a taming animation and become yours
+   The cat will enter a taming animation and become yours (and the used food gets consumed)
 
 6. Success! The cat is now tamed and will follow you
 
 **Important Interaction Rules:**
 
 * **Wrong items** – Offering non-food items to wild cats may upset them (*hiss!*)
-* **Feeding** – Tamed cats can be fed fish to keep them happy
+* **Feeding** – Tamed cats can be fed fish to keep them happy (fish gets consumed)
 * **Petting** – Press F (interact) with your tamed cat using an empty hand to pet them
-* **Creative mode block** – Players in Creative mode cannot tame or interact with cats to prevent exploits
+* **Creative mode block** – Players in Creative mode cannot tame or interact with cats to prevent
+  exploits
 
 ### Available Commands
 
@@ -101,9 +106,6 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 ### Important Notes
 
-* **State persistence**
-  Behavior states are currently not saved after a server restart.
-
 * **No natural spawning**
   Cats do not spawn naturally yet. Use spawn commands or spawn eggs.
 
@@ -114,7 +116,6 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 Planned improvements and additions:
 
-* State persistence across server restarts
 * Natural cat spawning in forests and plains
 * Interactive UI menu
 * Cat breeding and kittens
@@ -126,7 +127,7 @@ Planned improvements and additions:
 
 ## 🐛 Known Issues
 
-* Cat states reset after server restart
+* Some states/substates may reset after server restart
 * Wild cats may occasionally get stuck while approaching players holding fish
 * Some animation transitions are not yet smooth
 * Pathfinding still needs refinement

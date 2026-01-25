@@ -30,7 +30,6 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
@@ -52,11 +51,11 @@ final class CatNameCommand extends AbstractWorldCommand {
 
     if (entityRef != null && entityRef.isValid()) {
       CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, Main.getInstance().catOwnerComponentType);
+          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 
       if (ownerComponent != null) {
         ownerComponent.setCatName(catName);
-        store.putComponent(entityRef, Main.getInstance().catOwnerComponentType, ownerComponent);
+        store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
 
         // Set Nameplate for nametag
         Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());

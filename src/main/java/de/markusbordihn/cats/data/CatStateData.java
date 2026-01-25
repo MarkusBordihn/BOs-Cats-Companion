@@ -17,24 +17,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.interaction;
+package de.markusbordihn.cats.data;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.role.Role;
+import javax.annotation.Nonnull;
 
-public class InteractionOwner {
+public record CatStateData(@Nonnull CatState state) {
 
-  public static boolean handle(
-      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
-    InteractionLogger.logInteraction(
-        "OWNER: Petting Interaction", entityRef, role, store, player, null);
+  @Nonnull
+  public static CatStateData defaultState() {
+    return new CatStateData(CatState.FOLLOWING);
+  }
 
-    // Trigger Petting animation state (purring, happy animation)
-    role.getStateSupport().setState(entityRef, "Petting", "Default", store);
+  @Nonnull
+  public static CatStateData of(@Nonnull CatState state) {
+    return new CatStateData(state);
+  }
 
-    return false;
+  @Nonnull
+  public CatStateData withState(@Nonnull CatState newState) {
+    return new CatStateData(newState);
   }
 }

@@ -139,6 +139,33 @@
         }
       ]
     },
+    "Stretch": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cat/Animations/Idles/Stretch.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "Lick": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cat/Animations/Idles/Lick.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "Swing_Left": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cat/Animations/Attacks/Swing_Left.blockyanim",
+          "BlendingDuration": 0.1,
+          "Looping": false
+        }
+      ]
+    },
     "AttackMoving": {
       "Animations": [
         {
