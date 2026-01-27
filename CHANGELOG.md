@@ -7,6 +7,15 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.3.0
+
+- Fixed cat following behavior when tracking is lost by retriggering search state.
+- Fixed commands to show the correct cat name instead of just "Cat".
+- Added experimental kitten variant (Calico breed only for now).
+- Improved existing cat textures with better details and shading.
+
+Note: The kitten variant is experimental and has limited functionality and animations issues.
+
 ### 1.2.0
 
 - Fixed persistent component storage for cat owner and state components.

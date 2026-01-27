@@ -3,8 +3,7 @@
 [![Hytale](https://img.shields.io/badge/Hytale-Plugin-blue)](https://hytale.com)
 
 > ⚠️ **EARLY ALPHA – MVP VERSION**
-> This is a minimal viable product (MVP).
-> Interaction is currently command-based only. Several features are still work in progress.
+> This is a minimal viable product (MVP), several features are still work in progress.
 
 ## 📖 Overview
 

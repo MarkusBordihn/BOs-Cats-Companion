@@ -1,12 +1,14 @@
 # Cat Commands
-sit.success=Katze sitzt jetzt
-sleep.success=Katze schläft jetzt
-follow.success=Katze folgt dir jetzt
-wait.success=Katze wartet jetzt
-wander.success=Katze wandert jetzt frei umher
-play.success=Katze spielt jetzt!
-search.success=Katze sucht!
-name.success=Katze wurde umbenannt: {name}
+follow.re_triggered.hint=Katze war bereits im Folge-Modus, Aktualisierung erzwungen!
+follow.re_triggered={name} wurde neu zum Folgen aufgefordert
+follow.success={name} folgt dir jetzt
+name.success={name} wurde umbenannt: {newName}
+play.success={name} spielt jetzt!
+search.success={name} sucht!
+sit.success={name} sitzt jetzt
+sleep.success={name} schläft jetzt
+wait.success={name} wartet jetzt
+wander.success={name} wandert jetzt frei umher
 
 # Error Messages
 error.no_cat=Keine Katze in Sicht

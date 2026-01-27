@@ -1,12 +1,14 @@
 # Cat Commands
-sit.success=Cat is now sitting
-sleep.success=Cat is now sleeping
-follow.success=Cat is now following you
-wait.success=Cat is waiting
-wander.success=Cat is now wandering freely
-play.success=Cat is playing!
-search.success=Cat is searching!
-name.success=Cat has been named: {name}
+follow.re_triggered.hint=Cat was already following, forced refresh!
+follow.re_triggered=Re-triggered follow mode for {name}
+follow.success={name} is now following you
+name.success={name} has been named: {newName}
+play.success={name} is playing!
+search.success={name} is searching!
+sit.success={name} is now sitting
+sleep.success={name} is now sleeping
+wait.success={name} is waiting
+wander.success={name} is now wandering freely
 
 # Error Messages
 error.no_cat=No cat in view

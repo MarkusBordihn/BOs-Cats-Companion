@@ -59,7 +59,10 @@ final class CatWaitCommand extends AbstractWorldCommand implements CatCommandHel
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Waiting", store);
-        context.sendMessage(Message.translation("cats.commands.wait.success").color("#87CEEB"));
+        context.sendMessage(
+            Message.translation("cats.commands.wait.success")
+                .param("name", getCatDisplayName(entityRef, store))
+                .color("#87CEEB"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

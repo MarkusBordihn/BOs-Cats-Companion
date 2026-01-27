@@ -46,6 +46,7 @@ public class CatStateComponent implements Component<EntityStore> {
           .documentation("The current state of the cat (SITTING, SLEEPING, FOLLOWING, etc.).")
           .add()
           .build();
+
   @Nonnull private CatStateData data;
 
   public CatStateComponent() {

@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldC
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import javax.annotation.Nonnull;
@@ -53,13 +54,32 @@ final class CatFollowCommand extends AbstractWorldCommand implements CatCommandH
         return;
       }
 
-      CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
-      store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
-
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Default", store);
-        context.sendMessage(Message.translation("cats.commands.follow.success").color("#00FF00"));
+        StateSupport stateSupport = npcEntity.getRole().getStateSupport();
+        boolean wasAlreadyFollowing = stateSupport.inState("Pet", "Default");
+
+        // Set component state
+        CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
+        store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
+
+        // Already following, force refresh by toggling through Playing state
+        if (wasAlreadyFollowing) {
+          stateSupport.setState(entityRef, "Pet", "Playing", store);
+          stateSupport.setState(entityRef, "Pet", "Default", store);
+          context.sendMessage(
+              Message.translation("cats.commands.follow.re_triggered")
+                  .param("name", getCatDisplayName(entityRef, store))
+                  .color("#FFAA00"));
+          context.sendMessage(
+              Message.translation("cats.commands.follow.re_triggered.hint").color("#808080"));
+        } else {
+          stateSupport.setState(entityRef, "Pet", "Default", store);
+          context.sendMessage(
+              Message.translation("cats.commands.follow.success")
+                  .param("name", getCatDisplayName(entityRef, store))
+                  .color("#00FF00"));
+        }
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

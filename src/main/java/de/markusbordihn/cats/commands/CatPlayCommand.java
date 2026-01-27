@@ -59,7 +59,10 @@ final class CatPlayCommand extends AbstractWorldCommand implements CatCommandHel
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Playing", store);
-        context.sendMessage(Message.translation("cats.commands.play.success").color("#FF69B4"));
+        context.sendMessage(
+            Message.translation("cats.commands.play.success")
+                .param("name", getCatDisplayName(entityRef, store))
+                .color("#FF69B4"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

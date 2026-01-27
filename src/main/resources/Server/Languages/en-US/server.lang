@@ -1,4 +1,6 @@
 npcRoles.cats.cat.name=Cat
+npcRoles.cats.kitten.name=Kitten
+npcRoles.cats.kitten.calico.name=Calico Kitten
 npcRoles.cats.calico.name=Calico Cat
 npcRoles.cats.black.name=Black Cat
 npcRoles.cats.browntabby.name=Brown Tabby Cat
@@ -14,6 +16,7 @@ npcRoles.cats.white.name=White Cat
 items.cats.egg_spawner_black.name=Black Cat Spawner Egg
 items.cats.egg_spawner_browntabby.name=Brown Tabby Cat Spawner Egg
 items.cats.egg_spawner_calico.name=Calico Cat Spawner Egg
+items.cats.egg_spawner_kitten_calico.name=Calico Kitten Spawner Egg
 items.cats.egg_spawner_gray.name=Gray Cat Spawner Egg
 items.cats.egg_spawner_graytabby.name=Gray Tabby Cat Spawner Egg
 items.cats.egg_spawner_ocelot.name=Ocelot Cat Spawner Egg

@@ -60,7 +60,10 @@ final class CatWanderCommand extends AbstractWorldCommand implements CatCommandH
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Wandering", store);
-        context.sendMessage(Message.translation("cats.commands.wander.success").color("#00FF00"));
+        context.sendMessage(
+            Message.translation("cats.commands.wander.success")
+                .param("name", getCatDisplayName(entityRef, store))
+                .color("#00FF00"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

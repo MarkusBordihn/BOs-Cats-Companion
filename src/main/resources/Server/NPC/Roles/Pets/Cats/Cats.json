@@ -509,14 +509,14 @@
                     "Type": "Any"
                   },
                   "Type": "Random",
-                  "ExecuteFor": [8, 12],
+                  "ExecuteFor": [60, 120],
                   "Instructions": [
                     {
                       "$Comment": "Active following with short pauses",
                       "Weight": 40,
                       "Sensor": {
                         "Type": "Player",
-                        "Range": 40,
+                        "Range": 18,
                         "LockOnTarget": true
                       },
                       "Actions": [
@@ -555,7 +555,7 @@
                       "Weight": 60,
                       "Sensor": {
                         "Type": "Player",
-                        "Range": 40,
+                        "Range": 18,
                         "LockOnTarget": true
                       },
                       "Actions": [
@@ -577,7 +577,8 @@
                 {
                   "$Comment": "Teleport to player if too far away",
                   "Sensor": {
-                    "Type": "Target"
+                    "Type": "Target",
+                    "MinRange": 25
                   },
                   "BodyMotion": {
                     "Type": "Teleport"

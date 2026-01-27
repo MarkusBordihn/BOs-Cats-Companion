@@ -59,7 +59,10 @@ final class CatSleepCommand extends AbstractWorldCommand implements CatCommandHe
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
-        context.sendMessage(Message.translation("cats.commands.sleep.success").color("#00FF00"));
+        context.sendMessage(
+            Message.translation("cats.commands.sleep.success")
+                .param("name", getCatDisplayName(entityRef, store))
+                .color("#00FF00"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

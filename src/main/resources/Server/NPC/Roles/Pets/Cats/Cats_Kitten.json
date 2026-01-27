@@ -1,0 +1,23 @@
+{
+  "Type": "Variant",
+  "Reference": "Cats",
+  "Modify": {
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  },
+  "Parameters": {
+    "Appearance": {
+      "Value": "Cats_Kitten",
+      "Description": "The kitten's model appearance"
+    },
+    "MaxHealth": {
+      "Value": 12,
+      "Description": "Health points for kittens"
+    },
+    "NameTranslationKey": {
+      "Value": "cats.kitten.name",
+      "Description": "Translation key for kitten name display"
+    }
+  }
+}

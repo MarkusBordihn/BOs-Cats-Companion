@@ -36,16 +36,13 @@ public interface CatCommandHelper {
       @Nonnull Ref<EntityStore> entityRef,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandContext context) {
-
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 
-    // If cat has no owner, allow command (for initial taming scenarios)
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
       return true;
     }
 
-    // Try to get the executing player's username from context
     String executingPlayer = getExecutingPlayerName(context);
     if (executingPlayer == null) {
       return true;
@@ -85,5 +82,21 @@ public interface CatCommandHelper {
       // Entity not found or invalid argument
     }
     return Optional.empty();
+  }
+
+  @Nonnull
+  default String getCatDisplayName(
+      @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+
+    if (ownerComponent != null) {
+      String catName = ownerComponent.getCatName();
+      if (catName != null && !catName.isEmpty()) {
+        return catName;
+      }
+    }
+
+    return "Cat";
   }
 }

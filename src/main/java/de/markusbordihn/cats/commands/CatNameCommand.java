@@ -61,9 +61,14 @@ final class CatNameCommand extends AbstractWorldCommand {
         Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
         nameplate.setText(catName);
 
+        String oldName = ownerComponent.getCatName();
+        if (oldName == null || oldName.isEmpty()) {
+          oldName = "Cat";
+        }
         context.sendMessage(
             Message.translation("cats.commands.name.success")
-                .param("name", catName)
+                .param("name", oldName)
+                .param("newName", catName)
                 .color("#00FF00"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.not_owned").color("#FF0000"));

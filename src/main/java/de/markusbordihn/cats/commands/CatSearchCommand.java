@@ -59,7 +59,10 @@ final class CatSearchCommand extends AbstractWorldCommand implements CatCommandH
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Searching", store);
-        context.sendMessage(Message.translation("cats.commands.search.success").color("#FFA500"));
+        context.sendMessage(
+            Message.translation("cats.commands.search.success")
+                .param("name", getCatDisplayName(entityRef, store))
+                .color("#FFA500"));
       } else {
         context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
       }

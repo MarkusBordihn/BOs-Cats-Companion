@@ -68,6 +68,7 @@ public class CatOwnerComponent implements Component<EntityStore> {
           .documentation("The timestamp when the cat was tamed.")
           .add()
           .build();
+
   @Nonnull private CatOwnerData data;
 
   public CatOwnerComponent() {
