@@ -1,4 +1,7 @@
 # Cat Commands
+bed.going_to_bed={name} geht zu einem Bett {distance} Blöcke entfernt bei ({x}, {y}, {z})
+bed.no_beds_found=Keine Katzenbetten innerhalb von {radius} Blöcken um Position ({x}, {y}, {z}) gefunden
+bed.all_beds_occupied=Alle {count} Katzenbett(en) in der Nähe sind von anderen schlafenden Katzen belegt
 follow.re_triggered.hint=Katze war bereits im Folge-Modus, Aktualisierung erzwungen!
 follow.re_triggered={name} wurde neu zum Folgen aufgefordert
 follow.success={name} folgt dir jetzt
@@ -12,5 +15,6 @@ wander.success={name} wandert jetzt frei umher
 
 # Error Messages
 error.no_cat=Keine Katze in Sicht
+error.no_position=Katzenposition kann nicht ermittelt werden
 error.not_owned=Diese Katze hat keinen Besitzer
 error.not_owner=Diese Katze gehört {owner}

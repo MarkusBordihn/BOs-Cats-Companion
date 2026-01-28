@@ -25,7 +25,6 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -33,7 +32,7 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
 
-final class CatInfoCommand extends AbstractWorldCommand {
+final class CatInfoCommand extends CatCommand {
   @Nonnull private final EntityWrappedArg entityArg;
 
   public CatInfoCommand() {
@@ -44,8 +43,9 @@ final class CatInfoCommand extends AbstractWorldCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> entityRef = this.entityArg.get(store, context);
-    if (entityRef != null && entityRef.isValid()) {
+    var entityOpt = getEntityFromArgument(this.entityArg, store, context);
+    if (entityOpt.isPresent()) {
+      Ref<EntityStore> entityRef = entityOpt.get();
       context.sendMessage(Message.raw("=== Cat Info ===").color("#FFD700"));
 
       // Display UUID and Ref Index

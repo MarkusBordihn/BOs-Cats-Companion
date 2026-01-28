@@ -1,6 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.cats.egg_spawner_graytabby.name"
+    "Name": "server.items.cats.egg_spawner_graytabby.name",
+    "Description": "server.items.cats.egg_spawner_graytabby.description"
   },
   "Quality": "Rare",
   "PlayerAnimationsId": "Item",

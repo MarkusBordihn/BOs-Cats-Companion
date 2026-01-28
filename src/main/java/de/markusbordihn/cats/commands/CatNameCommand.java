@@ -26,14 +26,13 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
-final class CatNameCommand extends AbstractWorldCommand {
+final class CatNameCommand extends CatCommand {
   @Nonnull private final EntityWrappedArg entityArg;
   @Nonnull private final RequiredArg<String> nameArg;
 
@@ -46,10 +45,11 @@ final class CatNameCommand extends AbstractWorldCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> entityRef = this.entityArg.get(store, context);
     String catName = this.nameArg.get(context);
+    var entityOpt = getEntityFromArgument(this.entityArg, store, context);
 
-    if (entityRef != null && entityRef.isValid()) {
+    if (entityOpt.isPresent()) {
+      Ref<EntityStore> entityRef = entityOpt.get();
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 

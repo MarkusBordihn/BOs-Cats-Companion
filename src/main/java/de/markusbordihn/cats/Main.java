@@ -32,9 +32,13 @@ import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionWild;
-import de.markusbordihn.cats.commands.CatCommand;
+import de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState;
+import de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed;
+import de.markusbordihn.cats.commands.CatCommands;
+import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.system.CatOwnershipSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
@@ -55,6 +59,8 @@ public class Main extends JavaPlugin {
   private static Main instance;
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
+  public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
+  public CatsManager catsManager;
   private boolean actionsRegistered = false;
 
   public Main(JavaPluginInit init) {
@@ -101,6 +107,27 @@ public class Main extends JavaPlugin {
     }
 
     LOGGER.at(Level.INFO).log("Registered %d cat interaction actions", registeredCount);
+
+    // Register additional standalone actions
+    try {
+      actionFactory.add(
+          BuilderActionCatSetSleepingState.BUILDER_ID, BuilderActionCatSetSleepingState::new);
+      LOGGER.at(Level.INFO).log(
+          "Registered action: %s", BuilderActionCatSetSleepingState.BUILDER_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register action: %s", BuilderActionCatSetSleepingState.BUILDER_ID, e);
+    }
+
+    try {
+      actionFactory.add(
+          BuilderActionCatTeleportToBed.BUILDER_ID, BuilderActionCatTeleportToBed::new);
+      LOGGER.at(Level.INFO).log("Registered action: %s", BuilderActionCatTeleportToBed.BUILDER_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register action: %s", BuilderActionCatTeleportToBed.BUILDER_ID, e);
+    }
+
     actionsRegistered = true;
   }
 
@@ -121,12 +148,21 @@ public class Main extends JavaPlugin {
     catStateComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatStateComponent.class, "CatState", CatStateComponent.CODEC);
+    catBedTargetComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(
+                CatBedTargetComponent.class, "CatBedTarget", CatBedTargetComponent.CODEC);
 
     // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
     getEntityStoreRegistry().registerSystem(new CatOwnershipSystem(catOwnerComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
+
+    // Register cats manager
+    LOGGER.at(Level.INFO).log("Registering cats manager...");
+    this.catsManager = new CatsManager(catStateComponentType);
+    getEntityStoreRegistry().registerSystem(this.catsManager);
 
     // Try to register custom actions early (for client and server worlds)
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
@@ -149,7 +185,7 @@ public class Main extends JavaPlugin {
 
     // Register commands
     LOGGER.at(Level.INFO).log("Registering commands...");
-    this.getCommandRegistry().registerCommand(new CatCommand());
+    this.getCommandRegistry().registerCommand(new CatCommands());
   }
 
   @Override

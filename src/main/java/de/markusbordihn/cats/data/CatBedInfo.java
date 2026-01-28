@@ -19,13 +19,15 @@
 
 package de.markusbordihn.cats.data;
 
-public enum CatState {
-  SITTING,
-  SLEEPING,
-  GOING_TO_BED,
-  FOLLOWING,
-  WANDERING,
-  PLAYING,
-  SEARCHING,
-  WAITING
+import com.hypixel.hytale.math.vector.Vector3d;
+
+public record CatBedInfo(Vector3d position, double distance) {
+
+  public Vector3d getPosition() {
+    return position;
+  }
+
+  public double getDistance() {
+    return distance;
+  }
 }

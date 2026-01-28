@@ -77,20 +77,27 @@ tasks.register('proguard', proguard.gradle.ProGuardTask) {
   keep 'public class de.markusbordihn.cats.Main extends com.hypixel.hytale.server.core.plugin.JavaPlugin { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatOwnerComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatStateComponent { public protected *; }'
-  keep 'public class de.markusbordihn.cats.component.CatStateComponent$CatState { *; }'
+  keep 'public class de.markusbordihn.cats.component.CatBedTargetComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.system.CatOwnershipSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.system.CatStateSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.system.CatStateSyncSystem { public <init>(...); }'
+  keep 'public class de.markusbordihn.cats.manager.CatsManager { public <init>(...); }'
 
-  // Keep Action builders (referenced in JSON files and registered via reflection)
+  // Keep data classes and enums
+  keep 'public enum de.markusbordihn.cats.data.CatState { *; }'
+
+  // Keep Action builders (registered via reflection in Main.java)
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionWild { public <init>(); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner { public <init>(); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed { public <init>(); public protected *; }'
 
   // Keep enum structure
   keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
 
-  // Interaction classes, Commands, and Handlers will be obfuscated (only used internally)
+  // Keep all command classes (used by Hytale Command System)
+  keep 'public class de.markusbordihn.cats.commands.** extends com.hypixel.hytale.server.core.command.system.basecommands.** { public protected *; }'
 
   // Don't print notes about potential issues
   dontnote
@@ -129,17 +136,26 @@ jar {
 // IntelliJ IDEA run configuration
 def serverRunDir = file("$projectDir/run")
 
-idea.project.settings.runConfigurations {
-  'HytaleServer'(org.jetbrains.gradle.ext.Application) {
-    mainClass = 'com.hypixel.hytale.Main'
-    moduleName = project.idea.module.name + '.main'
+// IntelliJ run configuration using Application (not Gradle task)
+idea {
+  project {
+    settings {
+      runConfigurations {
+        'HytaleServer'(org.jetbrains.gradle.ext.Application) {
+          mainClass = 'com.hypixel.hytale.Main'
+          moduleName = rootProject.name + '.main'
 
-    def hytaleHome = project.findProperty('hytaleHome') ?: 'G:/Hytale/install/release'
-    def patchline = project.findProperty('patchline') ?: 'package/game/latest'
-    def assetsPath = "${hytaleHome}/${patchline}/Assets.zip"
-    def modsPath = file("src/main/").absolutePath
+          def hytaleHome = project.findProperty('hytaleHome') ?: 'G:/Hytale/install/release'
+          def patchline = project.findProperty('patchline') ?: 'package/game/latest'
+          def assetsPath = "${hytaleHome}/${patchline}/Assets.zip"
+          def modsPath = file("src/main/").absolutePath
 
-    programParameters = "--allow-op --assets=${assetsPath} --mods=${modsPath}"
-    workingDirectory = serverRunDir.absolutePath
+          programParameters = "--allow-op --assets=\"${assetsPath}\" --mods=\"${modsPath}\""
+          workingDirectory = serverRunDir.absolutePath
+
+          shortenCommandLine = 'MANIFEST'
+        }
+      }
+    }
   }
 }

@@ -25,3 +25,13 @@ items.cats.egg_spawner_siamese.name=Siamkatze Spawner Ei
 items.cats.egg_spawner_tortie.name=Schildpatt Katze Spawner Ei
 items.cats.egg_spawner_tuxedo.name=Smoking Katze Spawner Ei
 items.cats.egg_spawner_white.name=Weiße Katze Spawner Ei
+items.cats.egg_spawner_black.description=Spawnt eine Schwarze Katze beim Platzieren.
+items.cats.egg_spawner_calico.description=Spawnt eine Calico Katze beim Platzieren.
+items.cats.egg_spawner_kitten_calico.description=Spawnt ein Calico Kätzchen beim Platzieren.
+items.cats.egg_spawner_graytabby.description=Spawnt eine Graue Tabby Katze beim Platzieren.
+items.cats.egg_spawner_orangetabby.description=Spawnt eine Orange Tabby Katze beim Platzieren.
+items.cats.egg_spawner_siamese.description=Spawnt eine Siamkatze beim Platzieren.
+items.cats.egg_spawner_tuxedo.description=Spawnt eine Smoking Katze beim Platzieren.
+
+items.cats.cat_bed.name=Katzenbett
+items.cats.cat_bed.description=Ein gemütliches Bett für deine Katzen. Weise einer Katze dieses Bett mit dem /cat bed Befehl zu. Deine Katze wird hier ruhen, wenn sie dir nicht folgt.

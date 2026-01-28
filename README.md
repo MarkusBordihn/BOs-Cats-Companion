@@ -1,9 +1,7 @@
 # 🐱 Cats – Tameable Cat Companions for Hytale
 
-[![Hytale](https://img.shields.io/badge/Hytale-Plugin-blue)](https://hytale.com)
-
-> ⚠️ **EARLY ALPHA – MVP VERSION**
-> This is a minimal viable product (MVP), several features are still work in progress.
+[![🎮 Use Hytale Creator Code Kaworru](https://img.shields.io/badge/%20Use%20Hytale%20Creator%20Code-Kaworru-orange)](https://hytale.com/)
+⚠️ **BETA VERSION**  This is a beta version, several features are still work in progress.
 
 ## 📖 Overview
 
@@ -24,6 +22,7 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Multiple behavior states: sitting, following, waiting, wandering, sleeping, playing, searching
 * Matching animations for each behavior
 * Cat sounds
+* Cat Bed item for assigned sleeping spots
 * Item consumption for taming and feeding (items are consumed from the player's inventory)
 * Persistent component data for owner + state (component CODECs)
 
@@ -79,11 +78,27 @@ Each breed also has a spawn egg:
 * **Creative mode block** – Players in Creative mode cannot tame or interact with cats to prevent
   exploits
 
+### Cat Furniture
+
+#### Cat Bed
+
+Craft a Cat Bed to provide your cats with a cozy sleeping spot:
+
+**Crafting Recipe (at Furniture Bench):**
+
+* 4x Wood Planks (any type)
+* 2x White Wool
+* 3x Fiber
+
+Cat Beds can be assigned to your tamed cats using the `/cat bed` command.
+Your cat will find and sleep in the nearest available bed.
+
 ### Available Commands
 
 #### General Commands
 
 * `/cat info` – Show detailed cat information (works on any cat)
+* `/cat list` – List all cats owned by a player
 * `/cat owner` – Admin command to change ownership
 
 #### Tamed Cat Commands
@@ -92,6 +107,7 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 * `/cat sit` – Make the cat sit and stay
 * `/cat sleep` – Put the cat to sleep
+* `/cat bed` – Send the cat to the nearest available cat bed
 * `/cat follow` – Make the cat follow you
 * `/cat wait` – Stop following and wait in place
 * `/cat wander` – Allow free roaming
@@ -120,7 +136,6 @@ Planned improvements and additions:
 * Cat breeding and kittens
 * Accessories such as collars and bells
 * Toys and interactive items
-* Cat beds and assigned sleeping spots
 * Additional cat breeds
 * Cat progression and special abilities
 

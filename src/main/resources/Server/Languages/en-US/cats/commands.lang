@@ -1,4 +1,7 @@
 # Cat Commands
+bed.going_to_bed={name} is going to a bed {distance} blocks away at ({x}, {y}, {z})
+bed.no_beds_found=No cat beds found within {radius} blocks of position ({x}, {y}, {z})
+bed.all_beds_occupied=All {count} cat bed(s) nearby are occupied by other sleeping cats
 follow.re_triggered.hint=Cat was already following, forced refresh!
 follow.re_triggered=Re-triggered follow mode for {name}
 follow.success={name} is now following you
@@ -12,5 +15,6 @@ wander.success={name} is now wandering freely
 
 # Error Messages
 error.no_cat=No cat in view
+error.no_position=Cannot determine cat position
 error.not_owned=This cat doesn't have an owner
 error.not_owner=This cat belongs to {owner}

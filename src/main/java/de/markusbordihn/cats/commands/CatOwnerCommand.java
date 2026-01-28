@@ -26,15 +26,16 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
-final class CatOwnerCommand extends AbstractWorldCommand {
+final class CatOwnerCommand extends CatCommand {
   @Nonnull private final EntityWrappedArg entityArg;
   @Nonnull private final RequiredArg<String> ownerArg;
 
@@ -47,9 +48,11 @@ final class CatOwnerCommand extends AbstractWorldCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> entityRef = this.entityArg.get(store, context);
     String ownerName = this.ownerArg.get(context);
-    if (entityRef != null && entityRef.isValid()) {
+    var entityOpt = getEntityFromArgument(this.entityArg, store, context);
+
+    if (entityOpt.isPresent()) {
+      Ref<EntityStore> entityRef = entityOpt.get();
       context.sendMessage(Message.raw("=== Set Cat Owner ===").color("#FFD700"));
       var uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
       if (uuidComponent != null) {
@@ -60,6 +63,12 @@ final class CatOwnerCommand extends AbstractWorldCommand {
       UUID ownerId = UUID.nameUUIDFromBytes(("player:" + ownerName).getBytes());
       CatOwnerComponent ownerComponent = new CatOwnerComponent(ownerId, ownerName);
       store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
+
+      // Register owner in cats manager
+      CatsManager catsManager = Main.getInstance().catsManager;
+      if (catsManager != null) {
+        catsManager.registerOwner(entityRef, ownerId);
+      }
 
       context.sendMessage(Message.raw(""));
       context.sendMessage(Message.raw("✓ Owner set to: " + ownerName).color("#00FF00"));

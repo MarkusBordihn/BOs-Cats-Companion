@@ -1,9 +1,13 @@
 tasks.register('extractHytaleApi') {
   group = 'hytale'
-  description = 'Extracts Hytale API class files to hytale-api/ for reference'
+  description = 'Extracts Hytale API class files to temporary directory for decompilation'
 
   def hytaleJar = file(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
-  def outputDir = file("$projectDir/hytale-api")
+  def outputDir = file("$buildDir/tmp/hytale-classes")
+
+  // Define inputs and outputs for Gradle caching
+  inputs.file(hytaleJar)
+  outputs.dir(outputDir)
 
   doLast {
     if (!hytaleJar.exists()) {
@@ -13,7 +17,7 @@ tasks.register('extractHytaleApi') {
     delete outputDir
     outputDir.mkdirs()
 
-    println "Extracting from ${hytaleJar.name}..."
+    println "Extracting class files from ${hytaleJar.name}..."
 
     copy {
       from zipTree(hytaleJar)
@@ -21,23 +25,123 @@ tasks.register('extractHytaleApi') {
       include 'com/hypixel/hytale/**/*.class'
     }
 
-    // Create index file
-    def indexFile = new File(outputDir, 'API_INDEX.txt')
-    def classes = []
+    // Count extracted classes
+    def classCount = 0
     outputDir.eachFileRecurse { file ->
       if (file.name.endsWith('.class')) {
+        classCount++
+      }
+    }
+
+    println "✅ Extracted ${classCount} class files to temporary directory"
+  }
+}
+
+// Configuration for Vineflower decompiler
+def vineflowerConfig = configurations.create('vineflower') {
+  visible = false
+  transitive = true
+}
+
+dependencies {
+  vineflower 'org.vineflower:vineflower:1.10.1'
+}
+
+tasks.register('runVineflower', JavaExec) {
+  group = 'hytale'
+  description = 'Runs Vineflower decompiler on extracted Hytale API classes'
+
+  def classesDir = file("$buildDir/tmp/hytale-classes")
+  def outputDir = file("$projectDir/hytale-api")
+
+  mainClass = 'org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler'
+  classpath = vineflowerConfig
+
+  // Increase JVM memory and stack size to handle complex/nested classes
+  jvmArgs = [
+      '-Xmx2G',           // Maximum heap size
+      '-Xss16M',          // Stack size (default is usually 1M, increase to prevent StackOverflowError)
+      '-XX:+UseParallelGC' // Use parallel garbage collector for better performance
+  ]
+
+  args = [
+      '-dgs=1',  // Decompile generic signatures
+      '-hdc=0',  // Hide default constructor
+      '-asc=1',  // Encode non-ASCII characters
+      '-rsy=1',  // Remove synthetic class members
+      '-lit=1',  // Output numeric literals as-is
+      '-nns=1',  // Assume no custom classes implement standard interfaces
+      '-mpm=60', // Max processing time per method in seconds (prevent hangs)
+      '-log=ERROR', // Only show errors (suppress warnings about individual class failures)
+      classesDir.absolutePath,
+      outputDir.absolutePath
+  ]
+
+  // Ignore exit value - some classes may fail but we want to continue
+  ignoreExitValue = true
+
+  doFirst {
+    delete outputDir
+    outputDir.mkdirs()
+    println "Decompiling Hytale API classes using Vineflower..."
+    println "Note: Some complex classes may fail to decompile - this is expected"
+  }
+}
+
+tasks.register('decompileHytaleApi') {
+  group = 'hytale'
+  description = 'Decompiles extracted Hytale API class files to Java sources'
+
+  dependsOn extractHytaleApi, runVineflower
+
+  def classesDir = file("$buildDir/tmp/hytale-classes")
+  def outputDir = file("$projectDir/hytale-api")
+
+  doLast {
+    // Vineflower creates a nested directory structure, move files up
+    def decompDir = new File(outputDir, classesDir.name)
+    if (decompDir.exists()) {
+      copy {
+        from decompDir
+        into outputDir
+      }
+      delete decompDir
+    }
+
+    // Count decompiled files and identify failed classes
+    def javaFiles = []
+    def classFiles = []
+
+    // Count all original class files
+    def totalClasses = 0
+    classesDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.class')) {
+        totalClasses++
+      }
+    }
+
+    // Count successfully decompiled files
+    outputDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.java')) {
+        def className = file.absolutePath
+            .replace(outputDir.absolutePath + File.separator, '')
+            .replace(File.separator, '.')
+            .replace('.java', '')
+        javaFiles << className
+      } else if (file.name.endsWith('.class')) {
         def className = file.absolutePath
             .replace(outputDir.absolutePath + File.separator, '')
             .replace(File.separator, '.')
             .replace('.class', '')
-        classes << className
+        classFiles << className
       }
     }
 
-    // Sort and group by package
-    def sortedClasses = classes.sort()
+    // Create index file with statistics
+    def indexFile = new File(outputDir, 'API_INDEX.txt')
+    def sortedFiles = javaFiles.sort()
     def grouped = [:]
-    sortedClasses.each { className ->
+    sortedFiles.each { className ->
       def pkg = className.substring(0, className.lastIndexOf('.'))
       if (!grouped.containsKey(pkg)) {
         grouped[pkg] = []
@@ -45,9 +149,28 @@ tasks.register('extractHytaleApi') {
       grouped[pkg] << className.substring(className.lastIndexOf('.') + 1)
     }
 
-    // Write index with grouping
-    indexFile.text = "Hytale API Classes (${classes.size()} total)\n"
+    def successRate = totalClasses > 0 ? (javaFiles.size() * 100.0 / totalClasses) : 0
+
+    indexFile.text = "Hytale API - Decompiled Sources\n"
     indexFile.text += "=" * 80 + "\n"
+    indexFile.text += "Decompiled with Vineflower on ${new Date().format('yyyy-MM-dd HH:mm:ss')}\n"
+    indexFile.text += "=" * 80 + "\n"
+    indexFile.text += "\nDecompilation Statistics:\n"
+    indexFile.text += "  Total classes:      ${totalClasses}\n"
+    indexFile.text += "  Successfully decompiled: ${javaFiles.size()}\n"
+    indexFile.text += "  Failed to decompile:     ${totalClasses - javaFiles.size()}\n"
+    indexFile.text += "  Success rate:            ${String.format('%.2f', successRate)}%\n"
+
+    if (classFiles.size() > 0) {
+      indexFile.text += "\nNote: ${classFiles.size()} classes remain as .class files due to decompilation failures.\n"
+      indexFile.text += "These are typically complex/obfuscated classes that caused StackOverflowError.\n"
+      indexFile.text += "You can still reference them via IDE decompiler or use them for compilation.\n"
+    }
+
+    indexFile.text += "\n" + "=" * 80 + "\n"
+    indexFile.text += "\nDecompiled Classes by Package:\n"
+    indexFile.text += "=" * 80 + "\n"
+
     grouped.each { pkg, classList ->
       indexFile.text += "\n${pkg}:\n"
       classList.each { cls ->
@@ -55,9 +178,29 @@ tasks.register('extractHytaleApi') {
       }
     }
 
-    println "✅ Extracted ${classes.size()} Hytale classes"
+    if (classFiles.size() > 0) {
+      indexFile.text += "\n" + "=" * 80 + "\n"
+      indexFile.text += "\nFailed Decompilations (available as .class):\n"
+      indexFile.text += "=" * 80 + "\n"
+      classFiles.sort().each { className ->
+        indexFile.text += "  - ${className}\n"
+      }
+    }
+
+    println "✅ Decompilation complete!"
+    println "   Successfully decompiled: ${javaFiles.size()} classes"
+    if (totalClasses - javaFiles.size() > 0) {
+      println "   ⚠️  Failed to decompile: ${totalClasses - javaFiles.size()} classes (kept as .class)"
+      println "   These classes had StackOverflowError or other decompilation issues"
+    }
+    println "   Success rate: ${String.format('%.2f', successRate)}%"
     println "📁 Output: ${outputDir}"
     println "📄 Index: ${indexFile}"
+
+    // Clean up temporary class files
+    println "🧹 Cleaning up temporary class files..."
+    delete classesDir
+    println "✅ Temporary class files removed"
   }
 }
 
@@ -98,15 +241,34 @@ tasks.register('extractHytaleResources') {
   }
 }
 
+tasks.register('createHytaleApiSourcesJar', Jar) {
+  group = 'hytale'
+  description = 'Creates a sources JAR from decompiled Hytale API for IDE integration'
+
+  dependsOn decompileHytaleApi
+
+  archiveBaseName = 'hytale-api'
+  archiveClassifier = 'sources'
+  destinationDirectory = file("$buildDir/libs")
+
+  from file("$projectDir/hytale-api")
+  exclude 'API_INDEX.txt'
+
+  doLast {
+    println "✅ Created Hytale API sources JAR: ${archiveFile.get().asFile}"
+  }
+}
+
 tasks.register('decompile') {
   group = 'hytale'
   description = 'Decompile Hytale developer resources for reference'
 
-  dependsOn extractHytaleApi, extractHytaleResources
+  dependsOn decompileHytaleApi, createHytaleApiSourcesJar, extractHytaleResources
 
   doLast {
     println "\n✅ Hytale extraction complete!"
-    println "   - API classes available in hytale-api/"
+    println "   - Decompiled API sources available in hytale-api/"
+    println "   - API sources JAR available in build/libs/hytale-api-sources.jar"
     println "   - Resources available in hytale-resources/"
   }
 }

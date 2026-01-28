@@ -27,10 +27,12 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
+import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.inventory.InventoryHelper;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.logging.Level;
 
 public class InteractionTaming {
@@ -80,6 +82,12 @@ public class InteractionTaming {
 
     CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
     store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
+
+    // Register owner in cats manager
+    CatsManager catsManager = Main.getInstance().catsManager;
+    if (catsManager != null) {
+      catsManager.registerOwner(entityRef, playerUUID);
+    }
 
     // Trigger Taming animation state (auto-transitions to Pet state after 3 seconds)
     role.getStateSupport().setState(entityRef, "Taming", "Default", store);

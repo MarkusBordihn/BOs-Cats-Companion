@@ -306,6 +306,56 @@
               }
             },
             {
+              "$Comment": "GoingToBed behavior - walks to bed using TransientPath, teleports after timeout",
+              "Sensor": {
+                "Type": "State",
+                "State": ".GoingToBed"
+              },
+              "Instructions": [
+                {
+                  "$Comment": "Follow path to bed while path exists, teleport after 4-5 sec timeout",
+                  "Sensor": {
+                    "Type": "Path",
+                    "PathType": "TransientPath"
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [4, 5],
+                      "Action": {
+                        "Type": "CatTeleportToBed"
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Path"
+                  }
+                },
+                {
+                  "$Comment": "No path - teleport immediately to bed",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "CatTeleportToBed"
+                    },
+                    {
+                      "Type": "State",
+                      "State": ".Sleeping"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "$Comment": "Stretching behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
@@ -575,10 +625,9 @@
                   ]
                 },
                 {
-                  "$Comment": "Teleport to player if too far away",
+                  "$Comment": "Teleport to player if too far away (outside seek range)",
                   "Sensor": {
-                    "Type": "Target",
-                    "MinRange": 25
+                    "Type": "Target"
                   },
                   "BodyMotion": {
                     "Type": "Teleport"
@@ -618,6 +667,7 @@
                 {"Type": "State", "State": ".Default"},
                 {"Type": "State", "State": ".Sitting"},
                 {"Type": "State", "State": ".Sleeping"},
+                {"Type": "State", "State": ".GoingToBed"},
                 {"Type": "State", "State": ".Stretching"},
                 {"Type": "State", "State": ".Licking"},
                 {"Type": "State", "State": ".Playing"},
@@ -661,8 +711,7 @@
               "Delay": [3, 3],
               "Action": {
                 "Type": "State",
-                "State": "Pet",
-                "SubState": "Default"
+                "State": "Pet.Default"
               }
             }
           ],

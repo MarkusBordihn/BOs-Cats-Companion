@@ -1,6 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.cats.egg_spawner_tuxedo.name"
+    "Name": "server.items.cats.egg_spawner_tuxedo.name",
+    "Description": "server.items.cats.egg_spawner_tuxedo.description"
   },
   "Quality": "Rare",
   "PlayerAnimationsId": "Item",

@@ -1,6 +1,7 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.cats.egg_spawner_calico.name"
+    "Name": "server.items.cats.egg_spawner_calico.name",
+    "Description": "server.items.cats.egg_spawner_calico.description"
   },
   "Quality": "Rare",
   "PlayerAnimationsId": "Item",

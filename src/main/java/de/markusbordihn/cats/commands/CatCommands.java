@@ -17,15 +17,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.data;
+package de.markusbordihn.cats.commands;
 
-public enum CatState {
-  SITTING,
-  SLEEPING,
-  GOING_TO_BED,
-  FOLLOWING,
-  WANDERING,
-  PLAYING,
-  SEARCHING,
-  WAITING
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+
+public final class CatCommands extends AbstractCommandCollection {
+  public CatCommands() {
+    super("cat", "Cat management commands");
+    this.addAliases("cats");
+
+    this.addSubCommand(new CatInfoCommand());
+    this.addSubCommand(new CatListCommand());
+    this.addSubCommand(new CatOwnerCommand());
+    this.addSubCommand(new CatSitCommand());
+    this.addSubCommand(new CatSleepCommand());
+    this.addSubCommand(new CatBedCommand());
+    this.addSubCommand(new CatFollowCommand());
+    this.addSubCommand(new CatWaitCommand());
+    this.addSubCommand(new CatWanderCommand());
+    this.addSubCommand(new CatNameCommand());
+    this.addSubCommand(new CatPlayCommand());
+    this.addSubCommand(new CatSearchCommand());
+  }
 }

@@ -25,3 +25,13 @@ items.cats.egg_spawner_siamese.name=Siamese Cat Spawner Egg
 items.cats.egg_spawner_tortie.name=Tortoiseshell Cat Spawner Egg
 items.cats.egg_spawner_tuxedo.name=Tuxedo Cat Spawner Egg
 items.cats.egg_spawner_white.name=White Cat Spawner Egg
+items.cats.egg_spawner_black.description=Spawns a Black Cat when placed.
+items.cats.egg_spawner_calico.description=Spawns a Calico Cat when placed.
+items.cats.egg_spawner_kitten_calico.description=Spawns a Calico Kitten when placed.
+items.cats.egg_spawner_graytabby.description=Spawns a Gray Tabby Cat when placed.
+items.cats.egg_spawner_orangetabby.description=Spawns an Orange Tabby Cat when placed.
+items.cats.egg_spawner_siamese.description=Spawns a Siamese Cat when placed.
+items.cats.egg_spawner_tuxedo.description=Spawns a Tuxedo Cat when placed.
+
+items.cats.cat_bed.name=Cat Bed
+items.cats.cat_bed.description=A comfortable bed for your cats. Assign a cat to this bed using the /cat bed command. Your cat will rest here when not following you.

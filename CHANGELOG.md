@@ -7,6 +7,18 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.4.0
+
+- Fixed command exception handling when no entity is targeted.
+- Added Cat Bed item (placeable block for cats to sleep in).
+- Added `/cat bed` command to send cats to the nearest available cat bed.
+- Added custom hitbox for Cat Bed to prevent overlapping placement.
+- Added item descriptions for all cat-related items (spawn eggs and cat bed).
+- Added translation entries for Cat Bed in English and German.
+- Improved cat bed detection and pathfinding system.
+- Improved cat state management with GOING_TO_BED state.
+- Improved command error handling for CatInfoCommand, CatNameCommand, and CatOwnerCommand.
+
 ### 1.3.0
 
 - Fixed cat following behavior when tracking is lost by retriggering search state.

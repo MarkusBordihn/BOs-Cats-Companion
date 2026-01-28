@@ -19,22 +19,89 @@
 
 package de.markusbordihn.cats.commands;
 
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.component.CatOwnerComponent;
+import java.util.Optional;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public final class CatCommand extends AbstractCommandCollection {
-  public CatCommand() {
-    super("cat", "Cat management commands");
-    this.addAliases("cats");
+public abstract class CatCommand extends AbstractWorldCommand {
 
-    this.addSubCommand(new CatInfoCommand());
-    this.addSubCommand(new CatOwnerCommand());
-    this.addSubCommand(new CatSitCommand());
-    this.addSubCommand(new CatSleepCommand());
-    this.addSubCommand(new CatFollowCommand());
-    this.addSubCommand(new CatWaitCommand());
-    this.addSubCommand(new CatWanderCommand());
-    this.addSubCommand(new CatNameCommand());
-    this.addSubCommand(new CatPlayCommand());
-    this.addSubCommand(new CatSearchCommand());
+  protected CatCommand(@Nonnull String name, @Nonnull String description) {
+    super(name, description);
+  }
+
+  protected boolean checkOwnership(
+      @Nonnull Ref<EntityStore> entityRef,
+      @Nonnull Store<EntityStore> store,
+      @Nonnull CommandContext context) {
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+
+    if (ownerComponent == null || !ownerComponent.hasOwner()) {
+      return true;
+    }
+
+    String executingPlayer = getExecutingPlayerName(context);
+    if (executingPlayer == null) {
+      return true;
+    }
+
+    String ownerName = ownerComponent.getOwnerName();
+    if (ownerName != null && ownerName.equals(executingPlayer)) {
+      return true;
+    }
+
+    context.sendMessage(
+        Message.translation("cats.commands.error.not_owner")
+            .param("owner", ownerName)
+            .color("#FF0000"));
+    return false;
+  }
+
+  @Nullable
+  protected String getExecutingPlayerName(@Nonnull CommandContext context) {
+    if (!context.isPlayer()) {
+      return null;
+    }
+    return context.sender().getDisplayName();
+  }
+
+  @Nonnull
+  protected Optional<Ref<EntityStore>> getEntityFromArgument(
+      @Nonnull EntityWrappedArg entityArg,
+      @Nonnull Store<EntityStore> store,
+      @Nonnull CommandContext context) {
+    try {
+      Ref<EntityStore> entityRef = entityArg.get(store, context);
+      if (entityRef != null && entityRef.isValid()) {
+        return Optional.of(entityRef);
+      }
+    } catch (Exception e) {
+      // Entity not found or invalid argument
+    }
+    return Optional.empty();
+  }
+
+  @Nonnull
+  protected String getCatDisplayName(
+      @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+
+    if (ownerComponent != null) {
+      String catName = ownerComponent.getCatName();
+      if (catName != null && !catName.isEmpty()) {
+        return catName;
+      }
+    }
+
+    return "Cat";
   }
 }
