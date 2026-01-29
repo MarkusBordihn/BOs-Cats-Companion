@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import javax.annotation.Nonnull;
@@ -43,6 +44,7 @@ final class CatInfoCommand extends CatCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
+
     var entityOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityOpt.isPresent()) {
       Ref<EntityStore> entityRef = entityOpt.get();
@@ -51,9 +53,11 @@ final class CatInfoCommand extends CatCommand {
       // Display UUID and Ref Index
       UUIDComponent uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
       if (uuidComponent != null) {
-        context.sendMessage(Message.raw("UUID: " + uuidComponent.getUuid()).color("#808080"));
+        context.sendMessage(
+            Message.raw("UUID: " + uuidComponent.getUuid()).color(Constants.COLOR_GRAY));
       }
-      context.sendMessage(Message.raw("Ref Index: " + entityRef.getIndex()).color("#808080"));
+      context.sendMessage(
+          Message.raw("Ref Index: " + entityRef.getIndex()).color(Constants.COLOR_GRAY));
 
       // Display health information (if available from NPC config)
       context.sendMessage(Message.raw("Health: 20/20 (Max)").color("#FF6B6B"));
@@ -63,16 +67,16 @@ final class CatInfoCommand extends CatCommand {
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       if (ownerComponent != null && ownerComponent.hasOwner()) {
         context.sendMessage(
-            Message.raw("Owner: " + ownerComponent.getOwnerName()).color("#00FF00"));
+            Message.raw("Owner: " + ownerComponent.getOwnerName()).color(Constants.COLOR_SUCCESS));
 
         String catName = ownerComponent.getCatName();
         if (catName != null && !catName.isEmpty()) {
           context.sendMessage(Message.raw("Name: " + catName).color("#00FFFF"));
         } else {
-          context.sendMessage(Message.raw("Name: (unnamed)").color("#808080"));
+          context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
         }
       } else {
-        context.sendMessage(Message.raw("Owner: None (untamed)").color("#808080"));
+        context.sendMessage(Message.raw("Owner: None (untamed)").color(Constants.COLOR_GRAY));
       }
 
       // Display state information
@@ -83,11 +87,11 @@ final class CatInfoCommand extends CatCommand {
             switch (stateComponent.getState()) {
               case SITTING -> "#FFA500";
               case SLEEPING -> "#9370DB";
-              case FOLLOWING -> "#00FF00";
+              case FOLLOWING -> Constants.COLOR_SUCCESS;
               case PLAYING -> "#FF69B4";
               case SEARCHING -> "#FFD700";
               case WAITING -> "#87CEEB";
-              default -> "#FFFF00";
+              default -> Constants.COLOR_INFO;
             };
         context.sendMessage(Message.raw("State: " + stateComponent.getState()).color(stateColor));
       }
@@ -96,10 +100,11 @@ final class CatInfoCommand extends CatCommand {
       context.sendMessage(
           Message.raw(
                   "Tip: Use /cat sit, /cat sleep, /cat follow, /cat wait, /cat play, /cat search")
-              .color("#FFFF00"));
+              .color(Constants.COLOR_INFO));
     } else {
-      context.sendMessage(Message.raw("No entity in view.").color("#FF0000"));
-      context.sendMessage(Message.raw("Look at a cat and use: /cat info").color("#808080"));
+      context.sendMessage(Message.raw("No entity in view.").color(Constants.COLOR_ERROR));
+      context.sendMessage(
+          Message.raw("Look at a cat and use: /cat info").color(Constants.COLOR_GRAY));
     }
   }
 }

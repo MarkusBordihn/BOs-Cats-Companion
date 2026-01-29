@@ -7,6 +7,18 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.5.0
+
+- Added automatic cat naming when taming with over 90 unique names.
+- Added configurable cat names list (editable in `config/cats/cat_names.txt`).
+- Added security validation for custom cat names to prevent exploits.
+- Added `/cat release` command to release (remove) owned cats.
+- Added cat limit permission support with built-in Hytale permissions and LuckPerms.
+- Added cat owner tracking system to track and limit owned cats per player.
+- Added LuckPerms detection on startup with corresponding log messages and instructions.
+- Fixed permission system bug that could grant unlimited cats with wildcard permissions.
+- Improved code structure with centralized constants for colors and default limits.
+
 ### 1.4.0
 
 - Fixed command exception handling when no entity is targeted.

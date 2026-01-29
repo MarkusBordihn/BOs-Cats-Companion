@@ -15,10 +15,13 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 ### Working Features
 
-* Six cat breeds: Black Cat, Calico, Gray Tabby, Orange Tabby, Siamese, Tuxedo
+* Seven cat breeds: Black Cat, Calico, Gray Tabby, Orange Tabby, Siamese, Tuxedo, Kitten (
+  experimental)
 * Taming system using fish
+* Automatic cat naming with unique names for each cat
 * Full command-based interaction via `/cat`
-* Custom cat names
+* Custom cat names with `/cat name`
+* Cat ownership limits configurable via permissions
 * Multiple behavior states: sitting, following, waiting, wandering, sleeping, playing, searching
 * Matching animations for each behavior
 * Cat sounds
@@ -39,6 +42,7 @@ Use the NPC spawn command to create cats:
 /npc spawn Cats_OrangeTabby
 /npc spawn Cats_Siamese
 /npc spawn Cats_Tuxedo
+/npc spawn Cats_Kitten
 ```
 
 #### Option 2: Spawn Eggs
@@ -51,6 +55,7 @@ Each breed also has a spawn egg:
 * `Egg_Spawner_Cats_OrangeTabby` – Orange Tabby
 * `Egg_Spawner_Cats_Siamese` – Siamese Cat
 * `Egg_Spawner_Cats_Tuxedo` – Tuxedo Cat
+* `Egg_Spawner_Cats_Kitten` – Kitten (experimental)
 
 ### How to Tame a Cat
 
@@ -68,7 +73,8 @@ Each breed also has a spawn egg:
 5. Press F (interact key) on the cat while holding fish
    The cat will enter a taming animation and become yours (and the used food gets consumed)
 
-6. Success! The cat is now tamed and will follow you
+6. Success! The cat is now tamed, automatically named, and will follow you
+   Your new companion receives a unique name like "Whiskers", "Luna", or "Shadow"
 
 **Important Interaction Rules:**
 
@@ -105,17 +111,30 @@ Your cat will find and sleep in the nearest available bed.
 
 Commands work by looking at your tamed cat or by providing its entity ID:
 
-* `/cat sit` – Make the cat sit and stay
-* `/cat sleep` – Put the cat to sleep
 * `/cat bed` – Send the cat to the nearest available cat bed
 * `/cat follow` – Make the cat follow you
+* `/cat name <name>` – Set a custom name
+* `/cat play` – Enable playful behavior
+* `/cat release` – Release your cat back to the wild
+* `/cat search` – Send the cat roaming and hunting
+* `/cat sit` – Make the cat sit and stay
+* `/cat sleep` – Put the cat to sleep
 * `/cat wait` – Stop following and wait in place
 * `/cat wander` – Allow free roaming
-* `/cat play` – Enable playful behavior
-* `/cat search` – Send the cat roaming and hunting
-* `/cat name <name>` – Set a custom name
 
 **Tip:** For best results, look directly at your cat when using commands.
+
+## 🔐 Permissions & LuckPerms
+
+The plugin includes built-in support for both Hytale's permission system and LuckPerms.
+
+**LuckPerms Integration:**
+If you have LuckPerms installed, the plugin will automatically detect it on startup and provide
+helpful tips and permission examples in the server console.
+This makes it easier to configure cat ownership limits and command permissions for your players.
+
+**Default Cat Limit:**
+Players can own up to 16 cats by default. Server admins can adjust this limit using permissions.
 
 ## ⚠️ Known Limitations
 

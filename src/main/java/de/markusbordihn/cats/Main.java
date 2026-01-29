@@ -24,6 +24,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.event.PluginSetupEvent;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
@@ -35,11 +36,15 @@ import de.markusbordihn.cats.actions.BuilderActionCatInteractionWild;
 import de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState;
 import de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed;
 import de.markusbordihn.cats.commands.CatCommands;
+import de.markusbordihn.cats.compat.LuckPermsCompat;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.component.PlayerCatsComponent;
+import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.system.CatOwnershipSystem;
+import de.markusbordihn.cats.system.CatOwnershipTrackingSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
 import java.util.logging.Level;
@@ -60,6 +65,7 @@ public class Main extends JavaPlugin {
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
   public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
+  public ComponentType<EntityStore, PlayerCatsComponent> playerCatsComponentType;
   public CatsManager catsManager;
   private boolean actionsRegistered = false;
 
@@ -152,10 +158,14 @@ public class Main extends JavaPlugin {
         getEntityStoreRegistry()
             .registerComponent(
                 CatBedTargetComponent.class, "CatBedTarget", CatBedTargetComponent.CODEC);
+    playerCatsComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(PlayerCatsComponent.class, "PlayerCats", PlayerCatsComponent.CODEC);
 
     // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
     getEntityStoreRegistry().registerSystem(new CatOwnershipSystem(catOwnerComponentType));
+    getEntityStoreRegistry().registerSystem(new CatOwnershipTrackingSystem(catOwnerComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
 
@@ -163,6 +173,10 @@ public class Main extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Registering cats manager...");
     this.catsManager = new CatsManager(catStateComponentType);
     getEntityStoreRegistry().registerSystem(this.catsManager);
+
+    // Initialize cat names manager
+    LOGGER.at(Level.INFO).log("Initializing cat names manager...");
+    CatNamesManager.initialize();
 
     // Try to register custom actions early (for client and server worlds)
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
@@ -192,6 +206,9 @@ public class Main extends JavaPlugin {
   protected void start() {
     super.start();
     LOGGER.at(Level.INFO).log("Starting Cats Plugin...");
+
+    // Detect LuckPerms after Universe is ready
+    Universe.get().getUniverseReady().thenRun(LuckPermsCompat::detect);
   }
 
   @Override

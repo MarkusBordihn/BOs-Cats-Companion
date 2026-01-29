@@ -24,5 +24,13 @@ public final class Constants {
   public static final String MOD_ID = "cats";
   public static final String MOD_NAME = "Cats";
 
+  public static final String COLOR_ERROR = "#FF0000";
+  public static final String COLOR_SUCCESS = "#00FF00";
+  public static final String COLOR_WARNING = "#FFAA00";
+  public static final String COLOR_INFO = "#FFFF00";
+  public static final String COLOR_GRAY = "#808080";
+
+  public static final int DEFAULT_CAT_LIMIT = 16;
+
   private Constants() {}
 }

@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import javax.annotation.Nonnull;
@@ -63,10 +64,12 @@ final class CatWaitCommand extends CatCommand {
                 .param("name", getCatDisplayName(entityRef, store))
                 .color("#87CEEB"));
       } else {
-        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
+        context.sendMessage(
+            Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
       }
     } else {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
     }
   }
 }

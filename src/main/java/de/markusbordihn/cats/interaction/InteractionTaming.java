@@ -23,16 +23,24 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.permissions.PermissionHolder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.component.PlayerCatsComponent;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.inventory.InventoryHelper;
+import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.permission.PermissionManager;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class InteractionTaming {
@@ -70,6 +78,12 @@ public class InteractionTaming {
       return;
     }
 
+    var playerEntityRef = playerRef.getReference();
+    if (playerEntityRef == null) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
+      return;
+    }
+
     var playerUUID = playerRef.getUuid();
     var username = playerRef.getUsername();
     if (playerUUID == null || username == null) {
@@ -77,33 +91,91 @@ public class InteractionTaming {
       return;
     }
 
-    CatOwnerComponent ownerComponent = new CatOwnerComponent(playerUUID, username);
-    store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
-
-    CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
-    store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
-
-    // Register owner in cats manager
     CatsManager catsManager = Main.getInstance().catsManager;
-    if (catsManager != null) {
-      catsManager.registerOwner(entityRef, playerUUID);
+    if (catsManager == null) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - CatsManager is null");
+      player.sendMessage(
+          Message.translation("cats.interactions.taming.error_system")
+              .color(Constants.COLOR_ERROR));
+      return;
     }
 
-    // Trigger Taming animation state (auto-transitions to Pet state after 3 seconds)
+    int currentCatCount = catsManager.getCatsByOwner(playerUUID).size();
+    int catLimit = getCatLimit(player);
+    if (catLimit >= 0 && currentCatCount >= catLimit) {
+      player.sendMessage(
+          Message.translation("cats.interactions.taming.limit_reached")
+              .param("current", String.valueOf(currentCatCount))
+              .param("limit", String.valueOf(catLimit))
+              .color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    UUIDComponent catUuidComponent =
+        store.getComponent(entityRef, UUIDComponent.getComponentType());
+    UUID catUuid = catUuidComponent != null ? catUuidComponent.getUuid() : null;
+    if (catUuid == null) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - cat UUID not found");
+      player.sendMessage(
+          Message.translation("cats.interactions.taming.error_no_uuid")
+              .color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    String catName = CatNamesManager.getRandomName();
+    store.putComponent(
+        entityRef,
+        CatOwnerComponent.getComponentType(),
+        new CatOwnerComponent(playerUUID, username, catName));
+
+    Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
+    nameplate.setText(catName);
+
+    store.putComponent(
+        entityRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.FOLLOWING));
+
+    catsManager.registerOwner(entityRef, playerUUID);
+
+    PlayerCatsComponent playerCatsComponent =
+        store.getComponent(playerEntityRef, PlayerCatsComponent.getComponentType());
+    if (playerCatsComponent == null) {
+      playerCatsComponent = new PlayerCatsComponent();
+    }
+    playerCatsComponent.addCat(catUuid);
+    store.putComponent(
+        playerEntityRef, PlayerCatsComponent.getComponentType(), playerCatsComponent);
+
     role.getStateSupport().setState(entityRef, "Taming", "Default", store);
 
-    // Notify player
     player.sendMessage(
         Message.translation("cats.interactions.taming.success")
             .param("item", itemName)
-            .color("#00FF00"));
-    player.sendMessage(Message.translation("cats.interactions.taming.companion").color("#FFAA00"));
-    player.sendMessage(Message.translation("cats.interactions.taming.help").color("#FFFF00"));
+            .param("catName", catName)
+            .color(Constants.COLOR_SUCCESS));
+    player.sendMessage(
+        Message.translation("cats.interactions.taming.companion").color(Constants.COLOR_WARNING));
+    player.sendMessage(
+        Message.translation("cats.interactions.taming.help").color(Constants.COLOR_INFO));
 
-    // Consume item from inventory
+    if (catLimit >= 0) {
+      player.sendMessage(
+          Message.translation("cats.interactions.taming.count")
+              .param("current", String.valueOf(currentCatCount + 1))
+              .param("limit", String.valueOf(catLimit))
+              .color(Constants.COLOR_GRAY));
+    }
+
     InventoryHelper.consumeActiveHotbarItem(player, heldItem);
 
     LOGGER.at(Level.INFO).log(
-        "Cat successfully tamed by player %s with item %s", username, itemName);
+        "Cat successfully tamed by player %s with item %s (cats: %d/%d)",
+        username, itemName, currentCatCount + 1, catLimit);
+  }
+
+  private static int getCatLimit(Player player) {
+    if (!(player instanceof PermissionHolder permissionHolder)) {
+      return Constants.DEFAULT_CAT_LIMIT;
+    }
+    return PermissionManager.getCatLimit(permissionHolder);
   }
 }

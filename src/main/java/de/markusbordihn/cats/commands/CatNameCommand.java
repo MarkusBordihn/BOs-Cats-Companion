@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
@@ -50,6 +51,12 @@ final class CatNameCommand extends CatCommand {
 
     if (entityOpt.isPresent()) {
       Ref<EntityStore> entityRef = entityOpt.get();
+
+      // Check ownership before allowing rename
+      if (!checkOwnership(entityRef, store, context)) {
+        return;
+      }
+
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 
@@ -69,12 +76,14 @@ final class CatNameCommand extends CatCommand {
             Message.translation("cats.commands.name.success")
                 .param("name", oldName)
                 .param("newName", catName)
-                .color("#00FF00"));
+                .color(Constants.COLOR_SUCCESS));
       } else {
-        context.sendMessage(Message.translation("cats.commands.error.not_owned").color("#FF0000"));
+        context.sendMessage(
+            Message.translation("cats.commands.error.not_owned").color(Constants.COLOR_ERROR));
       }
     } else {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
     }
   }
 }

@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import javax.annotation.Nonnull;
@@ -69,21 +70,24 @@ final class CatFollowCommand extends CatCommand {
           context.sendMessage(
               Message.translation("cats.commands.follow.re_triggered")
                   .param("name", getCatDisplayName(entityRef, store))
-                  .color("#FFAA00"));
+                  .color(Constants.COLOR_WARNING));
           context.sendMessage(
-              Message.translation("cats.commands.follow.re_triggered.hint").color("#808080"));
+              Message.translation("cats.commands.follow.re_triggered.hint")
+                  .color(Constants.COLOR_GRAY));
         } else {
           stateSupport.setState(entityRef, "Pet", "Default", store);
           context.sendMessage(
               Message.translation("cats.commands.follow.success")
                   .param("name", getCatDisplayName(entityRef, store))
-                  .color("#00FF00"));
+                  .color(Constants.COLOR_SUCCESS));
         }
       } else {
-        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
+        context.sendMessage(
+            Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
       }
     } else {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
     }
   }
 }

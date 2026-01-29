@@ -1,20 +1,20 @@
 # Cat Commands
-bed.going_to_bed={name} geht zu einem Bett {distance} Blöcke entfernt bei ({x}, {y}, {z})
-bed.no_beds_found=Keine Katzenbetten innerhalb von {radius} Blöcken um Position ({x}, {y}, {z}) gefunden
-bed.all_beds_occupied=Alle {count} Katzenbett(en) in der Nähe sind von anderen schlafenden Katzen belegt
-follow.re_triggered.hint=Katze war bereits im Folge-Modus, Aktualisierung erzwungen!
+bed.going_to_bed={name} läuft zu einem gemütlichen Bett {distance} Blöcke entfernt bei ({x}, {y}, {z})
+bed.no_beds_found=Keine Katzenbetten innerhalb von {radius} Blöcken für {name} bei Position ({x}, {y}, {z}) gefunden
+bed.all_beds_occupied=Alle {count} Katzenbett(en) in der Nähe sind belegt! {name} muss auf einen freien Platz warten
+follow.re_triggered.hint={name} war bereits im Folge-Modus, Aktualisierung erzwungen!
 follow.re_triggered={name} wurde neu zum Folgen aufgefordert
-follow.success={name} folgt dir jetzt
-name.success={name} wurde umbenannt: {newName}
-play.success={name} spielt jetzt!
-search.success={name} sucht!
-sit.success={name} sitzt jetzt
-sleep.success={name} schläft jetzt
-wait.success={name} wartet jetzt
-wander.success={name} wandert jetzt frei umher
+follow.success={name} folgt dir jetzt treu und brav
+name.success={name} wurde umbenannt zu {newName}
+play.success={name} spielt jetzt vergnügt umher!
+search.success={name} ist auf der Jagd!
+sit.success={name} setzt sich gehorsam hin
+sleep.success={name} rollt sich für ein Nickerchen zusammen
+wait.success={name} wartet geduldig
+wander.success={name} erkundet frei die Umgebung
 
 # Error Messages
-error.no_cat=Keine Katze in Sicht
+error.no_cat=Keine Katze in Sicht, schau eine Katze an um diesen Befehl zu nutzen
 error.no_position=Katzenposition kann nicht ermittelt werden
-error.not_owned=Diese Katze hat keinen Besitzer
-error.not_owner=Diese Katze gehört {owner}
+error.not_owned=Diese Katze ist noch wild und hat keinen Besitzer
+error.not_owner={name} gehört {owner}

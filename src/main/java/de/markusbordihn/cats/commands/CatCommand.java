@@ -21,26 +21,52 @@ package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
+import com.hypixel.hytale.server.core.command.system.exceptions.NoPermissionException;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.permission.PermissionManager;
 import java.util.Optional;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class CatCommand extends AbstractWorldCommand {
 
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
   protected CatCommand(@Nonnull String name, @Nonnull String description) {
     super(name, description);
+  }
+
+  protected void checkPermissionAlways(@Nonnull CommandContext context, @Nonnull String permission)
+      throws NoPermissionException {
+    PermissionManager.checkPermissionAlways(context, permission);
+  }
+
+  protected boolean hasAdminBypass(@Nonnull CommandContext context) {
+    return PermissionManager.hasAdminBypass(context);
+  }
+
+  protected int getCatLimit(@Nonnull CommandContext context) {
+    return PermissionManager.getCatLimit(context);
   }
 
   protected boolean checkOwnership(
       @Nonnull Ref<EntityStore> entityRef,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandContext context) {
+
+    if (hasAdminBypass(context)) {
+      return true;
+    }
+
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
 
@@ -58,10 +84,20 @@ public abstract class CatCommand extends AbstractWorldCommand {
       return true;
     }
 
+    String catUuid = "unknown";
+    UUIDComponent uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
+    if (uuidComponent != null && uuidComponent.getUuid() != null) {
+      catUuid = uuidComponent.getUuid().toString();
+    }
+
+    LOGGER.at(Level.WARNING).log(
+        "SECURITY: Player '%s' attempted to access cat owned by '%s' (Cat UUID: %s)",
+        executingPlayer, ownerName, catUuid);
+
     context.sendMessage(
         Message.translation("cats.commands.error.not_owner")
             .param("owner", ownerName)
-            .color("#FF0000"));
+            .color(Constants.COLOR_ERROR));
     return false;
   }
 

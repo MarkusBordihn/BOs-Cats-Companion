@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -45,34 +46,39 @@ final class CatListCommand extends CatCommand {
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
     if (!context.isPlayer()) {
-      context.sendMessage(Message.raw("This command can only be used by players").color("#FF0000"));
+      context.sendMessage(
+          Message.raw("This command can only be used by players").color(Constants.COLOR_ERROR));
       return;
     }
 
     UUID playerUuid = context.sender().getUuid();
     if (playerUuid == null) {
-      context.sendMessage(Message.raw("Unable to get player UUID").color("#FF0000"));
+      context.sendMessage(Message.raw("Unable to get player UUID").color(Constants.COLOR_ERROR));
       return;
     }
 
     CatsManager catsManager = Main.getInstance().catsManager;
     if (catsManager == null) {
-      context.sendMessage(Message.raw("Cats manager not available").color("#FF0000"));
+      context.sendMessage(Message.raw("Cats manager not available").color(Constants.COLOR_ERROR));
       return;
     }
 
     Set<Ref<EntityStore>> playerCats = catsManager.getCatsByOwner(playerUuid);
 
+    int currentCount = playerCats.size();
+    int limit = getCatLimit(context);
+    String limitText = limit == -1 ? "unlimited" : String.valueOf(limit);
+
     if (playerCats.isEmpty()) {
-      context.sendMessage(Message.raw("=== Your Cats ===").color("#FFD700"));
-      context.sendMessage(Message.raw("You don't have any cats yet.").color("#808080"));
+      context.sendMessage(Message.raw("=== Your Cats (0/" + limitText + ") ===").color("#FFD700"));
+      context.sendMessage(Message.raw("You don't have any cats yet.").color(Constants.COLOR_GRAY));
       context.sendMessage(
-          Message.raw("Tip: Tame a wild cat by giving it raw fish!").color("#FFFF00"));
+          Message.raw("Tip: Tame a wild cat by giving it raw fish!").color(Constants.COLOR_INFO));
       return;
     }
 
     context.sendMessage(
-        Message.raw("=== Your Cats (" + playerCats.size() + ") ===").color("#FFD700"));
+        Message.raw("=== Your Cats (" + currentCount + "/" + limitText + ") ===").color("#FFD700"));
 
     int index = 1;
     for (Ref<EntityStore> catRef : playerCats) {
@@ -106,14 +112,15 @@ final class CatListCommand extends CatCommand {
 
       context.sendMessage(Message.raw(""));
       context.sendMessage(Message.raw(index + ". " + catName).color("#00FFFF"));
-      context.sendMessage(Message.raw("   UUID: " + catUuid).color("#808080"));
-      context.sendMessage(Message.raw("   Position: " + position).color("#FFAA00"));
+      context.sendMessage(Message.raw("   UUID: " + catUuid).color(Constants.COLOR_GRAY));
+      context.sendMessage(Message.raw("   Position: " + position).color(Constants.COLOR_WARNING));
 
       index++;
     }
 
     context.sendMessage(Message.raw(""));
     context.sendMessage(
-        Message.raw("Tip: Use /cat info while looking at a cat for more details").color("#FFFF00"));
+        Message.raw("Tip: Use /cat info while looking at a cat for more details")
+            .color(Constants.COLOR_INFO));
   }
 }

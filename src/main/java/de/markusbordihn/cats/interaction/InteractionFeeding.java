@@ -40,12 +40,8 @@ public class InteractionFeeding {
     String interactionType = isOwner ? "FEEDING: By Owner" : "FEEDING: By Stranger";
     InteractionLogger.logInteraction(interactionType, entityRef, role, store, player, itemName);
 
-    // Trigger Feeding animation state (auto-returns to Pet state after 2 seconds)
     role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
 
-    // TODO: Heal cat, increase happiness
-
-    // Consume item from inventory
     InventoryHelper.consumeActiveHotbarItem(player, heldItem);
 
     return false;

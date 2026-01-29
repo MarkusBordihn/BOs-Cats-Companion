@@ -33,6 +33,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
@@ -58,7 +59,8 @@ final class CatBedCommand extends CatCommand {
     var entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
 
     if (entityRefOpt.isEmpty()) {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -70,7 +72,8 @@ final class CatBedCommand extends CatCommand {
     TransformComponent catTransform =
         store.getComponent(catRef, TransformComponent.getComponentType());
     if (catTransform == null) {
-      context.sendMessage(Message.translation("cats.commands.error.no_position").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_position").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -85,7 +88,7 @@ final class CatBedCommand extends CatCommand {
               .param("y", String.format("%.1f", catPos.y))
               .param("z", String.format("%.1f", catPos.z))
               .param("radius", String.format("%.0f", CatBed.DEFAULT_SEARCH_RADIUS))
-              .color("#FFFF00"));
+              .color(Constants.COLOR_INFO));
       return;
     }
 
@@ -98,7 +101,7 @@ final class CatBedCommand extends CatCommand {
       context.sendMessage(
           Message.translation("cats.commands.bed.all_beds_occupied")
               .param("count", String.valueOf(beds.size()))
-              .color("#FFFF00"));
+              .color(Constants.COLOR_INFO));
       return;
     }
 
@@ -112,11 +115,11 @@ final class CatBedCommand extends CatCommand {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat")
               .param("name", catName)
-              .color("#FFFF00"));
+              .color(Constants.COLOR_INFO));
       return;
     }
 
-    // Set path to bed - the JSON timeout will handle teleport if pathfinding fails
+    // Set path to bed
     TransientPath path = new TransientPath();
     path.addWaypoint(new Vector3d(bedPos.x, bedPos.y + 0.5, bedPos.z), new Vector3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(path);
@@ -136,6 +139,6 @@ final class CatBedCommand extends CatCommand {
             .param("x", String.format("%.1f", bedPos.x))
             .param("y", String.format("%.1f", bedPos.y))
             .param("z", String.format("%.1f", bedPos.z))
-            .color("#00FF00"));
+            .color(Constants.COLOR_SUCCESS));
   }
 }
