@@ -11,3 +11,8 @@ taming.limit_reached=You have reached your cat limit ({current}/{limit})
 taming.error_no_uuid=Error: Could not tame cat (no UUID)
 taming.error_system=Error: Cats system not available
 taming.count=You now own {current} of {limit} cats
+
+# Hints
+hint.tame=Press [{key}] to tame
+hint.owner=Press [{key}] to interact with your cat
+hint.stranger=This cat belongs to someone else

@@ -155,7 +155,9 @@ public class InteractionTaming {
     player.sendMessage(
         Message.translation("cats.interactions.taming.companion").color(Constants.COLOR_WARNING));
     player.sendMessage(
-        Message.translation("cats.interactions.taming.help").color(Constants.COLOR_INFO));
+        Message.translation("cats.interactions.taming.help")
+            .param("catName", catName)
+            .color(Constants.COLOR_INFO));
 
     if (catLimit >= 0) {
       player.sendMessage(

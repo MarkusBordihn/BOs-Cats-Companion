@@ -94,8 +94,10 @@ public abstract class CatCommand extends AbstractWorldCommand {
         "SECURITY: Player '%s' attempted to access cat owned by '%s' (Cat UUID: %s)",
         executingPlayer, ownerName, catUuid);
 
+    String catName = getCatDisplayName(entityRef, store);
     context.sendMessage(
         Message.translation("cats.commands.error.not_owner")
+            .param("name", catName)
             .param("owner", ownerName)
             .color(Constants.COLOR_ERROR));
     return false;

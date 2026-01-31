@@ -7,6 +7,19 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.6.0
+
+- Fixed missing translation parameters in multiple commands (catName/name were not replaced in
+  messages).
+- Fixed taming help message not displaying cat name properly.
+- Fixed follow re-trigger hint message not displaying cat name.
+- Fixed bed command messages not displaying cat name.
+- Fixed ownership error message not displaying cat name.
+- Added longhaired Russian Blue cat variant based on a description by `Honest_Dragoness`.
+- Added Cat Yarn Ball toy item for playing with cats.
+- Added better interaction hints for owned, tamed and untamed cats.
+- Improved English and German translations for various commands and messages.
+
 ### 1.5.0
 
 - Added automatic cat naming when taming with over 90 unique names.
@@ -47,7 +60,7 @@ Note: The kitten variant is experimental and has limited functionality and anima
 - Fixed item consumption for taming and feeding (items are now consumed from the player's
   inventory).
 - Fixed cats spawn eggs icons.
-- Added Tuxedo cat variant (NPC role, spawn egg, model + textures).
+- Added Tuxedo cat variant based on a description by `Phosphoratorium`.
 - Added cat sounds for specific actions (purring, meowing, hissing).
 - Refactored commands, interactions, and systems to use the registered component types.
 - Improved NPC role behavior with additional idle actions (stretching, licking, playful pouncing,

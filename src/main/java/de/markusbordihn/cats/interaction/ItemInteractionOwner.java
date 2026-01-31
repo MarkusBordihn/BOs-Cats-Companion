@@ -48,6 +48,8 @@ public class ItemInteractionOwner {
           "Fish_Bluegill_Item",
           "Fish_Minnow_Item");
 
+  private static final String YARN_BALL_ITEM = "Cat_Yarn_Ball";
+
   public static boolean handle(
       Ref<EntityStore> entityRef,
       Role role,
@@ -59,6 +61,10 @@ public class ItemInteractionOwner {
 
     if (itemName != null && FOOD_ITEMS.contains(itemName)) {
       return InteractionFeeding.handle(entityRef, role, store, player, heldItem, true);
+    }
+
+    if (itemName != null && YARN_BALL_ITEM.equals(itemName)) {
+      return InteractionPlayingWithYarnBall.handle(entityRef, role, store, player);
     }
 
     if (player != null) {

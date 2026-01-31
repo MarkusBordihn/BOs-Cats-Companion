@@ -1,7 +1,12 @@
 # 🐱 Cats – Tameable Cat Companions for Hytale
 
 [![🎮 Use Hytale Creator Code Kaworru](https://img.shields.io/badge/%20Use%20Hytale%20Creator%20Code-Kaworru-orange)](https://hytale.com/)
+
 ⚠️ **BETA VERSION**  This is a beta version, several features are still work in progress.
+
+> **Important update note:**
+> Always remove all old versions of this plugin from your mods folder before updating, to avoid
+> issues like double saving or server startup errors!
 
 ## 📖 Overview
 
@@ -15,8 +20,8 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 ### Working Features
 
-* Seven cat breeds: Black Cat, Calico, Gray Tabby, Orange Tabby, Siamese, Tuxedo, Kitten (
-  experimental)
+* Eight cat breeds: Black Cat, Calico, Gray Tabby, Longhaired Russian Blue, Orange Tabby, Siamese,
+  Tuxedo, Kitten (experimental)
 * Taming system using fish
 * Automatic cat naming with unique names for each cat
 * Full command-based interaction via `/cat`
@@ -26,6 +31,7 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Matching animations for each behavior
 * Cat sounds
 * Cat Bed item for assigned sleeping spots
+* Cat Yarn Ball toy for playing with cats
 * Item consumption for taming and feeding (items are consumed from the player's inventory)
 * Persistent component data for owner + state (component CODECs)
 
@@ -39,6 +45,7 @@ Use the NPC spawn command to create cats:
 /npc spawn Cats_Black
 /npc spawn Cats_Calico
 /npc spawn Cats_GrayTabby
+/npc spawn Cats_LonghairedRussianBlue
 /npc spawn Cats_OrangeTabby
 /npc spawn Cats_Siamese
 /npc spawn Cats_Tuxedo
@@ -52,6 +59,7 @@ Each breed also has a spawn egg:
 * `Egg_Spawner_Cats_Black` – Black Cat
 * `Egg_Spawner_Cats_Calico` – Calico Cat
 * `Egg_Spawner_Cats_GrayTabby` – Gray Tabby
+* `Egg_Spawner_Cats_LonghairedRussianBlue` – Longhaired Russian Blue Cat
 * `Egg_Spawner_Cats_OrangeTabby` – Orange Tabby
 * `Egg_Spawner_Cats_Siamese` – Siamese Cat
 * `Egg_Spawner_Cats_Tuxedo` – Tuxedo Cat
@@ -98,6 +106,17 @@ Craft a Cat Bed to provide your cats with a cozy sleeping spot:
 
 Cat Beds can be assigned to your tamed cats using the `/cat bed` command.
 Your cat will find and sleep in the nearest available bed.
+
+#### Cat Yarn Ball
+
+A playful toy for your cats! Craft a Cat Yarn Ball to interact and play with your tamed cats:
+
+**Crafting Recipe (at Crafting Station):**
+
+* 3x Fiber
+
+Interact with your tamed cat while holding the Cat Yarn Ball to trigger a playful animation.
+Your cat will show affection with heart particles and happy sounds.
 
 ### Available Commands
 

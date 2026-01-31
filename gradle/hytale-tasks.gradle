@@ -239,36 +239,18 @@ tasks.register('extractHytaleResources') {
     println "✅ Extracted ${fileCount} Hytale resource files"
     println "📁 Output: ${outputDir}"
   }
-}
 
-tasks.register('createHytaleApiSourcesJar', Jar) {
-  group = 'hytale'
-  description = 'Creates a sources JAR from decompiled Hytale API for IDE integration'
-
-  dependsOn decompileHytaleApi
-
-  archiveBaseName = 'hytale-api'
-  archiveClassifier = 'sources'
-  destinationDirectory = file("$buildDir/libs")
-
-  from file("$projectDir/hytale-api")
-  exclude 'API_INDEX.txt'
-
-  doLast {
-    println "✅ Created Hytale API sources JAR: ${archiveFile.get().asFile}"
-  }
 }
 
 tasks.register('decompile') {
   group = 'hytale'
   description = 'Decompile Hytale developer resources for reference'
 
-  dependsOn decompileHytaleApi, createHytaleApiSourcesJar, extractHytaleResources
+  dependsOn decompileHytaleApi, extractHytaleResources
 
   doLast {
     println "\n✅ Hytale extraction complete!"
     println "   - Decompiled API sources available in hytale-api/"
-    println "   - API sources JAR available in build/libs/hytale-api-sources.jar"
     println "   - Resources available in hytale-resources/"
   }
 }

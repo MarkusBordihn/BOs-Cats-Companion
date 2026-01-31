@@ -26,9 +26,6 @@ node_modules
 npm-debug.log
 .npmrc
 
-# Files from Forge MDK
-forge*changelog.txt
-
 # VSCode
 .vscode/launch.json
 .vscode/settings.json
@@ -48,6 +45,7 @@ third_party
 *.stackdump
 
 # Hytale specific
+*.jar
 auth.json
 auth.enc
 hytale-api/

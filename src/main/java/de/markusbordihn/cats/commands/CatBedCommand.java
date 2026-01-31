@@ -82,8 +82,10 @@ final class CatBedCommand extends CatCommand {
     // Find all cat beds in range using CatBed helper
     List<CatBedInfo> beds = CatBed.findCatBeds(world, catPos);
     if (beds.isEmpty()) {
+      String catName = getCatDisplayName(catRef, store);
       context.sendMessage(
           Message.translation("cats.commands.bed.no_beds_found")
+              .param("name", catName)
               .param("x", String.format("%.1f", catPos.x))
               .param("y", String.format("%.1f", catPos.y))
               .param("z", String.format("%.1f", catPos.z))
@@ -98,8 +100,10 @@ final class CatBedCommand extends CatCommand {
     CatBedInfo availableBed = CatBed.findNearestAvailableBed(beds, store, catPos);
 
     if (availableBed == null) {
+      String catName = getCatDisplayName(catRef, store);
       context.sendMessage(
           Message.translation("cats.commands.bed.all_beds_occupied")
+              .param("name", catName)
               .param("count", String.valueOf(beds.size()))
               .color(Constants.COLOR_INFO));
       return;

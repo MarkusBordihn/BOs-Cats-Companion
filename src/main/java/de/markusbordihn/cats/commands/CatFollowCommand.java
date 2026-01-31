@@ -73,6 +73,7 @@ final class CatFollowCommand extends CatCommand {
                   .color(Constants.COLOR_WARNING));
           context.sendMessage(
               Message.translation("cats.commands.follow.re_triggered.hint")
+                  .param("name", getCatDisplayName(entityRef, store))
                   .color(Constants.COLOR_GRAY));
         } else {
           stateSupport.setState(entityRef, "Pet", "Default", store);

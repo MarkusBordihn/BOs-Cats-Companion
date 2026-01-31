@@ -678,6 +678,7 @@
                 {"Type": "State", "State": "Taming"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "Petting"},
+                {"Type": "State", "State": "PlayingWithYarnBall"},
                 {"Type": "State", "State": "Rejection"},
                 {"Type": "State", "State": "Despawn"}
               ]
@@ -795,6 +796,41 @@
           }
         },
         {
+          "$Comment": "Playing with Yarn Ball state - owner interaction with Cat_Yarn_Ball",
+          "Sensor": {
+            "Type": "State",
+            "State": "PlayingWithYarnBall"
+          },
+          "ActionsBlocking": true,
+          "Actions": [
+            {
+              "Type": "PlayAnimation",
+              "Animation": "Swing_Left",
+              "Slot": "Action"
+            },
+            {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Fox_Sleep"
+            },
+            {
+              "Type": "SpawnParticles",
+              "Offset": [0, 0.6, 0],
+              "ParticleSystem": "Hearts_Subtle"
+            },
+            {
+              "Type": "Timeout",
+              "Delay": [3, 3],
+              "Action": {
+                "Type": "State",
+                "State": "Pet"
+              }
+            }
+          ],
+          "BodyMotion": {
+            "Type": "Nothing"
+          }
+        },
+        {
           "$Comment": "Rejection state - wild cat refuses interaction with wrong item",
           "Sensor": {
             "Type": "State",
@@ -848,15 +884,68 @@
   "InteractionInstruction": {
     "Instructions": [
       {
-        "$Comment": "Always allow interaction",
+        "$Comment": "Wild cat (not tamed) - show taming hint on mouse-over",
         "Continue": true,
         "Sensor": {
-          "Type": "Any"
+          "Type": "Not",
+          "Sensor": {
+            "Type": "CatTamed"
+          }
         },
         "Actions": [
           {
             "Type": "SetInteractable",
-            "Interactable": true
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.tame",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Tamed cat + Owner - show owner interaction hint",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "CatTamed"
+            },
+            {
+              "Type": "CatOwner"
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.owner",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Tamed cat + Stranger - no interaction allowed",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {
+              "Type": "CatTamed"
+            },
+            {
+              "Type": "Not",
+              "Sensor": {
+                "Type": "CatOwner"
+              }
+            }
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": false,
+            "ShowPrompt": false
           }
         ]
       },

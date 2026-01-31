@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
 import com.hypixel.hytale.server.npc.instructions.Action;
+import com.hypixel.hytale.server.npc.instructions.Sensor;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
@@ -43,6 +44,8 @@ import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.PlayerCatsComponent;
 import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
+import de.markusbordihn.cats.sensors.BuilderSensorIsOwner;
 import de.markusbordihn.cats.system.CatOwnershipSystem;
 import de.markusbordihn.cats.system.CatOwnershipTrackingSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
@@ -68,6 +71,7 @@ public class Main extends JavaPlugin {
   public ComponentType<EntityStore, PlayerCatsComponent> playerCatsComponentType;
   public CatsManager catsManager;
   private boolean actionsRegistered = false;
+  private boolean sensorsRegistered = false;
 
   public Main(JavaPluginInit init) {
     super(init);
@@ -137,6 +141,36 @@ public class Main extends JavaPlugin {
     actionsRegistered = true;
   }
 
+  private void registerCatSensors(NPCPlugin npcPlugin) {
+    if (sensorsRegistered) {
+      LOGGER.at(Level.INFO).log("Custom sensors already registered - skipping");
+      return;
+    }
+
+    LOGGER.at(Level.INFO).log("Registering custom cat sensors...");
+
+    BuilderFactory<Sensor> sensorFactory = npcPlugin.getBuilderManager().getFactory(Sensor.class);
+
+    try {
+      sensorFactory.add(BuilderSensorIsCatTamed.SENSOR_ID, BuilderSensorIsCatTamed::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsCatTamed.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsCatTamed.SENSOR_ID, e);
+    }
+
+    try {
+      sensorFactory.add(BuilderSensorIsOwner.SENSOR_ID, BuilderSensorIsOwner::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsOwner.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsOwner.SENSOR_ID, e);
+    }
+
+    sensorsRegistered = true;
+    LOGGER.at(Level.INFO).log("Finished registering custom cat sensors");
+  }
+
   @Override
   protected void setup() {
     super.setup();
@@ -178,18 +212,20 @@ public class Main extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Initializing cat names manager...");
     CatNamesManager.initialize();
 
-    // Try to register custom actions early (for client and server worlds)
+    // Try to register custom actions and sensors early (for client and server worlds)
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin ...");
       registerCatInteractionActions(npcPlugin);
+      registerCatSensors(npcPlugin);
     } else if (getEventRegistry() != null) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin setup listener...");
       getEventRegistry()
           .registerGlobal(
               PluginSetupEvent.class,
               event -> {
-                if (event.getPlugin() instanceof NPCPlugin) {
-                  registerCatInteractionActions((NPCPlugin) event.getPlugin());
+                if (event.getPlugin() instanceof NPCPlugin npcPlugin) {
+                  registerCatInteractionActions(npcPlugin);
+                  registerCatSensors(npcPlugin);
                 }
               });
     } else {

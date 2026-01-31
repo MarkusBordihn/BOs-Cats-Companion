@@ -11,3 +11,8 @@ taming.limit_reached=Du hast dein Katzenlimit erreicht ({current}/{limit})
 taming.error_no_uuid=Fehler: Konnte Katze nicht zähmen (keine UUID)
 taming.error_system=Fehler: Katzensystem nicht verfügbar
 taming.count=Du besitzt jetzt {current} von {limit} Katzen
+
+# Hints
+hint.tame=Drücke [{key}] um zu zähmen
+hint.owner=Drücke [{key}] um mit deiner Katze zu interagieren
+hint.stranger=Diese Katze gehört jemand anderem
