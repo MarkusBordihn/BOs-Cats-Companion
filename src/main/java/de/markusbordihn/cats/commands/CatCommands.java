@@ -26,6 +26,7 @@ public final class CatCommands extends AbstractCommandCollection {
     super("cat", "Cat management commands");
     this.addAliases("cats");
 
+    this.addSubCommand(new CatAttackCommand());
     this.addSubCommand(new CatBedCommand());
     this.addSubCommand(new CatFollowCommand());
     this.addSubCommand(new CatInfoCommand());

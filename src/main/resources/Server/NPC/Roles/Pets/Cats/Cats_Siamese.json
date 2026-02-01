@@ -9,7 +9,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "cats.siamese.name"
+      "Value": "server.npcRoles.Cats_Siamese.name"
     }
   }
 }

@@ -49,41 +49,42 @@ final class CatNameCommand extends CatCommand {
     String catName = this.nameArg.get(context);
     var entityOpt = getEntityFromArgument(this.entityArg, store, context);
 
-    if (entityOpt.isPresent()) {
-      Ref<EntityStore> entityRef = entityOpt.get();
-
-      // Check ownership before allowing rename
-      if (!checkOwnership(entityRef, store, context)) {
-        return;
-      }
-
-      CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-
-      if (ownerComponent != null) {
-        ownerComponent.setCatName(catName);
-        store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
-
-        // Set Nameplate for nametag
-        Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
-        nameplate.setText(catName);
-
-        String oldName = ownerComponent.getCatName();
-        if (oldName == null || oldName.isEmpty()) {
-          oldName = "Cat";
-        }
-        context.sendMessage(
-            Message.translation("cats.commands.name.success")
-                .param("name", oldName)
-                .param("newName", catName)
-                .color(Constants.COLOR_SUCCESS));
-      } else {
-        context.sendMessage(
-            Message.translation("cats.commands.error.not_owned").color(Constants.COLOR_ERROR));
-      }
-    } else {
+    if (entityOpt.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
+      return;
     }
+
+    Ref<EntityStore> entityRef = entityOpt.get();
+
+    if (!checkOwnership(entityRef, store, context)) {
+      return;
+    }
+
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+
+    if (ownerComponent == null) {
+      context.sendMessage(
+          Message.translation("cats.commands.error.not_owned").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    ownerComponent.setCatName(catName);
+    store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
+
+    // Set Nameplate for nametag
+    Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
+    nameplate.setText(catName);
+
+    String oldName = ownerComponent.getCatName();
+    if (oldName == null || oldName.isEmpty()) {
+      oldName = "Cat";
+    }
+    context.sendMessage(
+        Message.translation("cats.commands.name.success")
+            .param("name", oldName)
+            .param("newName", catName)
+            .color(Constants.COLOR_SUCCESS));
   }
 }

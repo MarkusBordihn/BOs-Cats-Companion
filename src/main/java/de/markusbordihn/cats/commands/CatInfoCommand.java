@@ -46,65 +46,65 @@ final class CatInfoCommand extends CatCommand {
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
 
     var entityOpt = getEntityFromArgument(this.entityArg, store, context);
-    if (entityOpt.isPresent()) {
-      Ref<EntityStore> entityRef = entityOpt.get();
-      context.sendMessage(Message.raw("=== Cat Info ===").color("#FFD700"));
-
-      // Display UUID and Ref Index
-      UUIDComponent uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
-      if (uuidComponent != null) {
-        context.sendMessage(
-            Message.raw("UUID: " + uuidComponent.getUuid()).color(Constants.COLOR_GRAY));
-      }
-      context.sendMessage(
-          Message.raw("Ref Index: " + entityRef.getIndex()).color(Constants.COLOR_GRAY));
-
-      // Display health information (if available from NPC config)
-      context.sendMessage(Message.raw("Health: 20/20 (Max)").color("#FF6B6B"));
-
-      // Display owner information
-      CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-      if (ownerComponent != null && ownerComponent.hasOwner()) {
-        context.sendMessage(
-            Message.raw("Owner: " + ownerComponent.getOwnerName()).color(Constants.COLOR_SUCCESS));
-
-        String catName = ownerComponent.getCatName();
-        if (catName != null && !catName.isEmpty()) {
-          context.sendMessage(Message.raw("Name: " + catName).color("#00FFFF"));
-        } else {
-          context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
-        }
-      } else {
-        context.sendMessage(Message.raw("Owner: None (untamed)").color(Constants.COLOR_GRAY));
-      }
-
-      // Display state information
-      CatStateComponent stateComponent =
-          store.getComponent(entityRef, CatStateComponent.getComponentType());
-      if (stateComponent != null) {
-        String stateColor =
-            switch (stateComponent.getState()) {
-              case SITTING -> "#FFA500";
-              case SLEEPING -> "#9370DB";
-              case FOLLOWING -> Constants.COLOR_SUCCESS;
-              case PLAYING -> "#FF69B4";
-              case SEARCHING -> "#FFD700";
-              case WAITING -> "#87CEEB";
-              default -> Constants.COLOR_INFO;
-            };
-        context.sendMessage(Message.raw("State: " + stateComponent.getState()).color(stateColor));
-      }
-
-      context.sendMessage(Message.raw(""));
-      context.sendMessage(
-          Message.raw(
-                  "Tip: Use /cat sit, /cat sleep, /cat follow, /cat wait, /cat play, /cat search")
-              .color(Constants.COLOR_INFO));
-    } else {
+    if (entityOpt.isEmpty()) {
       context.sendMessage(Message.raw("No entity in view.").color(Constants.COLOR_ERROR));
       context.sendMessage(
           Message.raw("Look at a cat and use: /cat info").color(Constants.COLOR_GRAY));
+      return;
     }
+
+    Ref<EntityStore> entityRef = entityOpt.get();
+    context.sendMessage(Message.raw("=== Cat Info ===").color("#FFD700"));
+
+    // Display UUID and Ref Index
+    UUIDComponent uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
+    if (uuidComponent != null) {
+      context.sendMessage(
+          Message.raw("UUID: " + uuidComponent.getUuid()).color(Constants.COLOR_GRAY));
+    }
+    context.sendMessage(
+        Message.raw("Ref Index: " + entityRef.getIndex()).color(Constants.COLOR_GRAY));
+
+    // Display health information (if available from NPC config)
+    context.sendMessage(Message.raw("Health: 20/20 (Max)").color("#FF6B6B"));
+
+    // Display owner information
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+    if (ownerComponent != null && ownerComponent.hasOwner()) {
+      context.sendMessage(
+          Message.raw("Owner: " + ownerComponent.getOwnerName()).color(Constants.COLOR_SUCCESS));
+
+      String catName = ownerComponent.getCatName();
+      if (catName != null && !catName.isEmpty()) {
+        context.sendMessage(Message.raw("Name: " + catName).color("#00FFFF"));
+      } else {
+        context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
+      }
+    } else {
+      context.sendMessage(Message.raw("Owner: None (untamed)").color(Constants.COLOR_GRAY));
+    }
+
+    // Display state information
+    CatStateComponent stateComponent =
+        store.getComponent(entityRef, CatStateComponent.getComponentType());
+    if (stateComponent != null) {
+      String stateColor =
+          switch (stateComponent.getState()) {
+            case SITTING -> "#FFA500";
+            case SLEEPING -> "#9370DB";
+            case FOLLOWING -> Constants.COLOR_SUCCESS;
+            case PLAYING -> "#FF69B4";
+            case SEARCHING -> "#FFD700";
+            case WAITING -> "#87CEEB";
+            default -> Constants.COLOR_INFO;
+          };
+      context.sendMessage(Message.raw("State: " + stateComponent.getState()).color(stateColor));
+    }
+
+    context.sendMessage(Message.raw(""));
+    context.sendMessage(
+        Message.raw("Tip: Use /cat sit, /cat sleep, /cat follow, /cat wait, /cat play, /cat search")
+            .color(Constants.COLOR_INFO));
   }
 }

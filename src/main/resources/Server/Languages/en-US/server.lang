@@ -1,18 +1,13 @@
-npcRoles.cats.cat.name=Cat
-npcRoles.cats.kitten.name=Kitten
-npcRoles.cats.kitten.calico.name=Calico Kitten
-npcRoles.cats.calico.name=Calico Cat
-npcRoles.cats.longhairedrussianblue.name=Longhaired Russian Blue Cat
-npcRoles.cats.black.name=Black Cat
-npcRoles.cats.browntabby.name=Brown Tabby Cat
-npcRoles.cats.gray.name=Gray Cat
-npcRoles.cats.graytabby.name=Gray Tabby Cat
-npcRoles.cats.ocelot.name=Ocelot Cat
-npcRoles.cats.orangetabby.name=Orange Tabby Cat
-npcRoles.cats.siamese.name=Siamese Cat
-npcRoles.cats.tortie.name=Tortoiseshell Cat
-npcRoles.cats.tuxedo.name=Tuxedo Cat
-npcRoles.cats.white.name=White Cat
+npcRoles.Cats.name=Cat
+npcRoles.Cats_Black.name=Black Cat
+npcRoles.Cats_Calico.name=Calico Cat
+npcRoles.Cats_GrayTabby.name=Gray Tabby Cat
+npcRoles.Cats_Kitten.name=Kitten
+npcRoles.Cats_Kitten_Calico.name=Calico Kitten
+npcRoles.Cats_LonghairedRussianBlue.name=Longhaired Russian Blue Cat
+npcRoles.Cats_OrangeTabby.name=Orange Tabby Cat
+npcRoles.Cats_Siamese.name=Siamese Cat
+npcRoles.Cats_Tuxedo.name=Tuxedo Cat
 
 items.cats.egg_spawner_black.name=Black Cat Spawner Egg
 items.cats.egg_spawner_browntabby.name=Brown Tabby Cat Spawner Egg
@@ -41,3 +36,5 @@ items.cats.cat_bed.description=A comfortable bed for your cats. Assign a cat to 
 
 items.cats.cat_yarn_ball.name=Cat Yarn Ball
 items.cats.cat_yarn_ball.description=A playful yarn ball toy for your cats. Use it to attract your tamed cats or play with them. Cats love to play with yarn balls!
+
+memories.categories.Cats.title = Cats

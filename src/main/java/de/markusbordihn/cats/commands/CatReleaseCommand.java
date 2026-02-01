@@ -29,7 +29,6 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
@@ -78,7 +77,7 @@ final class CatReleaseCommand extends CatCommand {
         store.getComponent(entityRef, UUIDComponent.getComponentType());
     UUID catUuid = catUuidComponent != null ? catUuidComponent.getUuid() : null;
     UUID ownerId = ownerComponent.getOwnerId();
-    LOGGER.at(Level.WARNING).log("Releasing cat {} ({}) from owner {}", catName, catUuid, ownerId);
+    LOGGER.at(Level.INFO).log("Releasing cat %s (%s) from owner %s", catName, catUuid, ownerId);
 
     // Remove ownership
     store.removeComponent(entityRef, CatOwnerComponent.getComponentType());
@@ -88,7 +87,7 @@ final class CatReleaseCommand extends CatCommand {
     store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
 
     // Update CatsManager - this will handle PlayerCatsComponent automatically
-    CatsManager catsManager = Main.getInstance().catsManager;
+    CatsManager catsManager = CatsManager.getInstance();
     if (catsManager != null && ownerId != null) {
       catsManager.unregisterOwner(entityRef, ownerId);
     }

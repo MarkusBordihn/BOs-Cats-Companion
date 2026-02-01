@@ -29,7 +29,6 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.Main;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.Set;
@@ -57,7 +56,7 @@ final class CatListCommand extends CatCommand {
       return;
     }
 
-    CatsManager catsManager = Main.getInstance().catsManager;
+    CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
       context.sendMessage(Message.raw("Cats manager not available").color(Constants.COLOR_ERROR));
       return;

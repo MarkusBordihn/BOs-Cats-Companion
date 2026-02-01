@@ -16,7 +16,7 @@
       "Description": "Health points for kittens"
     },
     "NameTranslationKey": {
-      "Value": "cats.kitten.name",
+      "Value": "server.npcRoles.Cats_Kitten.name",
       "Description": "Translation key for kitten name display"
     }
   }

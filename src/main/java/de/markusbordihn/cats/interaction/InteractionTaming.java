@@ -25,17 +25,11 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.permissions.PermissionHolder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.Main;
-import de.markusbordihn.cats.component.CatOwnerComponent;
-import de.markusbordihn.cats.component.CatStateComponent;
-import de.markusbordihn.cats.component.PlayerCatsComponent;
-import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -91,7 +85,7 @@ public class InteractionTaming {
       return;
     }
 
-    CatsManager catsManager = Main.getInstance().catsManager;
+    CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - CatsManager is null");
       player.sendMessage(
@@ -123,29 +117,9 @@ public class InteractionTaming {
     }
 
     String catName = CatNamesManager.getRandomName();
-    store.putComponent(
-        entityRef,
-        CatOwnerComponent.getComponentType(),
-        new CatOwnerComponent(playerUUID, username, catName));
 
-    Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
-    nameplate.setText(catName);
-
-    store.putComponent(
-        entityRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.FOLLOWING));
-
-    catsManager.registerOwner(entityRef, playerUUID);
-
-    PlayerCatsComponent playerCatsComponent =
-        store.getComponent(playerEntityRef, PlayerCatsComponent.getComponentType());
-    if (playerCatsComponent == null) {
-      playerCatsComponent = new PlayerCatsComponent();
-    }
-    playerCatsComponent.addCat(catUuid);
-    store.putComponent(
-        playerEntityRef, PlayerCatsComponent.getComponentType(), playerCatsComponent);
-
-    role.getStateSupport().setState(entityRef, "Taming", "Default", store);
+    // Use centralized ownership assignment
+    catsManager.assignOwner(entityRef, playerUUID, username, catName, "Taming", store);
 
     player.sendMessage(
         Message.translation("cats.interactions.taming.success")

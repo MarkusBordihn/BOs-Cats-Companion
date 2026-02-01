@@ -1,4 +1,9 @@
 # Cat Commands
+attack.success={name} is now attacking {target}!
+attack.no_target=No target found. Look at the target or provide an entity ID
+attack.invalid_target=Invalid target
+attack.no_cats_nearby=You have no cats nearby the target (max 15 blocks)
+attack.no_available_cats=No available cats found to attack
 bed.going_to_bed={name} is heading to a cozy bed {distance} blocks away at ({x}, {y}, {z})
 bed.no_beds_found=No cat beds found within {radius} blocks for {name} at position ({x}, {y}, {z})
 bed.all_beds_occupied=All {count} cat bed(s) nearby are occupied! {name} will have to wait for a spot
@@ -18,3 +23,4 @@ error.no_cat=No cat in view, look at a cat to use this command
 error.no_position=Cannot determine cat position
 error.not_owned=This cat is still wild and doesn't have an owner
 error.not_owner={name} belongs to {owner}
+error.player_only=Only players can use this command

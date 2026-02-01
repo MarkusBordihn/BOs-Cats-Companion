@@ -7,6 +7,15 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.7.0
+
+- Fixed memory registration that was causing NPCs to not be properly tracked.
+- Fixed owner command not works in specific scenarios due failing to retrieve the owners UUID.
+- Added `/cat attack <target>` command for combat (experimental, no damage implementation yet).
+- Added natural spawning system across all zones with environment-specific distributions and
+  day/night variations.
+- Added all cat breeds to memory system for proper NPC tracking and persistence.
+
 ### 1.6.0
 
 - Fixed missing translation parameters in multiple commands (catName/name were not replaced in

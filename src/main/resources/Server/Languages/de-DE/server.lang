@@ -1,18 +1,13 @@
-npcRoles.cats.cat.name=Katze
-npcRoles.cats.kitten.name=Kätzchen
-npcRoles.cats.kitten.calico.name=Calico Kätzchen
-npcRoles.cats.calico.name=Calico Katze
-npcRoles.cats.longhairedrussianblue.name=Langhaar Russisch Blau Katze
-npcRoles.cats.black.name=Schwarze Katze
-npcRoles.cats.browntabby.name=Braune Tabby Katze
-npcRoles.cats.gray.name=Graue Katze
-npcRoles.cats.graytabby.name=Graue Tabby Katze
-npcRoles.cats.ocelot.name=Ozelot Katze
-npcRoles.cats.orangetabby.name=Orange Tabby Katze
-npcRoles.cats.siamese.name=Siamkatze
-npcRoles.cats.tortie.name=Schildpatt Katze
-npcRoles.cats.tuxedo.name=Smoking Katze
-npcRoles.cats.white.name=Weiße Katze
+npcRoles.Cats.name=Katze
+npcRoles.Cats_Black.name=Schwarze Katze
+npcRoles.Cats_Calico.name=Calico Katze
+npcRoles.Cats_GrayTabby.name=Graue Tabby Katze
+npcRoles.Cats_Kitten.name=Kätzchen
+npcRoles.Cats_Kitten_Calico.name=Calico Kätzchen
+npcRoles.Cats_LonghairedRussianBlue.name=Langhaar Russisch Blau Katze
+npcRoles.Cats_OrangeTabby.name=Orange Tabby Katze
+npcRoles.Cats_Siamese.name=Siamkatze
+npcRoles.Cats_Tuxedo.name=Smoking Katze
 
 items.cats.egg_spawner_black.name=Schwarze Katze Spawner Ei
 items.cats.egg_spawner_browntabby.name=Braune Tabby Katze Spawner Ei
@@ -41,3 +36,5 @@ items.cats.cat_bed.description=Ein gemütliches Bett für deine Katzen. Weise ei
 
 items.cats.cat_yarn_ball.name=Katzen-Garnknäuel
 items.cats.cat_yarn_ball.description=Ein verspieltes Garnknäuel-Spielzeug für deine Katzen. Verwende es, um deine gezähmten Katzen anzulocken oder mit ihnen zu spielen. Katzen lieben es, mit Garnknäueln zu spielen!
+
+memories.categories.Cats.title = Katzen

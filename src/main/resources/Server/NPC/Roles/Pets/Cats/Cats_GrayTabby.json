@@ -9,7 +9,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "cats.graytabby.name"
+      "Value": "server.npcRoles.Cats_GrayTabby.name"
     }
   }
 }

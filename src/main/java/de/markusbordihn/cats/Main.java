@@ -41,6 +41,7 @@ import de.markusbordihn.cats.compat.LuckPermsCompat;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.component.CatTargetComponent;
 import de.markusbordihn.cats.component.PlayerCatsComponent;
 import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -63,13 +64,12 @@ public class Main extends JavaPlugin {
         BuilderActionCatInteractionOwner.class,
         BuilderActionCatInteractionStranger.class
       };
-
+  public static ComponentType<EntityStore, CatTargetComponent> catTargetComponentType;
   private static Main instance;
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
   public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
   public ComponentType<EntityStore, PlayerCatsComponent> playerCatsComponentType;
-  public CatsManager catsManager;
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
 
@@ -195,6 +195,9 @@ public class Main extends JavaPlugin {
     playerCatsComponentType =
         getEntityStoreRegistry()
             .registerComponent(PlayerCatsComponent.class, "PlayerCats", PlayerCatsComponent.CODEC);
+    catTargetComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(CatTargetComponent.class, "CatTarget", CatTargetComponent.CODEC);
 
     // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
@@ -205,8 +208,7 @@ public class Main extends JavaPlugin {
 
     // Register cats manager
     LOGGER.at(Level.INFO).log("Registering cats manager...");
-    this.catsManager = new CatsManager(catStateComponentType);
-    getEntityStoreRegistry().registerSystem(this.catsManager);
+    getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
 
     // Initialize cat names manager
     LOGGER.at(Level.INFO).log("Initializing cat names manager...");

@@ -1,4 +1,9 @@
 # Cat Commands
+attack.success={name} greift nun {target} an!
+attack.no_target=Kein Ziel gefunden. Schaue das Ziel an oder gib eine Entity-ID an
+attack.invalid_target=Ungültiges Ziel
+attack.no_cats_nearby=Du hast keine Katzen in der Nähe des Ziels (max. 15 Blöcke)
+attack.no_available_cats=Keine verfügbaren Katzen zum Angreifen gefunden
 bed.going_to_bed={name} läuft zu einem gemütlichen Bett {distance} Blöcke entfernt bei ({x}, {y}, {z})
 bed.no_beds_found=Keine Katzenbetten innerhalb von {radius} Blöcken für {name} bei Position ({x}, {y}, {z}) gefunden
 bed.all_beds_occupied=Alle {count} Katzenbett(en) in der Nähe sind belegt! {name} muss auf einen freien Platz warten
@@ -18,3 +23,4 @@ error.no_cat=Keine Katze in Sicht, schau eine Katze an um diesen Befehl zu nutze
 error.no_position=Katzenposition kann nicht ermittelt werden
 error.not_owned=Diese Katze ist noch wild und hat keinen Besitzer
 error.not_owner={name} gehört {owner}
+error.player_only=Nur Spieler können diesen Befehl verwenden

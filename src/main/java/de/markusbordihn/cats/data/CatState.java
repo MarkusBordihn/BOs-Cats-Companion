@@ -27,5 +27,6 @@ public enum CatState {
   WANDERING,
   PLAYING,
   SEARCHING,
-  WAITING
+  WAITING,
+  ATTACKING
 }

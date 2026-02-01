@@ -22,6 +22,7 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 * Eight cat breeds: Black Cat, Calico, Gray Tabby, Longhaired Russian Blue, Orange Tabby, Siamese,
   Tuxedo, Kitten (experimental)
+* Natural spawning across all zones (Zone 1-4) with environment-specific distributions
 * Taming system using fish
 * Automatic cat naming with unique names for each cat
 * Full command-based interaction via `/cat`
@@ -34,10 +35,22 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Cat Yarn Ball toy for playing with cats
 * Item consumption for taming and feeding (items are consumed from the player's inventory)
 * Persistent component data for owner + state (component CODECs)
+* Full memory system support for NPC tracking and persistence
 
 ### How to Get a Cat
 
-#### Option 1: Manual Spawning (Recommended for Testing)
+#### Option 1: Natural Spawning (New!)
+
+Cats now spawn naturally across multiple zones:
+
+* **Zone 1 (Temperate):** All common breeds spawn in plains, forests, mountains, and at night
+* **Zone 2 (Desert/Savanna):** Siamese, Orange Tabby, and Calico spawn in oases and savannas
+* **Zone 3 (Borea/Cold):** Longhaired Russian Blue spawns in tundra and snowy forests
+* **Zone 4 (Devastated):** Siamese and darker breeds spawn in forests and jungles
+
+Simply explore these biomes and you'll encounter wild cats that can be tamed!
+
+#### Option 2: Manual Spawning (Quick Testing)
 
 Use the NPC spawn command to create cats:
 
@@ -52,7 +65,7 @@ Use the NPC spawn command to create cats:
 /npc spawn Cats_Kitten
 ```
 
-#### Option 2: Spawn Eggs
+#### Option 3: Spawn Eggs
 
 Each breed also has a spawn egg:
 
@@ -159,23 +172,24 @@ Players can own up to 16 cats by default. Server admins can adjust this limit us
 
 ### Important Notes
 
-* **No natural spawning**
-  Cats do not spawn naturally yet. Use spawn commands or spawn eggs.
-
 * **No UI menu**
   The interactive menu is temporarily disabled and will return in a later version.
+
+* **Attack command (experimental)**
+  The `/cat attack` command is available but currently does not deal damage. This is work in
+  progress.
 
 ## 🚧 Planned Features
 
 Planned improvements and additions:
 
-* Natural cat spawning in forests and plains
 * Interactive UI menu
 * Cat breeding and kittens
 * Accessories such as collars and bells
-* Toys and interactive items
+* More toys and interactive items
 * Additional cat breeds
 * Cat progression and special abilities
+* Combat integration (making attack command deal damage)
 
 ## 🐛 Known Issues
 

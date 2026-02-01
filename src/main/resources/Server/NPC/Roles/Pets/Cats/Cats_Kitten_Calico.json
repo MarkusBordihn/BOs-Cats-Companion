@@ -9,7 +9,7 @@
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "cats.kitten.calico.name"
+      "Value": "server.npcRoles.Cats_Kitten_Calico.name"
     }
   }
 }

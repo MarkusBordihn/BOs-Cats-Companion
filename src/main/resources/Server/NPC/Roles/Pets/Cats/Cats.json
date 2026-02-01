@@ -2,6 +2,8 @@
   "Type": "Generic",
   "StartState": "Wild",
   "DefaultSubState": "Default",
+  "DefaultNPCAttitude": "Ignore",
+  "DefaultPlayerAttitude": "Neutral",
   "Appearance": {
     "Compute": "Appearance"
   },
@@ -17,6 +19,36 @@
     }
   ],
   "MaxHealth": 20,
+  "InteractionVars": {
+    "Melee_Start": {
+      "Interactions": [
+        {
+          "$Comment": "Cat melee attack animation and timing configuration",
+          "Parent": "NPC_Attack_Melee_Simple",
+          "Effects": {
+            "ItemPlayerAnimationsId": "Fox_Default",
+            "ItemAnimationId": "Attack"
+          },
+          "RunTime": 0.25
+        }
+      ]
+    },
+    "Melee_Damage": {
+      "Interactions": [
+        {
+          "$Comment": "Cat melee attack damage configuration",
+          "Parent": "NPC_Attack_Melee_Damage",
+          "DamageCalculator": {
+            "Type": "Absolute",
+            "BaseDamage": {
+              "Physical": 5
+            },
+            "RandomPercentageModifier": 0.1
+          }
+        }
+      ]
+    }
+  },
   "Instructions": [
     {
       "Instructions": [
@@ -466,9 +498,74 @@
                     }
                   ],
                   "BodyMotion": {
-                    "Type": "Wander",
+                    "Type": "WanderInCircle",
                     "RelativeSpeed": 0.3
                   }
+                }
+              ]
+            },
+            {
+              "$Comment": "Attacking behavior - attacks commanded target",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Attacking"
+              },
+              "Instructions": [
+                {
+                  "$Comment": "Chase and attack target",
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": 20
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Alerted",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Seek",
+                    "SlowDownDistance": 4,
+                    "StopDistance": 2,
+                    "RelativeSpeed": 1.0
+                  },
+                  "HeadMotion": {
+                    "Type": "Watch"
+                  }
+                },
+                {
+                  "$Comment": "Execute attack when in range",
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": 2.5
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "Attack",
+                      "Attack": "Root_NPC_Attack_Melee",
+                      "AttackPauseRange": [1.5, 2]
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [1, 1.5]
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "No target found - go back to default behavior",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".Default"
+                    }
+                  ]
                 }
               ]
             },
@@ -526,7 +623,7 @@
                     }
                   ],
                   "BodyMotion": {
-                    "Type": "Wander",
+                    "Type": "WanderInCircle",
                     "RelativeSpeed": 0.5
                   }
                 }
@@ -672,6 +769,7 @@
                 {"Type": "State", "State": ".Licking"},
                 {"Type": "State", "State": ".Playing"},
                 {"Type": "State", "State": ".Searching"},
+                {"Type": "State", "State": ".Attacking"},
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
                 {"Type": "State", "State": ".Dying"},
@@ -972,7 +1070,7 @@
     ]
   },
   "IsMemory": true,
-  "MemoriesCategory": "Cat",
+  "MemoriesCategory": "Cats",
   "DropList": "Drop_Cats",
   "NameTranslationKey": {
     "Compute": "NameTranslationKey"
@@ -1013,8 +1111,16 @@
       "Description": "The cat's model appearance"
     },
     "NameTranslationKey": {
-      "Value": "cats.cat.name",
+      "Value": "npcRoles.Cats.name",
       "Description": "Translation key for cat name display"
+    },
+    "Attack": {
+      "Value": "Root_NPC_Attack_Melee",
+      "Description": "The attack type to use"
+    },
+    "AttackDistance": {
+      "Value": 2.5,
+      "Description": "The distance from which to attack"
     }
   }
 }

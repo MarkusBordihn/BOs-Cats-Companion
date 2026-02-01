@@ -98,6 +98,10 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
           stateSupport.setState(entityRef, "Pet", "Default", store);
           LOGGER.at(Level.FINE).log("Synced cat to FOLLOWING (Default) substate");
           break;
+        case ATTACKING:
+          stateSupport.setState(entityRef, "Pet", "Attacking", store);
+          LOGGER.at(Level.FINE).log("Synced cat to ATTACKING substate");
+          break;
         default:
           LOGGER.at(Level.WARNING).log("Unknown cat state: " + state);
           break;

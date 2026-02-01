@@ -19,19 +19,15 @@
 
 package de.markusbordihn.cats.commands;
 
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.Main;
-import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -55,54 +51,33 @@ final class CatOwnerCommand extends CatCommand {
     String ownerName = this.ownerArg.get(context);
     var entityOpt = getEntityFromArgument(this.entityArg, store, context);
 
-    if (entityOpt.isPresent()) {
-      Ref<EntityStore> entityRef = entityOpt.get();
-      context.sendMessage(Message.raw("=== Set Cat Owner ===").color("#FFD700"));
-
-      // Get cat UUID
-      var uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
-      UUID catUuid = null;
-      if (uuidComponent != null) {
-        catUuid = uuidComponent.getUuid();
-        context.sendMessage(Message.raw("Cat UUID: " + catUuid).color(Constants.COLOR_GRAY));
-      }
-
-      // Get old owner (if any) to remove cat from their list
-      CatOwnerComponent oldOwnerComponent =
-          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-      UUID oldOwnerId = null;
-      if (oldOwnerComponent != null && oldOwnerComponent.hasOwner()) {
-        oldOwnerId = oldOwnerComponent.getOwnerId();
-      }
-
-      // Set the new owner
-      UUID newOwnerId = UUID.nameUUIDFromBytes(("player:" + ownerName).getBytes());
-      CatOwnerComponent ownerComponent = new CatOwnerComponent(newOwnerId, ownerName);
-      store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
-
-      // Update PlayerCatsComponent for old owner (remove cat)
-      if (oldOwnerId != null && catUuid != null) {
-        CatsManager catsManager = Main.getInstance().catsManager;
-        if (catsManager != null) {
-          catsManager.unregisterOwner(entityRef, oldOwnerId);
-        }
-      }
-
-      // Register new owner in cats manager
-      CatsManager catsManager = Main.getInstance().catsManager;
-      if (catsManager != null) {
-        catsManager.registerOwner(entityRef, newOwnerId);
-      }
-
-      context.sendMessage(Message.raw(""));
-      context.sendMessage(
-          Message.raw("✓ Owner set to: " + ownerName).color(Constants.COLOR_SUCCESS));
-      context.sendMessage(
-          Message.raw("The cat now belongs to " + ownerName + "!").color("#FFD700"));
-    } else {
+    if (entityOpt.isEmpty()) {
       context.sendMessage(Message.raw("No entity in view.").color(Constants.COLOR_ERROR));
       context.sendMessage(
           Message.raw("Look at a cat and use: /cat owner <player>").color(Constants.COLOR_GRAY));
+      return;
     }
+
+    UUID newOwnerId = null;
+    for (var player : world.getPlayers()) {
+      if (player.getPlayerRef() != null
+          && ownerName.equalsIgnoreCase(player.getPlayerRef().getUsername())) {
+        newOwnerId = player.getPlayerRef().getUuid();
+        break;
+      }
+    }
+
+    if (newOwnerId == null) {
+      context.sendMessage(
+          Message.raw("Player '" + ownerName + "' not found online!").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager != null) {
+      catsManager.assignOwner(entityOpt.get(), newOwnerId, ownerName, null, "Pet", store);
+    }
+
+    context.sendMessage(Message.raw("Owner set to: " + ownerName).color(Constants.COLOR_SUCCESS));
   }
 }
