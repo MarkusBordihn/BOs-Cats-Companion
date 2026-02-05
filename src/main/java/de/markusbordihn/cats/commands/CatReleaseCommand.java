@@ -26,15 +26,11 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatOwnerComponent;
-import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
-import java.util.UUID;
-import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
 final class CatReleaseCommand extends CatCommand {
@@ -71,25 +67,13 @@ final class CatReleaseCommand extends CatCommand {
       return;
     }
 
-    // Get cat info before releasing
     String catName = getCatDisplayName(entityRef, store);
-    UUIDComponent catUuidComponent =
-        store.getComponent(entityRef, UUIDComponent.getComponentType());
-    UUID catUuid = catUuidComponent != null ? catUuidComponent.getUuid() : null;
-    UUID ownerId = ownerComponent.getOwnerId();
-    LOGGER.at(Level.INFO).log("Releasing cat %s (%s) from owner %s", catName, catUuid, ownerId);
-
-    // Remove ownership
     store.removeComponent(entityRef, CatOwnerComponent.getComponentType());
 
-    // Set cat to wandering state
-    CatStateComponent stateComponent = new CatStateComponent(CatState.WANDERING);
-    store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
-
-    // Update CatsManager - this will handle PlayerCatsComponent automatically
     CatsManager catsManager = CatsManager.getInstance();
-    if (catsManager != null && ownerId != null) {
-      catsManager.unregisterOwner(entityRef, ownerId);
+    if (catsManager != null) {
+      catsManager.unregisterOwner(entityRef, store);
+      catsManager.updateCatState(entityRef, CatState.WANDERING, store);
     }
 
     context.sendMessage(

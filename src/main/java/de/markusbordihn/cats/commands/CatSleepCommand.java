@@ -28,8 +28,8 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 final class CatSleepCommand extends CatCommand {
@@ -52,8 +52,8 @@ final class CatSleepCommand extends CatCommand {
         return;
       }
 
-      CatStateComponent stateComponent = new CatStateComponent(CatState.SLEEPING);
-      store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
+      // Update state (component + persistent data)
+      CatsManager.getInstance().updateCatState(entityRef, CatState.SLEEPING, store);
 
       NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {

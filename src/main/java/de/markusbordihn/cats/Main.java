@@ -20,6 +20,7 @@
 package de.markusbordihn.cats;
 
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -42,15 +43,13 @@ import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.CatTargetComponent;
-import de.markusbordihn.cats.component.PlayerCatsComponent;
-import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.manager.CatsNamesManager;
 import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
 import de.markusbordihn.cats.sensors.BuilderSensorIsOwner;
-import de.markusbordihn.cats.system.CatOwnershipSystem;
-import de.markusbordihn.cats.system.CatOwnershipTrackingSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
+import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.logging.Level;
 
 @SuppressWarnings("unused")
@@ -69,7 +68,7 @@ public class Main extends JavaPlugin {
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
   public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
-  public ComponentType<EntityStore, PlayerCatsComponent> playerCatsComponentType;
+  public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
 
@@ -192,27 +191,28 @@ public class Main extends JavaPlugin {
         getEntityStoreRegistry()
             .registerComponent(
                 CatBedTargetComponent.class, "CatBedTarget", CatBedTargetComponent.CODEC);
-    playerCatsComponentType =
-        getEntityStoreRegistry()
-            .registerComponent(PlayerCatsComponent.class, "PlayerCats", PlayerCatsComponent.CODEC);
     catTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatTargetComponent.class, "CatTarget", CatTargetComponent.CODEC);
 
+    // Register resources
+    LOGGER.at(Level.INFO).log("Registering cat resources...");
+    catsDataResourceType =
+        getEntityStoreRegistry()
+            .registerResource(CatsDataResource.class, "CatsData", CatsDataResource.CODEC);
+
     // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
-    getEntityStoreRegistry().registerSystem(new CatOwnershipSystem(catOwnerComponentType));
-    getEntityStoreRegistry().registerSystem(new CatOwnershipTrackingSystem(catOwnerComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
 
-    // Register cats manager
+    // Register cats manager (handles ownership tracking and data persistence)
     LOGGER.at(Level.INFO).log("Registering cats manager...");
     getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
 
     // Initialize cat names manager
     LOGGER.at(Level.INFO).log("Initializing cat names manager...");
-    CatNamesManager.initialize();
+    CatsNamesManager.initialize();
 
     // Try to register custom actions and sensors early (for client and server worlds)
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {

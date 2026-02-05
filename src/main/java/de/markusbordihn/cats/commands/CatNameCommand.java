@@ -31,6 +31,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 final class CatNameCommand extends CatCommand {
@@ -56,34 +57,29 @@ final class CatNameCommand extends CatCommand {
     }
 
     Ref<EntityStore> entityRef = entityOpt.get();
-
     if (!checkOwnership(entityRef, store, context)) {
       return;
     }
 
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-
     if (ownerComponent == null) {
       context.sendMessage(
           Message.translation("cats.commands.error.not_owned").color(Constants.COLOR_ERROR));
       return;
     }
 
-    ownerComponent.setCatName(catName);
-    store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
-
     // Set Nameplate for nametag
     Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
+    String formerCatName = nameplate.getText();
     nameplate.setText(catName);
 
-    String oldName = ownerComponent.getCatName();
-    if (oldName == null || oldName.isEmpty()) {
-      oldName = "Cat";
-    }
+    // Update CatsDataResource
+    CatsManager.getInstance().updateCatName(entityRef, catName, store);
+
     context.sendMessage(
         Message.translation("cats.commands.name.success")
-            .param("name", oldName)
+            .param("name", formerCatName == null || formerCatName.isEmpty() ? "Cat" : formerCatName)
             .param("newName", catName)
             .color(Constants.COLOR_SUCCESS));
   }

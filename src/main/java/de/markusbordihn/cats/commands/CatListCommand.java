@@ -19,19 +19,15 @@
 
 package de.markusbordihn.cats.commands;
 
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.manager.CatsManager;
-import java.util.Set;
+import java.util.Collection;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
@@ -57,12 +53,7 @@ final class CatListCommand extends CatCommand {
     }
 
     CatsManager catsManager = CatsManager.getInstance();
-    if (catsManager == null) {
-      context.sendMessage(Message.raw("Cats manager not available").color(Constants.COLOR_ERROR));
-      return;
-    }
-
-    Set<Ref<EntityStore>> playerCats = catsManager.getCatsByOwner(playerUuid);
+    Collection<CatDataEntry> playerCats = catsManager.getCatDataByOwner(playerUuid, store);
 
     int currentCount = playerCats.size();
     int limit = getCatLimit(context);
@@ -80,39 +71,29 @@ final class CatListCommand extends CatCommand {
         Message.raw("=== Your Cats (" + currentCount + "/" + limitText + ") ===").color("#FFD700"));
 
     int index = 1;
-    for (Ref<EntityStore> catRef : playerCats) {
-      if (!catRef.isValid()) {
-        continue;
-      }
+    for (CatDataEntry catData : playerCats) {
+      String catName =
+          catData.name() != null && !catData.name().isEmpty() ? catData.name() : "Unnamed Cat";
 
-      String catName = "Unnamed Cat";
-      CatOwnerComponent ownerComponent =
-          store.getComponent(catRef, CatOwnerComponent.getComponentType());
-      if (ownerComponent != null) {
-        String name = ownerComponent.getCatName();
-        if (name != null && !name.isEmpty()) {
-          catName = name;
-        }
-      }
-
-      String catUuid = "Unknown";
-      UUIDComponent uuidComponent = store.getComponent(catRef, UUIDComponent.getComponentType());
-      if (uuidComponent != null && uuidComponent.getUuid() != null) {
-        catUuid = uuidComponent.getUuid().toString();
-      }
-
-      String position = "Unknown";
-      TransformComponent transformComponent =
-          store.getComponent(catRef, TransformComponent.getComponentType());
-      if (transformComponent != null) {
-        Vector3d pos = transformComponent.getPosition();
-        position = String.format("%.1f, %.1f, %.1f", pos.x, pos.y, pos.z);
-      }
-
-      context.sendMessage(Message.raw(""));
-      context.sendMessage(Message.raw(index + ". " + catName).color("#00FFFF"));
-      context.sendMessage(Message.raw("   UUID: " + catUuid).color(Constants.COLOR_GRAY));
-      context.sendMessage(Message.raw("   Position: " + position).color(Constants.COLOR_WARNING));
+      boolean isInWorld = catsManager.getCatByUuid(catData.uuid(), store) != null;
+      String statusIndicator =
+          !isInWorld
+              ? "[DESPAWNED]"
+              : catsManager.isCatAliveInWorld(catData.uuid(), store) ? "[ALIVE]" : "[DEAD]";
+      String positionStr =
+          catData.position() != null
+              ? String.format(
+                  "(%d,%d,%d)", catData.position().x, catData.position().y, catData.position().z)
+              : "(no position)";
+      context.sendMessage(
+          Message.raw(index + ". " + catName + " " + statusIndicator + " " + positionStr)
+              .color("#00FFFF"));
+      context.sendMessage(
+          Message.raw("   Type: " + catData.catType() + " | State: " + catData.state())
+              .color(Constants.COLOR_GRAY));
+      context.sendMessage(
+          Message.raw("   UUID: " + catData.uuid().toString().substring(0, 8) + "...")
+              .color(Constants.COLOR_GRAY));
 
       index++;
     }

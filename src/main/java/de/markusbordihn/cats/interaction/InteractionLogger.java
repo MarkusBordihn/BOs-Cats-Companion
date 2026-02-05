@@ -59,7 +59,13 @@ public class InteractionLogger {
 
     if (ownerComponent != null && ownerComponent.hasOwner()) {
       LOGGER.at(Level.FINE).log("Owner: %s", ownerComponent.getOwnerName());
-      LOGGER.at(Level.FINE).log("Cat Name: %s", ownerComponent.getCatName());
+
+      com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
+          store.getComponent(
+              entityRef,
+              com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
+      String catName = nameplate != null ? nameplate.getText() : null;
+      LOGGER.at(Level.FINE).log("Cat Name: %s", catName);
     } else {
       LOGGER.at(Level.FINE).log("Owner: WILD CAT");
     }

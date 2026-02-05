@@ -17,30 +17,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.commands;
+package de.markusbordihn.cats.data;
 
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 
-public final class CatCommands extends AbstractCommandCollection {
-  public CatCommands() {
-    super("cat", "Cat management commands");
-    this.addAliases("cats");
+public enum CatStatus {
+  UNKNOWN,
+  IDLE,
+  SPAWNED,
+  DESPAWNED,
+  DEATH;
 
-    this.addSubCommand(new CatAttackCommand());
-    this.addSubCommand(new CatBedCommand());
-    this.addSubCommand(new CatDespawnCommand());
-    this.addSubCommand(new CatFollowCommand());
-    this.addSubCommand(new CatInfoCommand());
-    this.addSubCommand(new CatListCommand());
-    this.addSubCommand(new CatNameCommand());
-    this.addSubCommand(new CatOwnerCommand());
-    this.addSubCommand(new CatPlayCommand());
-    this.addSubCommand(new CatReleaseCommand());
-    this.addSubCommand(new CatSearchCommand());
-    this.addSubCommand(new CatSitCommand());
-    this.addSubCommand(new CatSleepCommand());
-    this.addSubCommand(new CatSpawnCommand());
-    this.addSubCommand(new CatWaitCommand());
-    this.addSubCommand(new CatWanderCommand());
-  }
+  public static final EnumCodec<CatStatus> CODEC = new EnumCodec<>(CatStatus.class);
 }

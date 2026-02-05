@@ -30,8 +30,8 @@ import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
-import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 public class BuilderActionCatSetSleepingState extends BuilderActionBase {
@@ -94,10 +94,11 @@ public class BuilderActionCatSetSleepingState extends BuilderActionBase {
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      store.putComponent(
-          entityRef,
-          CatStateComponent.getComponentType(),
-          new CatStateComponent(CatState.SLEEPING));
+      CatsManager catsManager = CatsManager.getInstance();
+      if (catsManager != null) {
+        catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
+      }
+
       return true;
     }
   }

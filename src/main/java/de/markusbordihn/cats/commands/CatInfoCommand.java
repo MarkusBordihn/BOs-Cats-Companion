@@ -25,12 +25,12 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.component.CatOwnerComponent;
-import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.manager.CatsManager;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 
 final class CatInfoCommand extends CatCommand {
@@ -54,43 +54,46 @@ final class CatInfoCommand extends CatCommand {
     }
 
     Ref<EntityStore> entityRef = entityOpt.get();
-    context.sendMessage(Message.raw("=== Cat Info ===").color("#FFD700"));
 
-    // Display UUID and Ref Index
-    UUIDComponent uuidComponent = store.getComponent(entityRef, UUIDComponent.getComponentType());
-    if (uuidComponent != null) {
+    // Get UUID (persistent identifier)
+    CatsManager catsManager = CatsManager.getInstance();
+    UUID catUuid = catsManager.getUuid(entityRef, store);
+    if (catUuid == null) {
       context.sendMessage(
-          Message.raw("UUID: " + uuidComponent.getUuid()).color(Constants.COLOR_GRAY));
+          Message.raw("Unable to get cat UUID (not a cat entity?)").color(Constants.COLOR_ERROR));
+      return;
     }
-    context.sendMessage(
-        Message.raw("Ref Index: " + entityRef.getIndex()).color(Constants.COLOR_GRAY));
 
-    // Display health information (if available from NPC config)
-    context.sendMessage(Message.raw("Health: 20/20 (Max)").color("#FF6B6B"));
-
-    // Display owner information
-    CatOwnerComponent ownerComponent =
-        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-    if (ownerComponent != null && ownerComponent.hasOwner()) {
+    CatDataEntry catData = catsManager.getCatData(catUuid, store);
+    if (catData == null) {
       context.sendMessage(
-          Message.raw("Owner: " + ownerComponent.getOwnerName()).color(Constants.COLOR_SUCCESS));
+          Message.raw("Cat data not found for UUID: " + catUuid).color(Constants.COLOR_ERROR));
+      return;
+    }
 
-      String catName = ownerComponent.getCatName();
-      if (catName != null && !catName.isEmpty()) {
-        context.sendMessage(Message.raw("Name: " + catName).color("#00FFFF"));
-      } else {
-        context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
-      }
+    UUID playerUuid = context.sender().getUuid();
+    boolean isOwner = playerUuid != null && playerUuid.equals(catData.ownerUuid());
+
+    if (catData.name() != null && !catData.name().isEmpty()) {
+      context.sendMessage(Message.raw("Name: " + catData.name()).color("#FFD700"));
     } else {
-      context.sendMessage(Message.raw("Owner: None (untamed)").color(Constants.COLOR_GRAY));
+      context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
     }
 
-    // Display state information
-    CatStateComponent stateComponent =
-        store.getComponent(entityRef, CatStateComponent.getComponentType());
-    if (stateComponent != null) {
+    context.sendMessage(Message.raw("UUID: " + catUuid.toString()).color(Constants.COLOR_GRAY));
+    context.sendMessage(Message.raw("Type: " + catData.catType()).color(Constants.COLOR_INFO));
+
+    if (catData.hasOwner()) {
+      context.sendMessage(Message.raw("Status: Tamed").color(Constants.COLOR_SUCCESS));
+      String ownerName = catData.ownerName() != null ? catData.ownerName() : "Unknown";
+      context.sendMessage(Message.raw("Owner: " + ownerName).color(Constants.COLOR_INFO));
+    } else {
+      context.sendMessage(Message.raw("Status: Wild").color(Constants.COLOR_WARNING));
+    }
+
+    if (isOwner) {
       String stateColor =
-          switch (stateComponent.getState()) {
+          switch (catData.state()) {
             case SITTING -> "#FFA500";
             case SLEEPING -> "#9370DB";
             case FOLLOWING -> Constants.COLOR_SUCCESS;
@@ -99,12 +102,21 @@ final class CatInfoCommand extends CatCommand {
             case WAITING -> "#87CEEB";
             default -> Constants.COLOR_INFO;
           };
-      context.sendMessage(Message.raw("State: " + stateComponent.getState()).color(stateColor));
+      context.sendMessage(Message.raw("State: " + catData.state()).color(stateColor));
+      context.sendMessage(
+          Message.raw("Spawn Status: " + catData.status()).color(Constants.COLOR_GRAY));
+
+      if (catData.position() != null) {
+        String position =
+            String.format(
+                "%d, %d, %d", catData.position().x, catData.position().y, catData.position().z);
+        context.sendMessage(Message.raw("Last Position: " + position).color(Constants.COLOR_GRAY));
+      }
     }
 
     context.sendMessage(Message.raw(""));
     context.sendMessage(
-        Message.raw("Tip: Use /cat sit, /cat sleep, /cat follow, /cat wait, /cat play, /cat search")
+        Message.raw("Tip: Use /cat sit, /cat sleep, /cat follow, /cat wait, /cat play")
             .color(Constants.COLOR_INFO));
   }
 }

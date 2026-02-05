@@ -109,8 +109,8 @@ final class CatAttackCommand extends CatCommand {
     // Get target name
     String targetName = getEntityDisplayName(targetRef, store);
 
-    CatStateComponent stateComponent = new CatStateComponent(CatState.ATTACKING);
-    store.putComponent(selectedCat, CatStateComponent.getComponentType(), stateComponent);
+    // Update state (component + persistent data)
+    CatsManager.getInstance().updateCatState(selectedCat, CatState.ATTACKING, store);
 
     NPCEntity npcEntity = store.getComponent(selectedCat, NPCEntity.getComponentType());
     if (npcEntity != null && npcEntity.getRole() != null) {
@@ -140,7 +140,7 @@ final class CatAttackCommand extends CatCommand {
       @Nonnull java.util.UUID ownerUuid) {
     List<Ref<EntityStore>> nearbyCats = new ArrayList<>();
 
-    for (Ref<EntityStore> entityRef : CatsManager.getInstance().getCatsByOwner(ownerUuid)) {
+    for (Ref<EntityStore> entityRef : CatsManager.getInstance().getCatsByOwner(ownerUuid, store)) {
       TransformComponent catTransform =
           store.getComponent(entityRef, TransformComponent.getComponentType());
       if (catTransform != null) {
@@ -221,7 +221,11 @@ final class CatAttackCommand extends CatCommand {
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent != null) {
-      String catName = ownerComponent.getCatName();
+      com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
+          store.getComponent(
+              entityRef,
+              com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
+      String catName = nameplate != null ? nameplate.getText() : null;
       if (catName != null && !catName.isEmpty()) {
         return catName;
       }

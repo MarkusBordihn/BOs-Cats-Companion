@@ -27,7 +27,6 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
-import de.markusbordihn.cats.component.CatOwnerComponent;
 import java.util.Set;
 
 public class ItemInteractionOwner {
@@ -63,14 +62,16 @@ public class ItemInteractionOwner {
       return InteractionFeeding.handle(entityRef, role, store, player, heldItem, true);
     }
 
-    if (itemName != null && YARN_BALL_ITEM.equals(itemName)) {
+    if (YARN_BALL_ITEM.equals(itemName)) {
       return InteractionPlayingWithYarnBall.handle(entityRef, role, store, player);
     }
 
     if (player != null) {
-      CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-      String catName = ownerComponent != null ? ownerComponent.getCatName() : null;
+      com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
+          store.getComponent(
+              entityRef,
+              com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
+      String catName = nameplate != null ? nameplate.getText() : null;
 
       if (catName != null && !catName.isEmpty()) {
         player.sendMessage(

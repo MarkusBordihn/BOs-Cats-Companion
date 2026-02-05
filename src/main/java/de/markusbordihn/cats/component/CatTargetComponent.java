@@ -57,7 +57,7 @@ public class CatTargetComponent implements Component<EntityStore> {
 
   @Nullable
   public static ComponentType<EntityStore, CatTargetComponent> getComponentType() {
-    return Main.getInstance().catTargetComponentType;
+    return Main.catTargetComponentType;
   }
 
   @Nullable

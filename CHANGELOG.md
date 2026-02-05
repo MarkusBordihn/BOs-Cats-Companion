@@ -7,6 +7,18 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.8.0
+
+- Fixed yarn ball recipe not working due to wrong workbench type.
+- Added `/cat despawn` and `/cat spawn` commands for better cat management.
+- Added CatsManager as centralized data access layer for all cat operations.
+- Added owner name persistence (stored alongside owner UUID in cat data).
+- Added persistent cat data storage in CatsDataResource (saved to `CatsData.json`).
+- Refactored all commands to use CatsManager instead of direct resource access.
+- Refactored cat name storage to use Nameplate component instead of CatOwnerComponent.
+- Improved data architecture with strict command → manager → resource flow.
+- Optimized CatDataEntry codec with named constants and streamlined implementation.
+
 ### 1.7.0
 
 - Fixed memory registration that was causing NPCs to not be properly tracked.

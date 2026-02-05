@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
-public class CatNamesManager {
+public class CatsNamesManager {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static final String RESOURCE_PATH = "/Server/cat_names.txt";
   private static final Path CONFIG_FILE_PATH = Paths.get("config", "cats", "cat_names.txt");
@@ -42,7 +42,7 @@ public class CatNamesManager {
   private static final String VALID_NAME_PATTERN = "^[a-zA-Z0-9 '\\-.]+$";
   private static final int MAX_NAME_LENGTH = 32;
   private static final int MIN_NAME_LENGTH = 1;
-  private static List<String> catNames = new ArrayList<>();
+  private static final List<String> catNames = new ArrayList<>();
   private static boolean initialized = false;
 
   public static void initialize() {
@@ -68,7 +68,7 @@ public class CatNamesManager {
   }
 
   private static void copyDefaultConfig() throws IOException {
-    try (InputStream inputStream = CatNamesManager.class.getResourceAsStream(RESOURCE_PATH)) {
+    try (InputStream inputStream = CatsNamesManager.class.getResourceAsStream(RESOURCE_PATH)) {
       if (inputStream == null) {
         LOGGER.at(Level.WARNING).log("Resource not found: %s, using fallback names", RESOURCE_PATH);
         createFallbackConfig();

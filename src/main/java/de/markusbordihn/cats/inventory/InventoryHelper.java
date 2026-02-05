@@ -42,7 +42,7 @@ public class InventoryHelper {
     }
 
     byte activeSlot = inventory.getActiveHotbarSlot();
-    inventory.getHotbar().removeItemStackFromSlot((short) activeSlot, 1);
+    inventory.getHotbar().removeItemStackFromSlot(activeSlot, 1);
     LOGGER.at(Level.FINE).log(
         "Consumed 1x %s from player inventory at slot %d", itemName, activeSlot);
   }

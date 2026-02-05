@@ -93,7 +93,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       if (infoProvider != null && infoProvider.hasPosition()) {
         IPositionProvider posProvider = infoProvider.getPositionProvider();
         if (posProvider instanceof EntityPositionProvider) {
-          Ref<EntityStore> playerRef = ((EntityPositionProvider) posProvider).getTarget();
+          Ref<EntityStore> playerRef = posProvider.getTarget();
           if (playerRef != null && playerRef.isValid()) {
             return store.getComponent(playerRef, Player.getComponentType());
           }
@@ -133,7 +133,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       }
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-      return ownerComponent != null && playerUuid.equals(ownerComponent.getOwnerId());
+      return ownerComponent != null && playerUuid.equals(ownerComponent.getOwnerUUID());
     }
   }
 }

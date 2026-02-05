@@ -19,6 +19,8 @@
 
 package de.markusbordihn.cats.data;
 
+import com.hypixel.hytale.codec.codecs.EnumCodec;
+
 public enum CatState {
   SITTING,
   SLEEPING,
@@ -28,5 +30,7 @@ public enum CatState {
   PLAYING,
   SEARCHING,
   WAITING,
-  ATTACKING
+  ATTACKING;
+
+  public static final EnumCodec<CatState> CODEC = new EnumCodec<>(CatState.class);
 }

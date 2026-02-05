@@ -20,6 +20,7 @@
 package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -27,46 +28,61 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.manager.CatsManager;
+import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 
-final class CatWanderCommand extends CatCommand {
-
+final class CatDespawnCommand extends CatCommand {
   @Nonnull private final EntityWrappedArg entityArg;
 
-  public CatWanderCommand() {
-    super("wander", "Makes your cat wander around freely");
+  public CatDespawnCommand() {
+    super("despawn", "Despawns your cat");
     this.entityArg = this.withOptionalArg("entity", "The cat entity", ArgTypes.ENTITY_ID);
   }
 
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    var entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
+    Optional<Ref<EntityStore>> entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
 
-    if (entityRefOpt.isPresent()) {
-      Ref<EntityStore> entityRef = entityRefOpt.get();
-
-      if (!checkOwnership(entityRef, store, context)) {
-        return;
-      }
-
-      // Update state (component + persistent data)
-      CatsManager.getInstance().updateCatState(entityRef, CatState.WANDERING, store);
-      NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-      if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Wandering", store);
-        context.sendMessage(
-            Message.translation("cats.commands.wander.success")
-                .param("name", getCatDisplayName(entityRef, store))
-                .color("#00FF00"));
-      } else {
-        context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FFFF00"));
-      }
-    } else {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+    if (entityRefOpt.isEmpty()) {
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
+      return;
     }
+
+    Ref<EntityStore> entityRef = entityRefOpt.get();
+    if (!checkOwnership(entityRef, store, context)) {
+      return;
+    }
+
+    CatsManager catsManager = CatsManager.getInstance();
+    UUID catUuid = catsManager.getUuid(entityRef, store);
+    if (catUuid == null) {
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_uuid").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    CatDataEntry catData = catsManager.getCatData(catUuid, store);
+    if (catData == null) {
+      context.sendMessage(
+          Message.translation("cats.commands.error.cat_not_found").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    // Despawn through manager
+    catsManager.despawnCat(entityRef, store);
+    store.removeEntity(entityRef, RemoveReason.REMOVE);
+
+    context.sendMessage(
+        Message.translation("cats.commands.despawn.success")
+            .param("name", getCatDisplayName(entityRef, store))
+            .color(Constants.COLOR_SUCCESS));
+    context.sendMessage(
+        Message.translation("cats.commands.despawn.info").color(Constants.COLOR_INFO));
   }
 }

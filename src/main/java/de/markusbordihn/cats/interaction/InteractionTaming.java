@@ -31,8 +31,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.inventory.InventoryHelper;
-import de.markusbordihn.cats.manager.CatNamesManager;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.manager.CatsNamesManager;
 import de.markusbordihn.cats.permission.PermissionManager;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -94,7 +94,7 @@ public class InteractionTaming {
       return;
     }
 
-    int currentCatCount = catsManager.getCatsByOwner(playerUUID).size();
+    int currentCatCount = catsManager.getCatCountByOwner(playerUUID, store);
     int catLimit = getCatLimit(player);
     if (catLimit >= 0 && currentCatCount >= catLimit) {
       player.sendMessage(
@@ -116,7 +116,7 @@ public class InteractionTaming {
       return;
     }
 
-    String catName = CatNamesManager.getRandomName();
+    String catName = CatsNamesManager.getRandomName();
 
     // Use centralized ownership assignment
     catsManager.assignOwner(entityRef, playerUUID, username, catName, "Taming", store);

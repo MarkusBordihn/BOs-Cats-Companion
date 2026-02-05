@@ -41,14 +41,10 @@ public class LuckPermsCompat {
     if (isDetected) {
       return;
     }
-
     isDetected = true;
-    isAvailable = PluginManager.get().getAvailablePlugins().containsKey(LUCKPERMS_ID);
 
-    if (isAvailable) {
+    if (PluginManager.get().getAvailablePlugins().containsKey(LUCKPERMS_ID)) {
       logLuckPermsEnabled();
-    } else {
-      logLuckPermsDisabled();
     }
   }
 
@@ -58,103 +54,86 @@ public class LuckPermsCompat {
 
   private static void logLuckPermsEnabled() {
     LOGGER.at(Level.INFO).log(
-        "╔═════════════════════════════════════════════════════════════════════════════╗");
+        "===============================================================================");
     LOGGER.at(Level.INFO).log(
-        "║ [Cats Plugin] LuckPerms detected! Permission checks are ENABLED.            ║");
+        "| [Cats Plugin] LuckPerms detected! Permission checks are ENABLED.           |");
     LOGGER.at(Level.INFO).log(
-        "╠═════════════════════════════════════════════════════════════════════════════╣");
+        "|=============================================================================|");
     LOGGER.at(Level.INFO).log(
-        "║ IMPORTANT: Use wildcard permission to grant access to /cat command          ║");
+        "| IMPORTANT: Use wildcard permission to grant access to /cat command         |");
     LOGGER.at(Level.INFO).log(
-        "║ and all sub-commands (/cat list, /cat info, etc.)                           ║");
+        "| and all sub-commands (/cat list, /cat info, etc.)                          |");
     LOGGER.at(Level.INFO).log(
-        "║                                                                             ║");
+        "|                                                                             |");
     LOGGER.at(Level.INFO).log(
-        "║ Recommended: Grant wildcard to player or group:                             ║");
+        "| Recommended: Grant wildcard to player or group:                            |");
     LOGGER.at(Level.INFO).log(
-        "║   /lp user <player> permission set markusbordihn.cats.command.cat.* true    ║");
+        "|   /lp user <player> permission set markusbordihn.cats.command.cat.* true   |");
     LOGGER.at(Level.INFO).log(
-        "║   /lp group default permission set markusbordihn.cats.command.cat.* true    ║");
+        "|   /lp group default permission set markusbordihn.cats.command.cat.* true   |");
     LOGGER.at(Level.INFO).log(
-        "║                                                                             ║");
+        "|                                                                             |");
     LOGGER.at(Level.INFO).log(
-        "║ Alternative: Grant individual permissions:                                  ║");
+        "| Alternative: Grant individual permissions:                                 |");
     LOGGER.at(Level.INFO).log(
-        "║   /lp user <player> permission set markusbordihn.cats.command.cat true      ║");
+        "|   /lp user <player> permission set markusbordihn.cats.command.cat true     |");
     LOGGER.at(Level.INFO).log(
-        "║   /lp user <player> permission set markusbordihn.cats.command.cat.list true ║");
+        "|   /lp user <player> permission set markusbordihn.cats.command.cat.list true|");
     LOGGER.at(Level.INFO).log(
-        "║   /lp user <player> permission set markusbordihn.cats.command.cat.info true ║");
+        "|   ...and so on for each sub-command                                        |");
     LOGGER.at(Level.INFO).log(
-        "║   ...and so on for each sub-command                                         ║");
+        "|                                                                             |");
     LOGGER.at(Level.INFO).log(
-        "║                                                                             ║");
+        "| Verify permissions were set:                                               |");
     LOGGER.at(Level.INFO).log(
-        "║ Verify permissions were set:                                                ║");
+        "|   /lp user <player> permission info                                        |");
     LOGGER.at(Level.INFO).log(
-        "║   /lp user <player> permission info                                         ║");
+        "|                                                                             |");
     LOGGER.at(Level.INFO).log(
-        "║                                                                             ║");
+        "| Available permissions:                                                     |");
     LOGGER.at(Level.INFO).log(
-        "║ Available permissions:                                                      ║");
+        "|   - markusbordihn.cats.command.cat          - Base /cat command            |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat       - Base /cat command                ║");
+        "|   - markusbordihn.cats.command.cat.*        - Wildcard: all sub-commands   |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.*     - Wildcard: all sub-commands       ║");
+        "|   - markusbordihn.cats.command.cat.attack   - /cat attack                  |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.list  - /cat list                        ║");
+        "|   - markusbordihn.cats.command.cat.bed      - /cat bed                     |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.info  - /cat info                        ║");
+        "|   - markusbordihn.cats.command.cat.despawn  - /cat despawn (admin)         |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.name  - /cat name                        ║");
+        "|   - markusbordihn.cats.command.cat.follow   - /cat follow                  |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.sit   - /cat sit                         ║");
+        "|   - markusbordihn.cats.command.cat.info     - /cat info                    |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.follow - /cat follow                     ║");
+        "|   - markusbordihn.cats.command.cat.list     - /cat list                    |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.wander - /cat wander                     ║");
+        "|   - markusbordihn.cats.command.cat.name     - /cat name                    |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.wait  - /cat wait                        ║");
+        "|   - markusbordihn.cats.command.cat.owner    - /cat owner (admin)           |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.play  - /cat play                        ║");
+        "|   - markusbordihn.cats.command.cat.play     - /cat play                    |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.sleep - /cat sleep                       ║");
+        "|   - markusbordihn.cats.command.cat.release  - /cat release                 |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.search - /cat search                     ║");
+        "|   - markusbordihn.cats.command.cat.search   - /cat search                  |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.bed   - /cat bed                         ║");
+        "|   - markusbordihn.cats.command.cat.sit      - /cat sit                     |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.release - /cat release                   ║");
+        "|   - markusbordihn.cats.command.cat.sleep    - /cat sleep                   |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.command.cat.owner - /cat owner (admin)               ║");
+        "|   - markusbordihn.cats.command.cat.spawn    - /cat spawn (admin)           |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.admin.bypass      - Bypass ownership checks          ║");
+        "|   - markusbordihn.cats.command.cat.wait     - /cat wait                    |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.limit.unlimited   - Unlimited cat ownership          ║");
+        "|   - markusbordihn.cats.command.cat.wander   - /cat wander                  |");
     LOGGER.at(Level.INFO).log(
-        "║   • markusbordihn.cats.limit.{number}    - Limit to N cats (e.g., .8 .. 32) ║");
+        "|   - markusbordihn.cats.admin.bypass         - Bypass ownership checks      |");
     LOGGER.at(Level.INFO).log(
-        "╚═════════════════════════════════════════════════════════════════════════════╝");
-  }
-
-  private static void logLuckPermsDisabled() {
+        "|   - markusbordihn.cats.limit.unlimited      - Unlimited cat ownership      |");
     LOGGER.at(Level.INFO).log(
-        "╔════════════════════════════════════════════════════════════════════════╗");
+        "|   - markusbordihn.cats.limit.{number}       - Limit to N cats (e.g. .8-32) |");
     LOGGER.at(Level.INFO).log(
-        "║ [Cats Plugin] LuckPerms not detected. Using OWNERSHIP CHECKS only.     ║");
-    LOGGER.at(Level.INFO).log(
-        "║ Players can use all commands on their own cats without restrictions.   ║");
-    LOGGER.at(Level.INFO).log(
-        "║                                                                        ║");
-    LOGGER.at(Level.INFO).log(
-        "║ To enable permission-based access control:                             ║");
-    LOGGER.at(Level.INFO).log(
-        "║   1. Install LuckPerms plugin                                          ║");
-    LOGGER.at(Level.INFO).log(
-        "║   2. Restart the server                                                ║");
-    LOGGER.at(Level.INFO).log(
-        "║   3. Configure permissions as shown when LuckPerms is detected         ║");
-    LOGGER.at(Level.INFO).log(
-        "╚════════════════════════════════════════════════════════════════════════╝");
+        "===============================================================================");
   }
 }

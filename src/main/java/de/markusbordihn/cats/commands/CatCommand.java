@@ -130,11 +130,13 @@ public abstract class CatCommand extends AbstractWorldCommand {
   @Nonnull
   protected String getCatDisplayName(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    CatOwnerComponent ownerComponent =
-        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+    com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
+        store.getComponent(
+            entityRef,
+            com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
 
-    if (ownerComponent != null) {
-      String catName = ownerComponent.getCatName();
+    if (nameplate != null) {
+      String catName = nameplate.getText();
       if (catName != null && !catName.isEmpty()) {
         return catName;
       }

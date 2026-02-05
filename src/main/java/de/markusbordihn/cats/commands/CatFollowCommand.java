@@ -30,8 +30,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 final class CatFollowCommand extends CatCommand {
@@ -59,9 +59,8 @@ final class CatFollowCommand extends CatCommand {
         StateSupport stateSupport = npcEntity.getRole().getStateSupport();
         boolean wasAlreadyFollowing = stateSupport.inState("Pet", "Default");
 
-        // Set component state
-        CatStateComponent stateComponent = new CatStateComponent(CatState.FOLLOWING);
-        store.putComponent(entityRef, CatStateComponent.getComponentType(), stateComponent);
+        // Update state (component + persistent data)
+        CatsManager.getInstance().updateCatState(entityRef, CatState.FOLLOWING, store);
 
         // Already following, force refresh by toggling through Playing state
         if (wasAlreadyFollowing) {

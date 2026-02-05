@@ -28,14 +28,24 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.vector.Vector3d;
+import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
-import de.markusbordihn.cats.component.PlayerCatsComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.CatStatus;
+import de.markusbordihn.cats.data.CatType;
+import de.markusbordihn.cats.world.storage.CatsDataResource;
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,10 +61,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static CatsManager instance;
   private final ComponentType<EntityStore, CatStateComponent> componentType;
-
-  private final Set<Ref<EntityStore>> allCats = new HashSet<>();
-  private final Map<UUID, Set<Ref<EntityStore>>> catsByOwner = new HashMap<>();
-  private final Set<Ref<EntityStore>> catsWithoutOwner = new HashSet<>();
+  private final Map<UUID, Ref<EntityStore>> catRefCache = new HashMap<>();
 
   public CatsManager(ComponentType<EntityStore, CatStateComponent> componentType) {
     this.componentType = componentType;
@@ -78,25 +85,21 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull AddReason reason,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    allCats.add(ref);
-
-    CatOwnerComponent ownerComponent =
-        store.getComponent(ref, CatOwnerComponent.getComponentType());
-    if (ownerComponent != null && ownerComponent.hasOwner()) {
-      UUID ownerUuid = ownerComponent.getOwnerId();
-      if (ownerUuid != null) {
-        catsByOwner.computeIfAbsent(ownerUuid, k -> new HashSet<>()).add(ref);
-        LOGGER.at(Level.FINE).log("Cat registered with owner - Ref: %s, Owner: %s", ref, ownerUuid);
-      } else {
-        catsWithoutOwner.add(ref);
+    UUID entityUuid = getUuid(ref, store);
+    if (entityUuid != null) {
+      catRefCache.put(entityUuid, ref);
+      CatOwnerComponent ownerComponent =
+          store.getComponent(ref, CatOwnerComponent.getComponentType());
+      if (ownerComponent != null) {
+        CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+        if (resource != null && resource.getCat(entityUuid) == null) {
+          registerCat(ref, store);
+          LOGGER.at(Level.INFO).log(
+              "Auto-registered missing cat entry for UUID %s (Owner: %s)",
+              entityUuid, ownerComponent.getOwnerName());
+        }
       }
-    } else {
-      catsWithoutOwner.add(ref);
     }
-
-    LOGGER.at(Level.FINE).log(
-        "Cat registered - Ref: %s, Total: %d, Without owner: %d",
-        ref, allCats.size(), catsWithoutOwner.size());
   }
 
   @Override
@@ -105,127 +108,200 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull RemoveReason reason,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    allCats.remove(ref);
-    catsWithoutOwner.remove(ref);
-    catsByOwner.values().forEach(set -> set.remove(ref));
+    UUID entityUuid = getUuid(ref, store);
+    if (entityUuid != null) {
+      catRefCache.remove(entityUuid);
+      CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+      if (resource != null) {
+        CatDataEntry catData = resource.getCat(entityUuid);
+        if (catData != null && reason == RemoveReason.REMOVE) {
+          if (catData.status() == CatStatus.SPAWNED) {
+            resource.updateCat(entityUuid, catData.withStatus(CatStatus.DESPAWNED));
+          }
+        }
+      }
+    }
+  }
 
-    LOGGER.at(Level.FINE).log("Cat unregistered - Ref: %s, Total: %d", ref, allCats.size());
+  @Nullable
+  public Ref<EntityStore> getCatByUuid(
+      @Nonnull UUID entityUuid, @Nonnull Store<EntityStore> store) {
+    Ref<EntityStore> cached = catRefCache.get(entityUuid);
+    if (cached != null && cached.isValid()) {
+      return cached;
+    }
+
+    Ref<EntityStore> resolved = store.getExternalData().getRefFromUUID(entityUuid);
+    if (resolved != null && resolved.isValid()) {
+      catRefCache.put(entityUuid, resolved);
+      return resolved;
+    }
+    return null;
   }
 
   @Nonnull
-  public Set<Ref<EntityStore>> getCatsByOwner(@Nonnull UUID ownerUuid) {
-    return catsByOwner.getOrDefault(ownerUuid, Collections.emptySet());
+  public Set<Ref<EntityStore>> getCatsByOwner(
+      @Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return Collections.emptySet();
+    }
+
+    Set<Ref<EntityStore>> catRefs = new HashSet<>();
+    for (CatDataEntry catDataEntry : resource.getCatsByOwner(ownerUuid)) {
+      if (catDataEntry.isSpawned()) {
+        Ref<EntityStore> catRef = getCatByUuid(catDataEntry.uuid(), store);
+        if (catRef != null && catRef.isValid()) {
+          catRefs.add(catRef);
+        }
+      }
+    }
+    return catRefs;
   }
 
   @Nonnull
-  public Set<Ref<EntityStore>> getCatsWithoutOwner() {
-    return Collections.unmodifiableSet(catsWithoutOwner);
+  public Set<Ref<EntityStore>> getCatsWithoutOwner(@Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return Collections.emptySet();
+    }
+
+    Set<Ref<EntityStore>> catsWithoutOwner = new HashSet<>();
+    for (CatDataEntry catDataEntry : resource.getCatsWithoutOwner()) {
+      if (catDataEntry.isSpawned()) {
+        Ref<EntityStore> catRef = getCatByUuid(catDataEntry.uuid(), store);
+        if (catRef != null && catRef.isValid()) {
+          catsWithoutOwner.add(catRef);
+        }
+      }
+    }
+    return catsWithoutOwner;
   }
 
   @Nonnull
-  public Set<Ref<EntityStore>> getAllCats() {
-    return Collections.unmodifiableSet(allCats);
+  public Set<Ref<EntityStore>> getAllCats(@Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return Collections.emptySet();
+    }
+
+    Set<Ref<EntityStore>> allCats = new HashSet<>();
+    for (CatDataEntry catDataEntry : resource.getSpawnedCats()) {
+      Ref<EntityStore> catRef = getCatByUuid(catDataEntry.uuid(), store);
+      if (catRef != null && catRef.isValid()) {
+        allCats.add(catRef);
+      }
+    }
+    return allCats;
   }
 
   public void registerOwner(
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull UUID newOwnerUuid,
       @Nonnull Store<EntityStore> store) {
-
-    // Find the old owner by searching through catsByOwner map
-    UUID oldOwnerUuid = null;
-    for (Map.Entry<UUID, Set<Ref<EntityStore>>> entry : catsByOwner.entrySet()) {
-      if (entry.getValue().contains(catRef)) {
-        oldOwnerUuid = entry.getKey();
-        break;
-      }
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      LOGGER.at(Level.WARNING).log("Cat UUID not found for %s", catRef);
+      return;
     }
 
-    // Update catsByOwner tracking - remove from old owner if exists
-    if (oldOwnerUuid != null && !oldOwnerUuid.equals(newOwnerUuid)) {
-      Set<Ref<EntityStore>> oldOwnerCats = catsByOwner.get(oldOwnerUuid);
-      if (oldOwnerCats != null) {
-        oldOwnerCats.remove(catRef);
-        if (oldOwnerCats.isEmpty()) {
-          catsByOwner.remove(oldOwnerUuid);
-        }
-      }
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      LOGGER.at(Level.WARNING).log("CatsDataResource not available");
+      return;
     }
 
-    // Add to new owner's cat list
-    catsByOwner.computeIfAbsent(newOwnerUuid, k -> new HashSet<>()).add(catRef);
-    catsWithoutOwner.remove(catRef);
+    CatDataEntry catDataEntry = resource.getCat(catUuid);
+    if (catDataEntry != null) {
+      resource.updateCat(catUuid, catDataEntry.withOwnerUuid(newOwnerUuid));
+    }
+  }
 
-    // Update PlayerCatsComponent
-    UUIDComponent catUuidComponent = store.getComponent(catRef, UUIDComponent.getComponentType());
-    if (catUuidComponent != null) {
-      UUID catUuid = catUuidComponent.getUuid();
+  public void unregisterOwner(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
 
-      // Remove from old owner
-      if (oldOwnerUuid != null && !oldOwnerUuid.equals(newOwnerUuid)) {
-        Ref<EntityStore> oldOwnerRef = findPlayerByUUID(store, oldOwnerUuid);
-        if (oldOwnerRef != null) {
-          PlayerCatsComponent oldPlayerCats =
-              store.getComponent(oldOwnerRef, PlayerCatsComponent.getComponentType());
-          if (oldPlayerCats != null) {
-            oldPlayerCats.removeCat(catUuid);
-            store.putComponent(oldOwnerRef, PlayerCatsComponent.getComponentType(), oldPlayerCats);
-            LOGGER.at(Level.FINE).log("Removed cat %s from old owner %s", catUuid, oldOwnerUuid);
-          }
-        }
+    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
+    if (npcEntity != null && npcEntity.getRole() != null) {
+      setInvulnerable(npcEntity, false, catUuid);
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catDataEntry = resource.getCat(catUuid);
+      if (catDataEntry != null) {
+        resource.updateCat(catUuid, catDataEntry.withOwner(null, null));
       }
+    }
+  }
 
-      // Add to new owner
-      Ref<EntityStore> newOwnerRef = findPlayerByUUID(store, newOwnerUuid);
-      if (newOwnerRef != null) {
-        PlayerCatsComponent newPlayerCats =
-            store.getComponent(newOwnerRef, PlayerCatsComponent.getComponentType());
-        if (newPlayerCats == null) {
-          newPlayerCats = new PlayerCatsComponent();
-        }
-        newPlayerCats.addCat(catUuid);
-        store.putComponent(newOwnerRef, PlayerCatsComponent.getComponentType(), newPlayerCats);
-        LOGGER.at(Level.INFO).log(
-            "Added cat %s to new owner %s PlayerCatsComponent", catUuid, newOwnerUuid);
-      } else {
-        LOGGER.at(Level.WARNING).log(
-            "Could not find player entity for owner UUID %s - PlayerCatsComponent not updated",
-            newOwnerUuid);
-      }
+  public int getCatCount(@Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    return resource != null ? resource.getTotalCatCount() : 0;
+  }
+
+  public int getCatCountByOwner(@Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    return resource != null ? resource.getOwnedCatCount(ownerUuid) : 0;
+  }
+
+  public void registerCat(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      LOGGER.at(Level.WARNING).log("Cannot register cat - cat has no UUID");
+      return;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      LOGGER.at(Level.WARNING).log("CatsDataResource not available");
+      return;
+    }
+
+    // Read current cat data from components
+    CatOwnerComponent ownerComponent =
+        store.getComponent(catRef, CatOwnerComponent.getComponentType());
+    UUID ownerUuid = ownerComponent != null ? ownerComponent.getOwnerUUID() : null;
+    String ownerName = ownerComponent != null ? ownerComponent.getOwnerName() : null;
+
+    Nameplate nameplate = store.getComponent(catRef, Nameplate.getComponentType());
+    String catName = nameplate != null ? nameplate.getText() : null;
+
+    CatStateComponent stateComponent =
+        store.getComponent(catRef, CatStateComponent.getComponentType());
+    CatState catState = stateComponent != null ? stateComponent.getState() : CatState.FOLLOWING;
+
+    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
+    CatType catType = CatType.UNKNOWN;
+    if (npcEntity != null && npcEntity.getRole() != null) {
+      catType = CatType.fromRoleName(npcEntity.getRole().getRoleName());
+    }
+
+    // Create or update entry in CatsDataResource
+    CatDataEntry existingEntry = resource.getCat(catUuid);
+    if (existingEntry != null) {
+      resource.updateCat(
+          catUuid,
+          existingEntry
+              .withOwner(ownerUuid, ownerName)
+              .withName(catName)
+              .withState(catState)
+              .withStatus(CatStatus.SPAWNED));
     } else {
-      LOGGER.at(Level.WARNING).log("Cat UUID component not found for cat %s", catRef);
+      CatDataEntry newEntry =
+          new CatDataEntry(
+              catUuid,
+              ownerUuid,
+              ownerName,
+              catType,
+              catName,
+              catState,
+              getPosition(catRef, store),
+              CatStatus.SPAWNED);
+      resource.addCat(newEntry);
     }
-
-    LOGGER.at(Level.INFO).log(
-        "Cat %s registered to owner %s in catsByOwner map", catRef, newOwnerUuid);
-  }
-
-  public void unregisterOwner(@Nonnull Ref<EntityStore> catRef, @Nullable UUID ownerUuid) {
-    if (ownerUuid != null) {
-      Set<Ref<EntityStore>> ownerCats = catsByOwner.get(ownerUuid);
-      if (ownerCats != null) {
-        ownerCats.remove(catRef);
-        if (ownerCats.isEmpty()) {
-          catsByOwner.remove(ownerUuid);
-        }
-      }
-    } else {
-      catsByOwner.values().forEach(set -> set.remove(catRef));
-    }
-
-    if (allCats.contains(catRef)) {
-      catsWithoutOwner.add(catRef);
-    }
-
-    LOGGER.at(Level.FINE).log("Cat %s unregistered from owner", catRef);
-  }
-
-  public int getCatCount() {
-    return allCats.size();
-  }
-
-  public int getCatCountByOwner(@Nonnull UUID ownerUuid) {
-    return catsByOwner.getOrDefault(ownerUuid, Collections.emptySet()).size();
   }
 
   public void assignOwner(
@@ -236,51 +312,186 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nullable String targetState,
       @Nonnull Store<EntityStore> store) {
 
-    // Set CatOwnerComponent
-    CatOwnerComponent ownerComponent = new CatOwnerComponent(ownerUuid, ownerName, catName);
-    store.putComponent(catRef, CatOwnerComponent.getComponentType(), ownerComponent);
-
-    // Update nameplate if catName provided
-    if (catName != null && !catName.isEmpty()) {
-      Nameplate nameplate = store.ensureAndGetComponent(catRef, Nameplate.getComponentType());
-      nameplate.setText(catName);
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      LOGGER.at(Level.WARNING).log("Cannot assign owner - cat has no UUID");
+      return;
     }
 
-    // Set cat state to FOLLOWING
+    store.putComponent(
+        catRef, CatOwnerComponent.getComponentType(), new CatOwnerComponent(ownerUuid, ownerName));
+
+    if (catName != null && !catName.isEmpty()) {
+      store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catName);
+    }
+
     store.putComponent(
         catRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.FOLLOWING));
-
-    // Register in CatsManager tracking and update PlayerCatsComponent
     registerOwner(catRef, ownerUuid, store);
 
-    // Set NPC state if provided
     if (targetState != null) {
       NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(catRef, targetState, "Default", store);
+        setInvulnerable(npcEntity, true, catUuid);
       }
     }
 
-    LOGGER.at(Level.FINE).log(
-        "Cat %s assigned to owner %s (name: %s, state: %s)",
-        catRef, ownerName, catName, targetState);
+    // Register/update cat in CatsDataResource with current state
+    registerCat(catRef, store);
   }
 
-  private Ref<EntityStore> findPlayerByUUID(Store<EntityStore> store, UUID playerUuid) {
-    final Ref<EntityStore>[] result = new Ref[1];
-    store.forEachChunk(
-        (chunk, buffer) -> {
-          if (result[0] != null) {
-            return;
-          }
-          for (int i = 0; i < chunk.size(); i++) {
-            UUIDComponent uuidComponent = chunk.getComponent(i, UUIDComponent.getComponentType());
-            if (uuidComponent != null && playerUuid.equals(uuidComponent.getUuid())) {
-              result[0] = chunk.getReferenceTo(i);
-              return;
-            }
-          }
-        });
-    return result[0];
+  public void updateCatName(
+      @Nonnull Ref<EntityStore> catRef,
+      @Nonnull String catName,
+      @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catDataEntry = resource.getCat(catUuid);
+      if (catDataEntry != null) {
+        resource.updateCat(catUuid, catDataEntry.withName(catName));
+      }
+    }
+  }
+
+  public void updateCatState(
+      @Nonnull Ref<EntityStore> catRef,
+      @Nonnull CatState state,
+      @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    store.putComponent(catRef, CatStateComponent.getComponentType(), new CatStateComponent(state));
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catDataEntry = resource.getCat(catUuid);
+      if (catDataEntry != null) {
+        resource.updateCat(catUuid, catDataEntry.withState(state));
+      }
+    }
+  }
+
+  @Nullable
+  public UUID getUuid(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+    UUIDComponent component = store.getComponent(ref, UUIDComponent.getComponentType());
+    return component != null ? component.getUuid() : null;
+  }
+
+  @Nullable
+  public String getCatName(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    Nameplate nameplate = store.getComponent(catRef, Nameplate.getComponentType());
+    if (nameplate != null) {
+      String name = nameplate.getText();
+      if (name != null && !name.isEmpty()) {
+        return name;
+      }
+    }
+    return null;
+  }
+
+  @Nonnull
+  public String getCatDisplayName(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    String name = getCatName(catRef, store);
+    return name != null ? name : "Cat";
+  }
+
+  @Nullable
+  public CatDataEntry getCatData(@Nonnull UUID catUuid, @Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    return resource != null ? resource.getCat(catUuid) : null;
+  }
+
+  @Nullable
+  public CatDataEntry getCatData(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    return catUuid != null ? getCatData(catUuid, store) : null;
+  }
+
+  @Nonnull
+  public Collection<CatDataEntry> getCatDataByOwner(
+      @Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    return resource != null ? resource.getCatsByOwner(ownerUuid) : Collections.emptyList();
+  }
+
+  public void despawnCat(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    Vector3i position = getPosition(catRef, store);
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catData = resource.getCat(catUuid);
+      if (catData != null) {
+        resource.updateCat(catUuid, catData.withStatus(CatStatus.DESPAWNED).withPosition(position));
+      }
+    }
+  }
+
+  public void updateCatUuid(
+      @Nonnull UUID oldUuid, @Nonnull UUID newUuid, @Nonnull Store<EntityStore> store) {
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catData = resource.getCat(oldUuid);
+      if (catData != null) {
+        resource.removeCat(oldUuid);
+        resource.addCat(catData.withUuid(newUuid).withStatus(CatStatus.SPAWNED));
+      }
+    }
+  }
+
+  @Nullable
+  private Vector3i getPosition(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+    TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+    if (transform != null) {
+      Vector3d pos = transform.getPosition();
+      return new Vector3i((int) pos.x, (int) pos.y, (int) pos.z);
+    }
+    return null;
+  }
+
+  private void setInvulnerable(
+      @Nonnull NPCEntity npcEntity, boolean invulnerable, @Nonnull UUID catUuid) {
+    try {
+      Field invulnerableField = npcEntity.getRole().getClass().getDeclaredField("invulnerable");
+      invulnerableField.setAccessible(true);
+      invulnerableField.setBoolean(npcEntity.getRole(), invulnerable);
+      LOGGER.at(Level.FINE).log("Set invulnerable=%s for cat %s", invulnerable, catUuid);
+    } catch (NoSuchFieldException e) {
+      LOGGER.at(Level.WARNING).log(
+          "Failed to find invulnerable field in Role class: %s", e.getMessage());
+    } catch (IllegalAccessException e) {
+      LOGGER.at(Level.WARNING).log("Failed to access invulnerable field: %s", e.getMessage());
+    } catch (Exception e) {
+      LOGGER.at(Level.WARNING).log(
+          "Unexpected error setting invulnerable state: %s", e.getMessage());
+    }
+  }
+
+  public boolean isCatAliveInWorld(@Nonnull UUID catUuid, @Nonnull Store<EntityStore> store) {
+    Ref<EntityStore> catRef = getCatByUuid(catUuid, store);
+    if (catRef == null || !catRef.isValid()) {
+      return false;
+    }
+
+    EntityStatMap statMap = store.getComponent(catRef, EntityStatMap.getComponentType());
+    if (statMap == null) {
+      return false;
+    }
+
+    var healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
+    return healthStat != null && healthStat.get() > 0;
   }
 }

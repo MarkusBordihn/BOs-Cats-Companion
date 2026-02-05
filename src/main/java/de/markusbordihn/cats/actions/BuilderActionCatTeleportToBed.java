@@ -33,8 +33,8 @@ import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
-import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 public class BuilderActionCatTeleportToBed extends BuilderActionBase {
@@ -119,11 +119,11 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
               currentTransform != null ? currentTransform.getRotation() : new Vector3f(0, 0, 0));
       store.putComponent(entityRef, TransformComponent.getComponentType(), newTransform);
 
-      // Set cat state to SLEEPING
-      store.putComponent(
-          entityRef,
-          CatStateComponent.getComponentType(),
-          new CatStateComponent(CatState.SLEEPING));
+      // Update state (component + persistent data)
+      CatsManager catsManager = CatsManager.getInstance();
+      if (catsManager != null) {
+        catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
+      }
 
       // Set NPC role state to Sleeping
       if (role != null && role.getStateSupport() != null) {

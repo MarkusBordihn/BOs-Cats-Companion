@@ -24,24 +24,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public record CatOwnerData(
-    @Nullable UUID ownerId,
-    @Nullable String ownerName,
-    @Nullable String catName,
-    long tamedTimestamp) {
+    @Nullable UUID ownerId, @Nullable String ownerName, long tamedTimestamp) {
 
   @Nonnull
   public static CatOwnerData empty() {
-    return new CatOwnerData(null, null, null, 0);
+    return new CatOwnerData(null, null, 0);
   }
 
   @Nonnull
   public static CatOwnerData create(UUID ownerId, String ownerName) {
-    return new CatOwnerData(ownerId, ownerName, null, System.currentTimeMillis());
-  }
-
-  @Nonnull
-  public static CatOwnerData create(UUID ownerId, String ownerName, String catName) {
-    return new CatOwnerData(ownerId, ownerName, catName, System.currentTimeMillis());
+    return new CatOwnerData(ownerId, ownerName, System.currentTimeMillis());
   }
 
   public boolean hasOwner() {
@@ -50,26 +42,21 @@ public record CatOwnerData(
 
   @Nonnull
   public CatOwnerData withOwnerId(UUID ownerId) {
-    return new CatOwnerData(ownerId, ownerName, catName, tamedTimestamp);
+    return new CatOwnerData(ownerId, ownerName, tamedTimestamp);
   }
 
   @Nonnull
   public CatOwnerData withOwnerName(String ownerName) {
-    return new CatOwnerData(ownerId, ownerName, catName, tamedTimestamp);
-  }
-
-  @Nonnull
-  public CatOwnerData withCatName(String catName) {
-    return new CatOwnerData(ownerId, ownerName, catName, tamedTimestamp);
+    return new CatOwnerData(ownerId, ownerName, tamedTimestamp);
   }
 
   @Nonnull
   public CatOwnerData withTamedTimestamp(long tamedTimestamp) {
-    return new CatOwnerData(ownerId, ownerName, catName, tamedTimestamp);
+    return new CatOwnerData(ownerId, ownerName, tamedTimestamp);
   }
 
   @Nonnull
   public CatOwnerData withOwner(UUID ownerId, String ownerName) {
-    return new CatOwnerData(ownerId, ownerName, catName, System.currentTimeMillis());
+    return new CatOwnerData(ownerId, ownerName, System.currentTimeMillis());
   }
 }

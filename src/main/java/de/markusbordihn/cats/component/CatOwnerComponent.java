@@ -37,7 +37,6 @@ public class CatOwnerComponent implements Component<EntityStore> {
 
   public static final String OWNER_ID_TAG = "OwnerId";
   public static final String OWNER_NAME_TAG = "OwnerName";
-  public static final String CAT_NAME_TAG = "CatName";
   public static final String TAMED_TIMESTAMP_TAG = "TamedTimestamp";
 
   @Nonnull
@@ -54,12 +53,6 @@ public class CatOwnerComponent implements Component<EntityStore> {
               (component, value) -> component.data = component.data.withOwnerName(value),
               component -> component.data.ownerName())
           .documentation("The name of the cat's owner.")
-          .add()
-          .append(
-              new KeyedCodec<>(CAT_NAME_TAG, new StringCodec()),
-              (component, value) -> component.data = component.data.withCatName(value),
-              component -> component.data.catName())
-          .documentation("The custom name of the cat.")
           .add()
           .append(
               new KeyedCodec<>(TAMED_TIMESTAMP_TAG, new LongCodec()),
@@ -83,10 +76,6 @@ public class CatOwnerComponent implements Component<EntityStore> {
     this.data = CatOwnerData.create(ownerId, ownerName);
   }
 
-  public CatOwnerComponent(UUID ownerId, String ownerName, String catName) {
-    this.data = CatOwnerData.create(ownerId, ownerName, catName);
-  }
-
   public static ComponentType<EntityStore, CatOwnerComponent> getComponentType() {
     return Main.getInstance().catOwnerComponentType;
   }
@@ -105,7 +94,7 @@ public class CatOwnerComponent implements Component<EntityStore> {
   }
 
   @Nullable
-  public UUID getOwnerId() {
+  public UUID getOwnerUUID() {
     return data.ownerId();
   }
 
@@ -126,21 +115,8 @@ public class CatOwnerComponent implements Component<EntityStore> {
     return data.tamedTimestamp();
   }
 
-  @Nullable
-  public String getCatName() {
-    return data.catName();
-  }
-
-  public void setCatName(@Nullable String catName) {
-    this.data = data.withCatName(catName);
-  }
-
   public void setOwner(UUID ownerId, String ownerName) {
-    this.data = data.withOwner(ownerId, ownerName);
-  }
-
-  public void setOwner(UUID ownerId, String ownerName, String catName) {
-    this.data = new CatOwnerData(ownerId, ownerName, catName, System.currentTimeMillis());
+    this.data = new CatOwnerData(ownerId, ownerName, System.currentTimeMillis());
   }
 
   public void clearOwner() {

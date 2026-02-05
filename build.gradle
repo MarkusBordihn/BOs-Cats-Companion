@@ -78,20 +78,45 @@ tasks.register('proguard', proguard.gradle.ProGuardTask) {
   keep 'public class de.markusbordihn.cats.component.CatOwnerComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatStateComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatBedTargetComponent { public protected *; }'
-  keep 'public class de.markusbordihn.cats.system.CatOwnershipSystem { public <init>(...); }'
+  keep 'public class de.markusbordihn.cats.component.CatTargetComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.system.CatStateSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.system.CatStateSyncSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.manager.CatsManager { public <init>(...); }'
+  keep 'public class de.markusbordihn.cats.manager.CatsNamesManager { public protected *; }'
+
+  // Keep resource classes
+  keep 'public class de.markusbordihn.cats.world.storage.CatsDataResource { public protected *; }'
 
   // Keep data classes and enums
   keep 'public enum de.markusbordihn.cats.data.CatState { *; }'
+  keep 'public enum de.markusbordihn.cats.data.CatStatus { *; }'
+  keep 'public enum de.markusbordihn.cats.data.CatType { *; }'
+
+  // Keep data records (records are final classes that extend java.lang.Record)
+  keep 'public final class de.markusbordihn.cats.data.CatDataEntry { public protected *; }'
+  keep 'public final class de.markusbordihn.cats.data.CatOwnerData { public protected *; }'
+  keep 'public final class de.markusbordihn.cats.data.CatStateData { public protected *; }'
+  keep 'public final class de.markusbordihn.cats.data.CatBedInfo { public protected *; }'
 
   // Keep Action builders (registered via reflection in Main.java)
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionWild { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionWild$ActionCatInteractionWild { public <init>(...); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner$ActionCatInteractionOwner { public <init>(...); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger$ActionCatInteractionStranger { public <init>(...); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState$ActionCatSetSleepingState { public <init>(...); public protected *; }'
   keep 'public class de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed$ActionCatTeleportToBed { public <init>(...); public protected *; }'
+  keep 'public abstract class de.markusbordihn.cats.actions.BuilderActionCatInteractionBase { public protected *; }'
+  keep 'public abstract class de.markusbordihn.cats.actions.BuilderActionCatInteractionBase$ActionCatInteractionBase { public <init>(...); public protected *; }'
+
+  // Keep Sensor builders (registered via reflection in Main.java)
+  keep 'public class de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed$SensorIsCatTamed { public <init>(...); public protected *; }'
+  keep 'public class de.markusbordihn.cats.sensors.BuilderSensorIsOwner { public <init>(); public protected *; }'
+  keep 'public class de.markusbordihn.cats.sensors.BuilderSensorIsOwner$SensorIsOwner { public <init>(...); public protected *; }'
 
   // Keep enum structure
   keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'

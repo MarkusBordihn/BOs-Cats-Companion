@@ -36,6 +36,8 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Item consumption for taming and feeding (items are consumed from the player's inventory)
 * Persistent component data for owner + state (component CODECs)
 * Full memory system support for NPC tracking and persistence
+* Persistent cat data storage with owner names, positions, and states
+  (saved in `worlds/default/resources/CatsData.json`)
 
 ### How to Get a Cat
 
@@ -80,8 +82,11 @@ Each breed also has a spawn egg:
 
 ### How to Tame a Cat
 
-1. **Switch to Survival or Adventure mode**
-   ⚠️ Cats cannot be tamed while in Creative mode! They will ignore all interaction attempts.
+1. **Switch to Survival or Adventure mode or enable "Allow NPC Detection" in Creative mode**
+   ⚠️ Cats cannot be tamed while in Creative mode by default!
+
+   **Creative Mode Users:** Enable **"Allow NPC Detection"** in the **Creative Mode Quick Settings**
+   (press TAB or the quick settings key) to interact with cats in Creative mode.
 
 2. Obtain fish
    Supported types: Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, Minnow
@@ -138,6 +143,8 @@ Your cat will show affection with heart particles and happy sounds.
 * `/cat info` – Show detailed cat information (works on any cat)
 * `/cat list` – List all cats owned by a player
 * `/cat owner` – Admin command to change ownership
+* `/cat spawn` – Spawn a previously despawned cat
+* `/cat despawn` – Despawn a cat (saves state, can be respawned later)
 
 #### Tamed Cat Commands
 
@@ -160,12 +167,29 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 The plugin includes built-in support for both Hytale's permission system and LuckPerms.
 
-**LuckPerms Integration:**
+### Hytale permissions
+
+Hytale evaluates permissions on the player by checking assigned groups and user entries.
+If a permission node is granted via a group or directly on a user, the command becomes usable.
+Permissions are additive, so a user inherits group permissions and can receive additional nodes.
+
+**Quick setup with Hytale permissions:**
+
+1. Run `/commands dump` as op to generate a full command list.
+2. Open `commands.dump.json` and search for `/cat` commands.
+3. Add the relevant permissions (e.g., `markusbordihn.cats.command.cat`,
+   `markusbordihn.cats.command.cat.follow`) to a group or user.
+
+The group or user can now use those commands without a server restart.
+
+### LuckPerms Integration
+
 If you have LuckPerms installed, the plugin will automatically detect it on startup and provide
 helpful tips and permission examples in the server console.
 This makes it easier to configure cat ownership limits and command permissions for your players.
 
-**Default Cat Limit:**
+### Default Cat Limit
+
 Players can own up to 16 cats by default. Server admins can adjust this limit using permissions.
 
 ## ⚠️ Known Limitations
@@ -191,9 +215,19 @@ Planned improvements and additions:
 * Cat progression and special abilities
 * Combat integration (making attack command deal damage)
 
+## 🗃️ Data Storage
+
+Cat data is automatically saved to `worlds/default/resources/CatsData.json`.
+This includes:
+
+* Cat UUID and owner information
+* Cat type, name, and current state
+* Last known position and spawn status
+
+Backup this file to preserve your cats when moving worlds.
+
 ## 🐛 Known Issues
 
-* Some states/substates may reset after server restart
 * Wild cats may occasionally get stuck while approaching players holding fish
 * Some animation transitions are not yet smooth
 * Pathfinding still needs refinement

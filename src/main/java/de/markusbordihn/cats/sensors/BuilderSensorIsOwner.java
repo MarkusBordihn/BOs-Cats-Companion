@@ -101,7 +101,7 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
       }
 
       UUID playerUUID = player.getPlayerRef().getUuid();
-      return ownerComponent.getOwnerId().equals(playerUUID);
+      return ownerComponent.getOwnerUUID().equals(playerUUID);
     }
 
     @Override

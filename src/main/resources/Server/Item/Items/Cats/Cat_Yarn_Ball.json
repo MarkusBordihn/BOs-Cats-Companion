@@ -48,18 +48,16 @@
     "Input": [
       {
         "ItemId": "Ingredient_Fibre",
-        "Quantity": 3
+        "Quantity": 2
       }
     ],
     "BenchRequirement": [
       {
         "Type": "Crafting",
-        "Id": "Crafting_Station",
-        "Categories": [
-          "General"
-        ]
+        "Id": "Furniture"
       }
-    ]
+    ],
+    "KnowledgeRequired": false
   },
   "ItemSoundSetId": "ISS_Items_Cloth",
   "DropOnDeath": true
