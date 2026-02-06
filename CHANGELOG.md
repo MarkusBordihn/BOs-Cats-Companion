@@ -7,6 +7,12 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 1.8.1
+
+- Fixed cat despawn command error message.
+- Added better taming system with increased taming chances for higher quality food.
+- Smaller bug fixes for v2026.02.06
+
 ### 1.8.0
 
 - Fixed yarn ball recipe not working due to wrong workbench type.

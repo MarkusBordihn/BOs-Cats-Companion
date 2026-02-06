@@ -74,13 +74,13 @@ final class CatDespawnCommand extends CatCommand {
       return;
     }
 
-    // Despawn through manager
+    String catName = getCatDisplayName(entityRef, store);
     catsManager.despawnCat(entityRef, store);
     store.removeEntity(entityRef, RemoveReason.REMOVE);
 
     context.sendMessage(
         Message.translation("cats.commands.despawn.success")
-            .param("name", getCatDisplayName(entityRef, store))
+            .param("name", catName)
             .color(Constants.COLOR_SUCCESS));
     context.sendMessage(
         Message.translation("cats.commands.despawn.info").color(Constants.COLOR_INFO));

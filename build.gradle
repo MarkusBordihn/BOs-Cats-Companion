@@ -74,11 +74,12 @@ tasks.register('proguard', proguard.gradle.ProGuardTask) {
   keepattributes 'Manifest'
 
   // Keep main plugin class and components/systems
-  keep 'public class de.markusbordihn.cats.Main extends com.hypixel.hytale.server.core.plugin.JavaPlugin { public protected *; }'
+  keep 'public class de.markusbordihn.cats.Cats extends com.hypixel.hytale.server.core.plugin.JavaPlugin { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatOwnerComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatStateComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatBedTargetComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.component.CatTargetComponent { public protected *; }'
+  keep 'public class de.markusbordihn.cats.component.CatTamingProgressComponent { public protected *; }'
   keep 'public class de.markusbordihn.cats.system.CatStateSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.system.CatStateSyncSystem { public <init>(...); }'
   keep 'public class de.markusbordihn.cats.manager.CatsManager { public <init>(...); }'
@@ -86,6 +87,9 @@ tasks.register('proguard', proguard.gradle.ProGuardTask) {
 
   // Keep resource classes
   keep 'public class de.markusbordihn.cats.world.storage.CatsDataResource { public protected *; }'
+
+  // Keep compatibility layers
+  keep 'public class de.markusbordihn.cats.compat.LuckPermsCompat { public protected *; }'
 
   // Keep data classes and enums
   keep 'public enum de.markusbordihn.cats.data.CatState { *; }'
@@ -122,7 +126,9 @@ tasks.register('proguard', proguard.gradle.ProGuardTask) {
   keepclassmembers 'enum * { public static **[] values(); public static ** valueOf(java.lang.String); }'
 
   // Keep all command classes (used by Hytale Command System)
-  keep 'public class de.markusbordihn.cats.commands.** extends com.hypixel.hytale.server.core.command.system.basecommands.** { public protected *; }'
+  keep 'public class de.markusbordihn.cats.commands.CatCommands extends com.hypixel.hytale.server.core.command.system.basecommands.** { public protected *; }'
+  keep 'public abstract class de.markusbordihn.cats.commands.CatCommand extends com.hypixel.hytale.server.core.command.system.basecommands.** { public protected *; }'
+  keep 'class de.markusbordihn.cats.commands.*Command extends de.markusbordihn.cats.commands.CatCommand { public protected *; }'
 
   // Don't print notes about potential issues
   dontnote

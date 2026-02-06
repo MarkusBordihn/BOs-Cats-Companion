@@ -27,7 +27,7 @@ import com.hypixel.hytale.codec.codecs.simple.StringCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.Cats;
 import de.markusbordihn.cats.data.CatOwnerData;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -77,7 +77,7 @@ public class CatOwnerComponent implements Component<EntityStore> {
   }
 
   public static ComponentType<EntityStore, CatOwnerComponent> getComponentType() {
-    return Main.getInstance().catOwnerComponentType;
+    return Cats.getInstance().catOwnerComponentType;
   }
 
   @Nonnull

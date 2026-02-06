@@ -11,6 +11,11 @@ taming.limit_reached=You have reached your cat limit ({current}/{limit})
 taming.error_no_uuid=Error: Could not tame cat (no UUID)
 taming.error_system=Error: Cats system not available
 taming.count=You now own {current} of {limit} cats
+taming.progress=Cat enjoyed the food! Trust progress: {current}/{required}
+taming.gaining_trust=The cat seems interested but is still cautious...
+taming.likes_food=The cat is starting to like you!
+taming.almost_there=The cat is almost ready to trust you!
+taming.too_soon=The cat is still full! Wait {seconds} more seconds before feeding again.
 
 # Hints
 hint.tame=Press [{key}] to tame

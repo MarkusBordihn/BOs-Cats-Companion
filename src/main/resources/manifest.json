@@ -1,7 +1,7 @@
 {
-  "Group": "markusbordihn",
+  "Group": "MarkusBordihn",
   "Name": "Cats",
-  "Version": "1.8.0",
+  "Version": "1.8.1",
   "Description": "Adds new cat breeds to bringing more variety, personality, and cuteness to your worlds.",
   "Authors": [
     {
@@ -9,7 +9,7 @@
     }
   ],
   "Website": "https://www.curseforge.com/hytale/mods/cats",
-  "Main": "de.markusbordihn.cats.Main",
+  "Main": "de.markusbordihn.cats.Cats",
   "ServerVersion": "*",
   "Dependencies": {
     "Hytale:EntityModule": "*"

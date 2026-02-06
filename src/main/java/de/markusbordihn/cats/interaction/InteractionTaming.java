@@ -30,6 +30,7 @@ import com.hypixel.hytale.server.core.permissions.PermissionHolder;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.component.CatTamingProgressComponent;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
@@ -39,6 +40,7 @@ import java.util.logging.Level;
 
 public class InteractionTaming {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+  private static final long FEEDING_COOLDOWN_MS = 5000;
 
   public static boolean handle(
       Ref<EntityStore> entityRef,
@@ -50,8 +52,94 @@ public class InteractionTaming {
     InteractionLogger.logInteraction(
         "WILD CAT: Taming Attempt", entityRef, role, store, player, itemName);
 
-    handleSuccessfulTaming(entityRef, role, store, player, heldItem);
+    CatTamingProgressComponent progressComponent =
+        store.getComponent(entityRef, CatTamingProgressComponent.getComponentType());
+    if (progressComponent == null) {
+      progressComponent = new CatTamingProgressComponent();
+      store.putComponent(
+          entityRef, CatTamingProgressComponent.getComponentType(), progressComponent);
+      LOGGER.at(Level.FINE).log(
+          "Initialized taming progress: requires %d fish", progressComponent.getRequiredProgress());
+    }
+
+    if (!progressComponent.canFeedNow(FEEDING_COOLDOWN_MS)) {
+      role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
+      if (player != null) {
+        player.sendMessage(
+            Message.translation("cats.interactions.taming.too_soon")
+                .param(
+                    "seconds",
+                    String.valueOf(
+                        (progressComponent.getLastFedTimestamp()
+                                + FEEDING_COOLDOWN_MS
+                                - System.currentTimeMillis())
+                            / 1000))
+                .color(Constants.COLOR_WARNING));
+      }
+      return true;
+    }
+
+    progressComponent.incrementProgress();
+    store.putComponent(entityRef, CatTamingProgressComponent.getComponentType(), progressComponent);
+
+    LOGGER.at(Level.FINE).log(
+        "Taming progress: %d/%d",
+        progressComponent.getCurrentProgress(), progressComponent.getRequiredProgress());
+
+    if (progressComponent.isReadyToTame()) {
+      handleSuccessfulTaming(entityRef, role, store, player, heldItem);
+      store.removeComponent(entityRef, CatTamingProgressComponent.getComponentType());
+    } else {
+      handleProgressFeedback(
+          entityRef,
+          role,
+          store,
+          player,
+          heldItem,
+          progressComponent.getCurrentProgress(),
+          progressComponent.getRequiredProgress());
+    }
+
     return false;
+  }
+
+  private static void handleProgressFeedback(
+      Ref<EntityStore> entityRef,
+      Role role,
+      Store<EntityStore> store,
+      Player player,
+      ItemStack heldItem,
+      long currentProgress,
+      long requiredProgress) {
+
+    role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
+
+    if (player != null) {
+      player.sendMessage(
+          Message.translation("cats.interactions.taming.progress")
+              .param("current", String.valueOf(currentProgress))
+              .param("required", String.valueOf(requiredProgress))
+              .color(Constants.COLOR_INFO));
+      if (currentProgress == 1) {
+        player.sendMessage(
+            Message.translation("cats.interactions.taming.gaining_trust")
+                .color(Constants.COLOR_SUCCESS));
+      } else if (currentProgress >= requiredProgress - 1) {
+        player.sendMessage(
+            Message.translation("cats.interactions.taming.almost_there")
+                .color(Constants.COLOR_SUCCESS));
+      } else {
+        player.sendMessage(
+            Message.translation("cats.interactions.taming.likes_food")
+                .color(Constants.COLOR_SUCCESS));
+      }
+    }
+
+    InventoryHelper.consumeActiveHotbarItem(player, heldItem);
+
+    LOGGER.at(Level.FINE).log(
+        "Cat fed with %s - progress: %d/%d",
+        heldItem != null ? heldItem.getItemId() : null, currentProgress, requiredProgress);
   }
 
   private static void handleSuccessfulTaming(
@@ -117,8 +205,6 @@ public class InteractionTaming {
     }
 
     String catName = CatsNamesManager.getRandomName();
-
-    // Use centralized ownership assignment
     catsManager.assignOwner(entityRef, playerUUID, username, catName, "Taming", store);
 
     player.sendMessage(

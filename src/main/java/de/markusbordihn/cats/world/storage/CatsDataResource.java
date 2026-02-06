@@ -26,7 +26,7 @@ import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.Cats;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatStatus;
 import java.util.Collections;
@@ -66,7 +66,7 @@ public class CatsDataResource implements Resource<EntityStore> {
 
   @Nonnull
   public static ResourceType<EntityStore, CatsDataResource> getResourceType() {
-    return Main.getInstance().catsDataResourceType;
+    return Cats.getInstance().catsDataResourceType;
   }
 
   public void addCat(@Nonnull CatDataEntry catDataEntry) {

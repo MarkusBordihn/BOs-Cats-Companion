@@ -25,7 +25,7 @@ import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.Cats;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.CatStateData;
 import javax.annotation.Nonnull;
@@ -62,7 +62,7 @@ public class CatStateComponent implements Component<EntityStore> {
   }
 
   public static ComponentType<EntityStore, CatStateComponent> getComponentType() {
-    return Main.getInstance().catStateComponentType;
+    return Cats.getInstance().catStateComponentType;
   }
 
   @Nonnull

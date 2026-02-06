@@ -81,6 +81,14 @@
         }
       ]
     },
+    "Fall": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cat/Animations/Fall.blockyanim",
+          "BlendingDuration": 0.15
+        }
+      ]
+    },
     "Alerted": {
       "Animations": [
         {

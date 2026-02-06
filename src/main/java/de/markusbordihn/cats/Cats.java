@@ -42,6 +42,7 @@ import de.markusbordihn.cats.compat.LuckPermsCompat;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.component.CatTamingProgressComponent;
 import de.markusbordihn.cats.component.CatTargetComponent;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
@@ -53,7 +54,7 @@ import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.logging.Level;
 
 @SuppressWarnings("unused")
-public class Main extends JavaPlugin {
+public class Cats extends JavaPlugin {
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -64,20 +65,21 @@ public class Main extends JavaPlugin {
         BuilderActionCatInteractionStranger.class
       };
   public static ComponentType<EntityStore, CatTargetComponent> catTargetComponentType;
-  private static Main instance;
+  private static Cats instance;
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
   public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
+  public ComponentType<EntityStore, CatTamingProgressComponent> catTamingProgressComponentType;
   public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
 
-  public Main(JavaPluginInit init) {
+  public Cats(JavaPluginInit init) {
     super(init);
     instance = this;
   }
 
-  public static Main getInstance() {
+  public static Cats getInstance() {
     return instance;
   }
 
@@ -173,7 +175,7 @@ public class Main extends JavaPlugin {
   @Override
   protected void setup() {
     super.setup();
-    LOGGER.at(Level.INFO).log("Setting up Cats Plugin...");
+    LOGGER.at(Level.INFO).log("Setting up %s Plugin...", Constants.MOD_NAME);
     LOGGER.at(Level.INFO).log("Plugin: %s", getManifest().getName());
     LOGGER.at(Level.INFO).log("Version: %s", getManifest().getVersion());
     LOGGER.at(Level.INFO).log("Author: %s", getManifest().getAuthors());
@@ -191,6 +193,12 @@ public class Main extends JavaPlugin {
         getEntityStoreRegistry()
             .registerComponent(
                 CatBedTargetComponent.class, "CatBedTarget", CatBedTargetComponent.CODEC);
+    catTamingProgressComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(
+                CatTamingProgressComponent.class,
+                "CatTamingProgress",
+                CatTamingProgressComponent.CODEC);
     catTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatTargetComponent.class, "CatTarget", CatTargetComponent.CODEC);

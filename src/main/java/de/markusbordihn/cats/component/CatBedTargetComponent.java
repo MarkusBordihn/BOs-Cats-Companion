@@ -26,7 +26,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import de.markusbordihn.cats.Main;
+import de.markusbordihn.cats.Cats;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -83,7 +83,7 @@ public class CatBedTargetComponent implements Component<EntityStore> {
 
   @Nullable
   public static ComponentType<EntityStore, CatBedTargetComponent> getComponentType() {
-    return Main.getInstance().catBedTargetComponentType;
+    return Cats.getInstance().catBedTargetComponentType;
   }
 
   @Nonnull
