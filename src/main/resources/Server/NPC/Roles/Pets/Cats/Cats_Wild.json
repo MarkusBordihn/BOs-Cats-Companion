@@ -1,0 +1,548 @@
+{
+  "Type": "Generic",
+  "StartState": "Wild",
+  "DefaultSubState": "Default",
+  "DefaultNPCAttitude": "Ignore",
+  "DefaultPlayerAttitude": "Neutral",
+  "Appearance": {
+    "Compute": "Appearance"
+  },
+  "MotionControllerList": [
+    {
+      "Type": "Walk",
+      "MaxWalkSpeed": 6,
+      "RunThreshold": 0.7,
+      "RunThresholdRange": 0.1,
+      "Gravity": 10,
+      "MaxFallSpeed": 20,
+      "Acceleration": 12
+    }
+  ],
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
+  "InteractionVars": {
+    "Melee_Start": {
+      "Interactions": [
+        {
+          "$Comment": "Cat melee attack animation and timing configuration",
+          "Parent": "NPC_Attack_Melee_Simple",
+          "Effects": {
+            "ItemPlayerAnimationsId": "Fox_Default",
+            "ItemAnimationId": "Attack"
+          },
+          "RunTime": 0.25
+        }
+      ]
+    },
+    "Melee_Damage": {
+      "Interactions": [
+        {
+          "$Comment": "Cat melee attack damage configuration",
+          "Parent": "NPC_Attack_Melee_Damage",
+          "DamageCalculator": {
+            "Type": "Absolute",
+            "BaseDamage": {
+              "Physical": 5
+            },
+            "RandomPercentageModifier": 0.1
+          }
+        }
+      ]
+    }
+  },
+  "Instructions": [
+    {
+      "Instructions": [
+        {
+          "$Comment": "Cat is not tamed yet and wanders around looking for food",
+          "Sensor": {
+            "Type": "State",
+            "State": "Wild"
+          },
+          "Instructions": [
+            {
+              "$Comment": "Follow player with fish or cat food in hand",
+              "Sensor": {
+                "Type": "Player",
+                "Range": 8,
+                "Filters": [
+                  {
+                    "Type": "ItemInHand",
+                    "Items": [
+                      "Food_Fish_Raw",
+                      "Food_Fish_Raw_Uncommon",
+                      "Food_Fish_Raw_Rare",
+                      "Food_Fish_Raw_Epic",
+                      "Food_Fish_Raw_Legendary",
+                      "Food_Fish_Grilled",
+                      "Fish_Salmon_Item",
+                      "Fish_Catfish_Item",
+                      "Fish_Trout_Rainbow_Item",
+                      "Fish_Pike_Item",
+                      "Fish_Bluegill_Item",
+                      "Fish_Minnow_Item"
+                    ]
+                  }
+                ]
+              },
+              "BodyMotion": {
+                "Type": "Seek",
+                "SlowDownDistance": 4,
+                "StopDistance": 2,
+                "RelativeSpeed": 0.6
+              }
+            },
+            {
+              "$Comment": "Natural behavior with pauses, sitting, and sleeping for targetability",
+              "Sensor": {
+                "Type": "Any"
+              },
+              "Type": "Random",
+              "ExecuteFor": [15, 20],
+              "Instructions": [
+                {
+                  "$Comment": "Regular wander with pauses",
+                  "Weight": 30,
+                  "Instructions": [
+                    {
+                      "$Comment": "Reset animation when starting to wander",
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "BodyMotion": {
+                        "Type": "Sequence",
+                        "Looped": true,
+                        "Motions": [
+                          {
+                            "Type": "Timer",
+                            "Time": [3, 6],
+                            "Motion": {
+                              "Type": "WanderInCircle",
+                              "Radius": 8,
+                              "MaxHeadingChange": 60,
+                              "RelativeSpeed": 0.3
+                            }
+                          },
+                          {
+                            "Type": "Timer",
+                            "Time": [2, 6],
+                            "Motion": {
+                              "Type": "Nothing"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Stand still and play idle variations (Lick, Stretch, etc.)",
+                  "Weight": 10,
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "Any",
+                        "Once": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ]
+                    },
+                    {
+                      "Sensor": {
+                        "Type": "Any"
+                      },
+                      "BodyMotion": {
+                        "Type": "Nothing"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Stretch and groom",
+                  "Weight": 5,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Stretch",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [3, 5]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Lick and clean",
+                  "Weight": 5,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Lick",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [2, 4]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Playful pouncing",
+                  "Weight": 3,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Swing_Left",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [2, 4]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Searching and hunting",
+                  "Weight": 8,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Search",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [4, 7]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Sit and observe surroundings cautiously",
+                  "Weight": 7,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sit",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [5, 10]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Sleep/rest in place",
+                  "Weight": 4,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sleep",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "PlaySound",
+                      "SoundEventId": "SFX_Wolf_Sleep"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [8, 15]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Alert scanning for danger",
+                  "Weight": 6,
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Alerted",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [2, 4]
+                    },
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$Comment": "State setter declarations for validation - never executed",
+          "Sensor": {
+            "Type": "Flag",
+            "Name": "_VALIDATION_ONLY_NEVER_SET"
+          },
+          "Actions": [
+            {"Type": "State", "State": "Wild"},
+            {"Type": "State", "State": "Feeding"},
+            {"Type": "State", "State": "Rejection"},
+            {"Type": "State", "State": "Despawn"}
+          ]
+        },
+        {
+          "$Comment": "Feeding animation state - cat eats fish during taming, shows hearts",
+          "Sensor": {
+            "Type": "State",
+            "State": "Feeding"
+          },
+          "ActionsBlocking": true,
+          "Actions": [
+            {
+              "Type": "PlayAnimation",
+              "Animation": "Sit",
+              "Slot": "Action"
+            },
+            {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Fox_Sleep"
+            },
+            {
+              "Type": "SpawnParticles",
+              "Offset": [0, 0.5, 0],
+              "ParticleSystem": "Food_Eat"
+            },
+            {
+              "Type": "SpawnParticles",
+              "Offset": [0, 0.5, 0],
+              "ParticleSystem": "Hearts_Subtle"
+            },
+            {
+              "Type": "Timeout",
+              "Delay": [2, 2],
+              "Action": {
+                "Type": "State",
+                "State": "Wild"
+              }
+            }
+          ],
+          "BodyMotion": {
+            "Type": "Nothing"
+          }
+        },
+        {
+          "$Comment": "Rejection state - wild cat refuses interaction (wrong item, too soon, etc.)",
+          "Sensor": {
+            "Type": "State",
+            "State": "Rejection"
+          },
+          "ActionsBlocking": true,
+          "Actions": [
+            {
+              "Type": "PlaySound",
+              "SoundEventId": "SFX_Leopard_Snow_Alerted"
+            },
+            {
+              "Type": "PlayAnimation",
+              "Animation": "Alerted",
+              "Slot": "Action"
+            },
+            {
+              "Type": "SpawnParticles",
+              "Offset": [0, 0.6, 0],
+              "ParticleSystem": "Angry"
+            },
+            {
+              "Type": "Timeout",
+              "Delay": [1.5, 1.5],
+              "Action": {
+                "Type": "State",
+                "State": "Wild"
+              }
+            }
+          ],
+          "BodyMotion": {
+            "Type": "Nothing"
+          }
+        },
+        {
+          "$Comment": "Cat despawns",
+          "Sensor": {
+            "Type": "State",
+            "State": "Despawn"
+          },
+          "ActionsBlocking": true,
+          "Actions": [
+            {
+              "Type": "Despawn"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "InteractionInstruction": {
+    "Instructions": [
+      {
+        "$Comment": "Wild cat - always show taming hint on mouse-over",
+        "Continue": true,
+        "Sensor": {
+          "Type": "Any"
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.tame",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Handle taming interaction",
+        "Sensor": {
+          "Type": "HasInteracted"
+        },
+        "Actions": [
+          {
+            "Type": "LockOnInteractionTarget"
+          },
+          {
+            "Type": "CatInteractionWild"
+          }
+        ]
+      }
+    ]
+  },
+  "DropList": "Drop_Cats",
+  "NameTranslationKey": {
+    "Compute": "NameTranslationKey"
+  },
+  "Parameters": {
+    "MaxHealth": {
+      "Value": 20,
+      "Description": "Maximum health points for wild cats"
+    },
+    "AttractiveItems": {
+      "Value": [
+        "Food_Fish_Raw",
+        "Food_Fish_Raw_Uncommon",
+        "Food_Fish_Raw_Rare",
+        "Food_Fish_Raw_Epic",
+        "Food_Fish_Raw_Legendary",
+        "Food_Fish_Grilled",
+        "Fish_Salmon_Item",
+        "Fish_Catfish_Item",
+        "Fish_Trout_Rainbow_Item",
+        "Fish_Pike_Item",
+        "Fish_Bluegill_Item",
+        "Fish_Minnow_Item"
+      ],
+      "Description": "Items that attract cats and make them follow players"
+    },
+    "LovedItems": {
+      "Value": [
+        "Food_Fish_Raw",
+        "Food_Fish_Grilled",
+        "Fish_Salmon_Item",
+        "Fish_Catfish_Item"
+      ],
+      "Description": "Items that cats love and will befriend for"
+    },
+    "Timid": {
+      "Value": false,
+      "Description": "Whether cats are timid or not"
+    },
+    "Appearance": {
+      "Value": "Cat",
+      "Description": "The cat's model appearance"
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Cats_Wild.name",
+      "Description": "Translation key for cat name display"
+    },
+    "Attack": {
+      "Value": "Root_NPC_Attack_Melee",
+      "Description": "The attack type to use"
+    },
+    "AttackDistance": {
+      "Value": 2.5,
+      "Description": "The distance from which to attack"
+    }
+  }
+}

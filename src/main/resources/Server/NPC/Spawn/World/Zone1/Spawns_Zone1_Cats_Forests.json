@@ -8,13 +8,13 @@
     {
       "Weight": 7,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_Calico",
+      "Id": "Cats_Calico_Wild",
       "Flock": "One_Or_Two"
     },
     {
       "Weight": 5,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_Kitten_Calico",
+      "Id": "Cats_Kitten_Wild",
       "Flock": "One_Or_Two"
     }
   ],

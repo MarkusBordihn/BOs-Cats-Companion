@@ -7,6 +7,25 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.0.0
+
+#### ⚠️ MAJOR UPDATE - BREAKING CHANGES
+
+After updating from v1.8.x or earlier, your tamed cats will despawn due to the role system changes
+below.
+However, all cat data (owner, name, breed) are safely stored in `CatsData.json`.
+
+Simply use `/cat spawn` to respawn your cats, they will keep their owner, name, and breed.
+Use `/cat list` to see all your cats and their status.
+
+- Added separate NPC roles for each cat breed: `Cats_<Breed>_Wild` and `Cats_<Breed>_Tamed`.
+- Added cats kitten memories category.
+- Improved cats memories category icon.
+- Improved NPC performance by splitting logic and behavior into separate wild and tamed roles.
+- Updated all egg spawner items to spawn wild cats (untamed) instead of tamed cats.
+- Optimized interaction instructions by removing redundant CatTamed sensor checks.
+- Moved yarn ball item to Farming bench for better organization.
+
 ### 1.8.1
 
 - Fixed cat despawn command error message.
@@ -108,4 +127,4 @@ Note: The kitten variant is experimental and has limited functionality and anima
 
 - Initial release of Cats - Tameable Cat Companions for Hytale!
 
-[history]: https://github.com/MarkusBordihn/BOs-Cats-Hytale/commits/
+[history]: https://github.com/MarkusBordihn/BOs-Cats-Companion/commits/

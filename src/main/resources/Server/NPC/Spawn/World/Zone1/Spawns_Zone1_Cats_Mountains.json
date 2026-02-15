@@ -8,19 +8,19 @@
     {
       "Weight": 6,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_GrayTabby",
+      "Id": "Cats_GrayTabby_Wild",
       "Flock": "One_Or_Two"
     },
     {
-      "Weight": 5,
+      "Weight": 6,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_Tuxedo",
+      "Id": "Cats_Tuxedo_Wild",
       "Flock": "One_Or_Two"
     },
     {
-      "Weight": 3,
+      "Weight": 4,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_Kitten",
+      "Id": "Cats_Kitten_Wild",
       "Flock": "One_Or_Two"
     }
   ],

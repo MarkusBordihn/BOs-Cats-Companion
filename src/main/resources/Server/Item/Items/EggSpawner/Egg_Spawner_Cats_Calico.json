@@ -10,7 +10,7 @@
       "Interactions": [
         {
           "Type": "SpawnNPC",
-          "EntityId": "Cats_Calico",
+          "EntityId": "Cats_Calico_Wild",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1

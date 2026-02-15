@@ -10,7 +10,7 @@
       "Interactions": [
         {
           "Type": "SpawnNPC",
-          "EntityId": "Cats_LonghairedRussianBlue",
+          "EntityId": "Cats_LonghairedRussianBlue_Wild",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1

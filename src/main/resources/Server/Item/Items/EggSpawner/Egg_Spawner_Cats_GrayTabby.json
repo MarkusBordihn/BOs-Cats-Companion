@@ -10,7 +10,7 @@
       "Interactions": [
         {
           "Type": "SpawnNPC",
-          "EntityId": "Cats_GrayTabby",
+          "EntityId": "Cats_GrayTabby_Wild",
           "Next": {
             "Type": "ModifyInventory",
             "AdjustHeldItemQuantity": -1

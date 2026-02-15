@@ -21,16 +21,15 @@ package de.markusbordihn.cats.interaction;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import java.util.Set;
 
 public class ItemInteractionOwner {
-  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
   private static final Set<String> FOOD_ITEMS =
       Set.of(
@@ -67,10 +66,7 @@ public class ItemInteractionOwner {
     }
 
     if (player != null) {
-      com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
-          store.getComponent(
-              entityRef,
-              com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
+      Nameplate nameplate = store.getComponent(entityRef, Nameplate.getComponentType());
       String catName = nameplate != null ? nameplate.getText() : null;
 
       if (catName != null && !catName.isEmpty()) {

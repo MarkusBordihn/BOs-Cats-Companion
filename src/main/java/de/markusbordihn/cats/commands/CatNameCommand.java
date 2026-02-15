@@ -32,6 +32,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 final class CatNameCommand extends CatCommand {
@@ -48,8 +49,7 @@ final class CatNameCommand extends CatCommand {
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
     String catName = this.nameArg.get(context);
-    var entityOpt = getEntityFromArgument(this.entityArg, store, context);
-
+    Optional<Ref<EntityStore>> entityOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityOpt.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));

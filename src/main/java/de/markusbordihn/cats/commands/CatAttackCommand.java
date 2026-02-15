@@ -40,6 +40,7 @@ import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
@@ -59,7 +60,7 @@ final class CatAttackCommand extends CatCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    var targetRefOpt = getEntityFromArgument(this.targetArg, store, context);
+    Optional<Ref<EntityStore>> targetRefOpt = getEntityFromArgument(this.targetArg, store, context);
     if (targetRefOpt.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.attack.no_target").color(Constants.COLOR_ERROR));

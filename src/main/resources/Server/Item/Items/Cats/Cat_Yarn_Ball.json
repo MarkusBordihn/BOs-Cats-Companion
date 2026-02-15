@@ -54,7 +54,10 @@
     "BenchRequirement": [
       {
         "Type": "Crafting",
-        "Id": "Furniture"
+        "Id": "Farmingbench",
+        "Categories": [
+          "Farming"
+        ]
       }
     ],
     "KnowledgeRequired": false

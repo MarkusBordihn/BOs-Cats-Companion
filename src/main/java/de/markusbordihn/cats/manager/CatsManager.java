@@ -34,6 +34,7 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
@@ -491,7 +492,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       return false;
     }
 
-    var healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
+    EntityStatValue healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
     return healthStat != null && healthStat.get() > 0;
   }
 }

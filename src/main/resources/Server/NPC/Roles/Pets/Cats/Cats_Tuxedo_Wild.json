@@ -1,15 +1,15 @@
 {
   "Type": "Variant",
-  "Reference": "Cats",
+  "Reference": "Cats_Wild",
   "Modify": {
-    "Appearance": "Cats_GrayTabby",
+    "Appearance": "Cats_Tuxedo",
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }
   },
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "server.npcRoles.Cats_GrayTabby.name"
+      "Value": "server.npcRoles.Cats_Tuxedo_Wild.name"
     }
   }
 }

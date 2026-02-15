@@ -1,9 +1,9 @@
 {
   "Type": "Generic",
-  "StartState": "Wild",
+  "StartState": "Pet",
   "DefaultSubState": "Default",
-  "DefaultNPCAttitude": "Ignore",
-  "DefaultPlayerAttitude": "Neutral",
+  "DefaultNPCAttitude": "Friendly",
+  "DefaultPlayerAttitude": "Friendly",
   "Appearance": {
     "Compute": "Appearance"
   },
@@ -18,7 +18,9 @@
       "Acceleration": 12
     }
   ],
-  "MaxHealth": 20,
+  "MaxHealth": {
+    "Compute": "MaxHealth"
+  },
   "InteractionVars": {
     "Melee_Start": {
       "Interactions": [
@@ -52,228 +54,6 @@
   "Instructions": [
     {
       "Instructions": [
-        {
-          "$Comment": "Cat is not tamed yet and wanders around looking for food",
-          "Sensor": {
-            "Type": "State",
-            "State": "Wild"
-          },
-          "Instructions": [
-            {
-              "$Comment": "Follow player with fish or cat food in hand",
-              "Sensor": {
-                "Type": "Player",
-                "Range": 8,
-                "Filters": [
-                  {
-                    "Type": "ItemInHand",
-                    "Items": [
-                      "Food_Fish_Raw",
-                      "Food_Fish_Raw_Uncommon",
-                      "Food_Fish_Raw_Rare",
-                      "Food_Fish_Raw_Epic",
-                      "Food_Fish_Raw_Legendary",
-                      "Food_Fish_Grilled",
-                      "Fish_Salmon_Item",
-                      "Fish_Catfish_Item",
-                      "Fish_Trout_Rainbow_Item",
-                      "Fish_Pike_Item",
-                      "Fish_Bluegill_Item",
-                      "Fish_Minnow_Item"
-                    ]
-                  }
-                ]
-              },
-              "BodyMotion": {
-                "Type": "Seek",
-                "SlowDownDistance": 4,
-                "StopDistance": 2,
-                "RelativeSpeed": 0.6
-              }
-            },
-            {
-              "$Comment": "Natural behavior with pauses, sitting, and sleeping for targetability",
-              "Sensor": {
-                "Type": "Any"
-              },
-              "Type": "Random",
-              "ExecuteFor": [15, 20],
-              "Instructions": [
-                {
-                  "$Comment": "Regular wander with pauses",
-                  "Weight": 30,
-                  "Instructions": [
-                    {
-                      "$Comment": "Reset animation when starting to wander",
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "Any"
-                      },
-                      "BodyMotion": {
-                        "Type": "Sequence",
-                        "Looped": true,
-                        "Motions": [
-                          {
-                            "Type": "Timer",
-                            "Time": [3, 6],
-                            "Motion": {
-                              "Type": "WanderInCircle",
-                              "Radius": 8,
-                              "MaxHeadingChange": 60,
-                              "RelativeSpeed": 0.3
-                            }
-                          },
-                          {
-                            "Type": "Timer",
-                            "Time": [2, 6],
-                            "Motion": {
-                              "Type": "Nothing"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                },
-                {
-                  "$Comment": "Stand still and play idle variations (Lick, Stretch, etc.)",
-                  "Weight": 10,
-                  "Instructions": [
-                    {
-                      "Sensor": {
-                        "Type": "Any",
-                        "Once": true
-                      },
-                      "Actions": [
-                        {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
-                        }
-                      ]
-                    },
-                    {
-                      "Sensor": {
-                        "Type": "Any"
-                      },
-                      "BodyMotion": {
-                        "Type": "Nothing"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "$Comment": "Stretch and groom",
-                  "Weight": 5,
-                  "ActionsBlocking": true,
-                  "Actions": [
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Stretch",
-                      "Slot": "Action"
-                    },
-                    {
-                      "Type": "Timeout",
-                      "Delay": [3, 5]
-                    },
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Idle",
-                      "Slot": "Action"
-                    }
-                  ],
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                },
-                {
-                  "$Comment": "Lick and clean",
-                  "Weight": 5,
-                  "ActionsBlocking": true,
-                  "Actions": [
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Lick",
-                      "Slot": "Action"
-                    },
-                    {
-                      "Type": "Timeout",
-                      "Delay": [2, 4]
-                    },
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Idle",
-                      "Slot": "Action"
-                    }
-                  ],
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                },
-                {
-                  "$Comment": "Playful pouncing",
-                  "Weight": 3,
-                  "ActionsBlocking": true,
-                  "Actions": [
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Swing_Left",
-                      "Slot": "Action"
-                    },
-                    {
-                      "Type": "Timeout",
-                      "Delay": [2, 4]
-                    },
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Idle",
-                      "Slot": "Action"
-                    }
-                  ],
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                },
-                {
-                  "$Comment": "Searching and hunting",
-                  "Weight": 8,
-                  "ActionsBlocking": true,
-                  "Actions": [
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Search",
-                      "Slot": "Action"
-                    },
-                    {
-                      "Type": "Timeout",
-                      "Delay": [4, 7]
-                    },
-                    {
-                      "Type": "PlayAnimation",
-                      "Animation": "Idle",
-                      "Slot": "Action"
-                    }
-                  ],
-                  "BodyMotion": {
-                    "Type": "Nothing"
-                  }
-                }
-              ]
-            }
-          ]
-        },
         {
           "$Comment": "Cat is tamed - use substates for different behaviors",
           "Sensor": {
@@ -773,50 +553,13 @@
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
                 {"Type": "State", "State": ".Dying"},
-                {"Type": "State", "State": "Taming"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "Petting"},
                 {"Type": "State", "State": "PlayingWithYarnBall"},
-                {"Type": "State", "State": "Rejection"},
                 {"Type": "State", "State": "Despawn"}
               ]
             }
           ]
-        },
-        {
-          "$Comment": "Taming animation state - triggered manually, auto-transitions to Pet state",
-          "Sensor": {
-            "Type": "State",
-            "State": "Taming"
-          },
-          "ActionsBlocking": true,
-          "Actions": [
-            {
-              "Type": "PlayAnimation",
-              "Animation": "Jump",
-              "Slot": "Action"
-            },
-            {
-              "Type": "PlaySound",
-              "SoundEventId": "SFX_Fox_Alerted"
-            },
-            {
-              "Type": "SpawnParticles",
-              "Offset": [0, 0.8, 0],
-              "ParticleSystem": "Hearts"
-            },
-            {
-              "Type": "Timeout",
-              "Delay": [3, 3],
-              "Action": {
-                "Type": "State",
-                "State": "Pet.Default"
-              }
-            }
-          ],
-          "BodyMotion": {
-            "Type": "Nothing"
-          }
         },
         {
           "$Comment": "Feeding animation state - triggered manually, returns to previous state",
@@ -929,41 +672,6 @@
           }
         },
         {
-          "$Comment": "Rejection state - wild cat refuses interaction with wrong item",
-          "Sensor": {
-            "Type": "State",
-            "State": "Rejection"
-          },
-          "ActionsBlocking": true,
-          "Actions": [
-            {
-              "Type": "PlayAnimation",
-              "Animation": "Alerted",
-              "Slot": "Action"
-            },
-            {
-              "Type": "PlaySound",
-              "SoundEventId": "SFX_Leopard_Snow_Alerted"
-            },
-            {
-              "Type": "SpawnParticles",
-              "Offset": [0, 0.6, 0],
-              "ParticleSystem": "Angry"
-            },
-            {
-              "Type": "Timeout",
-              "Delay": [1, 1],
-              "Action": {
-                "Type": "State",
-                "State": "Wild"
-              }
-            }
-          ],
-          "BodyMotion": {
-            "Type": "Nothing"
-          }
-        },
-        {
           "$Comment": "Cat despawns",
           "Sensor": {
             "Type": "State",
@@ -982,36 +690,10 @@
   "InteractionInstruction": {
     "Instructions": [
       {
-        "$Comment": "Wild cat (not tamed) - show taming hint on mouse-over",
-        "Continue": true,
-        "Sensor": {
-          "Type": "Not",
-          "Sensor": {
-            "Type": "CatTamed"
-          }
-        },
-        "Actions": [
-          {
-            "Type": "SetInteractable",
-            "Interactable": true,
-            "Hint": "cats.interactions.hint.tame",
-            "ShowPrompt": true
-          }
-        ]
-      },
-      {
         "$Comment": "Tamed cat + Owner - show owner interaction hint",
         "Continue": true,
         "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "CatTamed"
-            },
-            {
-              "Type": "CatOwner"
-            }
-          ]
+          "Type": "CatOwner"
         },
         "Actions": [
           {
@@ -1026,18 +708,10 @@
         "$Comment": "Tamed cat + Stranger - no interaction allowed",
         "Continue": true,
         "Sensor": {
-          "Type": "And",
-          "Sensors": [
-            {
-              "Type": "CatTamed"
-            },
-            {
-              "Type": "Not",
-              "Sensor": {
-                "Type": "CatOwner"
-              }
-            }
-          ]
+          "Type": "Not",
+          "Sensor": {
+            "Type": "CatOwner"
+          }
         },
         "Actions": [
           {
@@ -1048,7 +722,7 @@
         ]
       },
       {
-        "$Comment": "All interactions handled by Java actions with internal logic - order matters: check owner first, then stranger, then wild",
+        "$Comment": "Interaction handlers - check owner first, then stranger",
         "Sensor": {
           "Type": "HasInteracted"
         },
@@ -1061,21 +735,28 @@
           },
           {
             "Type": "CatInteractionStranger"
-          },
-          {
-            "Type": "CatInteractionWild"
           }
         ]
       }
     ]
   },
   "IsMemory": true,
-  "MemoriesCategory": "Cats",
+  "MemoriesCategory": {
+    "Compute": "MemoriesCategory"
+  },
   "DropList": "Drop_Cats",
   "NameTranslationKey": {
     "Compute": "NameTranslationKey"
   },
   "Parameters": {
+    "MemoriesCategory": {
+      "Value": "Cats",
+      "Description": "The memories category for grouping NPCs"
+    },
+    "MaxHealth": {
+      "Value": 20,
+      "Description": "Maximum health points for cats"
+    },
     "AttractiveItems": {
       "Value": [
         "Food_Fish_Raw",
@@ -1111,7 +792,7 @@
       "Description": "The cat's model appearance"
     },
     "NameTranslationKey": {
-      "Value": "npcRoles.Cats.name",
+      "Value": "server.npcRoles.Cats_Tamed.name",
       "Description": "Translation key for cat name display"
     },
     "Attack": {

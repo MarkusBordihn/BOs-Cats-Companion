@@ -21,7 +21,6 @@ package de.markusbordihn.cats.interaction;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -29,7 +28,6 @@ import com.hypixel.hytale.server.npc.role.Role;
 import java.util.Set;
 
 public class ItemInteractionStranger {
-  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
   private static final Set<String> FOOD_ITEMS =
       Set.of(

@@ -27,10 +27,15 @@ import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.permissions.PermissionHolder;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.systems.RoleChangeSystem;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
+import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
@@ -87,7 +92,7 @@ public class InteractionTaming {
         progressComponent.getCurrentProgress(), progressComponent.getRequiredProgress());
 
     if (progressComponent.isReadyToTame()) {
-      handleSuccessfulTaming(entityRef, role, store, player, heldItem);
+      handleSuccessfulTaming(entityRef, store, player, heldItem);
       store.removeComponent(entityRef, CatTamingProgressComponent.getComponentType());
     } else {
       handleProgressFeedback(
@@ -143,31 +148,27 @@ public class InteractionTaming {
   }
 
   private static void handleSuccessfulTaming(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     if (player == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player is null");
       return;
     }
 
-    var playerRef = player.getPlayerRef();
+    PlayerRef playerRef = player.getPlayerRef();
     if (playerRef == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player ref is null");
       return;
     }
 
-    var playerEntityRef = playerRef.getReference();
+    Ref<EntityStore> playerEntityRef = playerRef.getReference();
     if (playerEntityRef == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
       return;
     }
 
-    var playerUUID = playerRef.getUuid();
-    var username = playerRef.getUsername();
+    UUID playerUUID = playerRef.getUuid();
+    String username = playerRef.getUsername();
     if (playerUUID == null || username == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - UUID or username not found");
       return;
@@ -206,6 +207,40 @@ public class InteractionTaming {
 
     String catName = CatsNamesManager.getRandomName();
     catsManager.assignOwner(entityRef, playerUUID, username, catName, "Taming", store);
+
+    // Change role from Wild to Tamed
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+    if (npcEntity != null) {
+      try {
+        Role currentRole = npcEntity.getRole();
+        if (currentRole == null) {
+          LOGGER.at(Level.WARNING).log("Failed to request role change: currentRole is null");
+        } else {
+          String tamedRoleName = CatType.fromRoleName(currentRole.getRoleName()).getTamedRoleName();
+          if (tamedRoleName.isEmpty()) {
+            LOGGER.at(Level.WARNING).log(
+                "Failed to get tamed role name for CatType %s",
+                CatType.fromRoleName(currentRole.getRoleName()));
+          } else if (NPCPlugin.get().getIndex(tamedRoleName) < 0) {
+            LOGGER.at(Level.WARNING).log("Failed to find role index for %s", tamedRoleName);
+          } else {
+            RoleChangeSystem.requestRoleChange(
+                entityRef,
+                currentRole,
+                NPCPlugin.get().getIndex(tamedRoleName),
+                true,
+                null,
+                null,
+                store);
+            LOGGER.at(Level.INFO).log(
+                "Cat role change requested from %s to %s",
+                currentRole.getRoleName(), tamedRoleName);
+          }
+        }
+      } catch (Exception e) {
+        LOGGER.at(Level.SEVERE).log("Failed to change cat role", e);
+      }
+    }
 
     player.sendMessage(
         Message.translation("cats.interactions.taming.success")

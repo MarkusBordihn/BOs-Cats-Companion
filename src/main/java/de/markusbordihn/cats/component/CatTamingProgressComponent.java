@@ -21,6 +21,7 @@ package de.markusbordihn.cats.component;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.simple.IntegerCodec;
 import com.hypixel.hytale.codec.codecs.simple.LongCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
@@ -37,17 +38,18 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   private static final Random RANDOM = new Random();
   private static final int MIN_REQUIRED_FISH = 2;
   private static final int MAX_REQUIRED_FISH = 5;
+
   @Nonnull
   public static final BuilderCodec<CatTamingProgressComponent> CODEC =
       BuilderCodec.builder(CatTamingProgressComponent.class, CatTamingProgressComponent::new)
           .append(
-              new KeyedCodec<>(CURRENT_PROGRESS_TAG, new LongCodec()),
+              new KeyedCodec<>(CURRENT_PROGRESS_TAG, new IntegerCodec()),
               (component, value) -> component.currentProgress = value,
               component -> component.currentProgress)
           .documentation("The current taming progress (number of fish fed).")
           .add()
           .append(
-              new KeyedCodec<>(REQUIRED_PROGRESS_TAG, new LongCodec()),
+              new KeyedCodec<>(REQUIRED_PROGRESS_TAG, new IntegerCodec()),
               (component, value) -> component.requiredProgress = value,
               component -> component.requiredProgress)
           .documentation("The required progress to tame the cat (random between 2-5).")
@@ -60,12 +62,12 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
           .add()
           .build();
 
-  private long currentProgress;
-  private long requiredProgress;
+  private int currentProgress;
+  private int requiredProgress;
   private long lastFedTimestamp;
 
   public CatTamingProgressComponent() {
-    this.currentProgress = 0L;
+    this.currentProgress = 0;
     this.requiredProgress =
         MIN_REQUIRED_FISH + RANDOM.nextInt(MAX_REQUIRED_FISH - MIN_REQUIRED_FISH + 1);
     this.lastFedTimestamp = 0L;

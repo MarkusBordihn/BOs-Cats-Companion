@@ -40,6 +40,7 @@ import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBedInfo;
 import de.markusbordihn.cats.data.CatState;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
@@ -56,8 +57,7 @@ final class CatBedCommand extends CatCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    var entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
-
+    Optional<Ref<EntityStore>> entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityRefOpt.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
@@ -98,7 +98,6 @@ final class CatBedCommand extends CatCommand {
 
     // Find the nearest unoccupied bed using CatBed helper
     CatBedInfo availableBed = CatBed.findNearestAvailableBed(beds, store, catPos);
-
     if (availableBed == null) {
       String catName = getCatDisplayName(catRef, store);
       context.sendMessage(

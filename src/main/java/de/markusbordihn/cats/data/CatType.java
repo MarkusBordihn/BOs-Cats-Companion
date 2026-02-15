@@ -25,23 +25,26 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public enum CatType {
-  UNKNOWN(""),
-  BLACK("Cats_Black"),
-  CALICO("Cats_Calico"),
-  GRAY_TABBY("Cats_GrayTabby"),
-  KITTEN("Cats_Kitten"),
-  KITTEN_CALICO("Cats_Kitten_Calico"),
-  LONGHAIRED_RUSSIAN_BLUE("Cats_LonghairedRussianBlue"),
-  ORANGE_TABBY("Cats_OrangeTabby"),
-  SIAMESE("Cats_Siamese"),
-  TUXEDO("Cats_Tuxedo");
+  UNKNOWN("", ""),
+  GENERIC_CAT("Cats_Tamed", "Cats_Wild"),
+  BLACK("Cats_Black_Tamed", "Cats_Black_Wild"),
+  CALICO("Cats_Calico_Tamed", "Cats_Calico_Wild"),
+  GRAY_TABBY("Cats_GrayTabby_Tamed", "Cats_GrayTabby_Wild"),
+  KITTEN("Cats_Kitten_Tamed", "Cats_Kitten_Wild"),
+  KITTEN_CALICO("Cats_Kitten_Calico_Tamed", "Cats_Kitten_Calico_Wild"),
+  LONGHAIRED_RUSSIAN_BLUE("Cats_LonghairedRussianBlue_Tamed", "Cats_LonghairedRussianBlue_Wild"),
+  ORANGE_TABBY("Cats_OrangeTabby_Tamed", "Cats_OrangeTabby_Wild"),
+  SIAMESE("Cats_Siamese_Tamed", "Cats_Siamese_Wild"),
+  TUXEDO("Cats_Tuxedo_Tamed", "Cats_Tuxedo_Wild");
 
   public static final EnumCodec<CatType> CODEC = new EnumCodec<>(CatType.class);
 
-  private final String roleName;
+  private final String tamedRoleName;
+  private final String wildRoleName;
 
-  CatType(String roleName) {
-    this.roleName = roleName;
+  CatType(String tamedRoleName, String wildRoleName) {
+    this.tamedRoleName = tamedRoleName;
+    this.wildRoleName = wildRoleName;
   }
 
   @Nonnull
@@ -50,7 +53,7 @@ public enum CatType {
       return UNKNOWN;
     }
     for (CatType type : values()) {
-      if (type.roleName.equals(roleName)) {
+      if (type.tamedRoleName.equals(roleName) || type.wildRoleName.equals(roleName)) {
         return type;
       }
     }
@@ -69,8 +72,24 @@ public enum CatType {
   }
 
   @Nonnull
+  public String getTamedRoleName() {
+    return tamedRoleName;
+  }
+
+  @Nonnull
+  public String getWildRoleName() {
+    return wildRoleName;
+  }
+
+  @Nonnull
+  public String getRoleName(boolean isTamed) {
+    return isTamed ? tamedRoleName : wildRoleName;
+  }
+
+  @Nonnull
+  @Deprecated
   public String getRoleName() {
-    return roleName;
+    return tamedRoleName;
   }
 
   @Override

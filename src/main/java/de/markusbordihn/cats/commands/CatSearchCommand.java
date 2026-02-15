@@ -31,6 +31,7 @@ import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 
 final class CatSearchCommand extends CatCommand {
@@ -44,8 +45,7 @@ final class CatSearchCommand extends CatCommand {
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
-    var entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
-
+    Optional<Ref<EntityStore>> entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityRefOpt.isPresent()) {
       Ref<EntityStore> entityRef = entityRefOpt.get();
 

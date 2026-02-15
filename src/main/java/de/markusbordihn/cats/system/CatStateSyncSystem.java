@@ -30,6 +30,7 @@ import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
 import java.util.logging.Level;
@@ -67,7 +68,7 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
     }
 
     try {
-      var stateSupport = npcEntity.getRole().getStateSupport();
+      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
       CatState state = stateComponent.getState();
       switch (state) {
         case SITTING:

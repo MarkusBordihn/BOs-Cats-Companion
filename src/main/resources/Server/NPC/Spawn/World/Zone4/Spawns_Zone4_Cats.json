@@ -7,7 +7,7 @@
     {
       "Weight": 4,
       "SpawnBlockSet": "Soil",
-      "Id": "Cats_Siamese",
+      "Id": "Cats_Siamese_Wild",
       "Flock": "One_Or_Two"
     }
   ],

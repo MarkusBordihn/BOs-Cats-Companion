@@ -16,6 +16,10 @@ This plugin adds multiple cat breeds that can be tamed, named, and commanded.
 Cats can follow you on your adventures or stay at home as a cozy companion.
 Each cat supports multiple behavior states and animations, making them feel alive and responsive.
 
+## Introduction & Overview Video (English)
+
+<span><iframe width="788" height="443" src="https://www.youtube.com/embed/RbwMXmpuRPM" frameborder="0" allowfullscreen="allowfullscreen"></iframe></span>
+
 ## ✅ Current Features
 
 ### Working Features
@@ -129,9 +133,9 @@ Your cat will find and sleep in the nearest available bed.
 
 A playful toy for your cats! Craft a Cat Yarn Ball to interact and play with your tamed cats:
 
-**Crafting Recipe (at Crafting Station):**
+**Crafting Recipe (at Farmers Workbench):**
 
-* 3x Fiber
+* 2x Fiber
 
 Interact with your tamed cat while holding the Cat Yarn Ball to trigger a playful animation.
 Your cat will show affection with heart particles and happy sounds.
