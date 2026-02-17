@@ -1,6 +1,12 @@
 # 🐱 Cats – Tameable Cat Companions for Hytale
 
+[![CurseForge](https://cf.way2muchnoise.eu/title/1430961.svg)](https://www.curseforge.com/hytale/mods/cats)
+[![CurseForge Downloads](https://cf.way2muchnoise.eu/full_1430961_downloads.svg)](https://www.curseforge.com/hytale/mods/cats)
 [![🎮 Use Hytale Creator Code Kaworru](https://img.shields.io/badge/%20Use%20Hytale%20Creator%20Code-Kaworru-orange)](https://hytale.com/)
+
+[![Report an Issue](https://img.shields.io/badge/Report%20Issue%20%2F%20Bug%20%2F%20Feature%20Request-grey?logo=github)](https://github.com/MarkusBordihn/BOs-Cats-Companion/issues)
+[![Open Issues](https://img.shields.io/github/issues/MarkusBordihn/BOs-Cats-Companion?logo=github&color=red)](https://github.com/MarkusBordihn/BOs-Cats-Companion/issues?q=is%3Aopen)
+[![Closed Issues](https://img.shields.io/github/issues-closed/MarkusBordihn/BOs-Cats-Companion?logo=github)](https://github.com/MarkusBordihn/BOs-Cats-Companion/issues?q=is%3Aclosed)
 
 ⚠️ **BETA VERSION**  This is a beta version, several features are still work in progress.
 
@@ -45,74 +51,24 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 ### How to Get a Cat
 
-#### Option 1: Natural Spawning (New!)
+**Natural Spawning:** Cats spawn naturally across all zones (Zone 1-4) with breed distributions based on climate. Simply explore and you'll find them!
 
-Cats now spawn naturally across multiple zones:
+**Manual Spawning:** Use `/npc spawn Cats_<Breed>` (e.g., `/npc spawn Cats_Black`, `/npc spawn Cats_Siamese`)
 
-* **Zone 1 (Temperate):** All common breeds spawn in plains, forests, mountains, and at night
-* **Zone 2 (Desert/Savanna):** Siamese, Orange Tabby, and Calico spawn in oases and savannas
-* **Zone 3 (Borea/Cold):** Longhaired Russian Blue spawns in tundra and snowy forests
-* **Zone 4 (Devastated):** Siamese and darker breeds spawn in forests and jungles
-
-Simply explore these biomes and you'll encounter wild cats that can be tamed!
-
-#### Option 2: Manual Spawning (Quick Testing)
-
-Use the NPC spawn command to create cats:
-
-```unix
-/npc spawn Cats_Black
-/npc spawn Cats_Calico
-/npc spawn Cats_GrayTabby
-/npc spawn Cats_LonghairedRussianBlue
-/npc spawn Cats_OrangeTabby
-/npc spawn Cats_Siamese
-/npc spawn Cats_Tuxedo
-/npc spawn Cats_Kitten
-```
-
-#### Option 3: Spawn Eggs
-
-Each breed also has a spawn egg:
-
-* `Egg_Spawner_Cats_Black` – Black Cat
-* `Egg_Spawner_Cats_Calico` – Calico Cat
-* `Egg_Spawner_Cats_GrayTabby` – Gray Tabby
-* `Egg_Spawner_Cats_LonghairedRussianBlue` – Longhaired Russian Blue Cat
-* `Egg_Spawner_Cats_OrangeTabby` – Orange Tabby
-* `Egg_Spawner_Cats_Siamese` – Siamese Cat
-* `Egg_Spawner_Cats_Tuxedo` – Tuxedo Cat
-* `Egg_Spawner_Cats_Kitten` – Kitten (experimental)
+**Spawn Eggs:** Each breed has a spawn egg: `Egg_Spawner_Cats_<Breed>` (e.g., `Egg_Spawner_Cats_Calico`)
 
 ### How to Tame a Cat
 
-1. **Switch to Survival or Adventure mode or enable "Allow NPC Detection" in Creative mode**
-   ⚠️ Cats cannot be tamed while in Creative mode by default!
+1. Get fish (Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, or Minnow)
+2. Hold fish and approach a wild cat
+3. Press F (interact) on the cat - it will eat the fish and become tamed
+4. Your cat gets an automatic unique name (e.g., "Whiskers", "Luna", "Shadow")
 
-   **Creative Mode Users:** Enable **"Allow NPC Detection"** in the **Creative Mode Quick Settings**
-   (press TAB or the quick settings key) to interact with cats in Creative mode.
-
-2. Obtain fish
-   Supported types: Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, Minnow
-
-3. Spawn a wild cat using `/npc spawn Cats_Black` (or other breeds) or spawn eggs
-
-4. Approach the wild cat with fish in your hand
-   The cat will notice you're holding food
-
-5. Press F (interact key) on the cat while holding fish
-   The cat will enter a taming animation and become yours (and the used food gets consumed)
-
-6. Success! The cat is now tamed, automatically named, and will follow you
-   Your new companion receives a unique name like "Whiskers", "Luna", or "Shadow"
-
-**Important Interaction Rules:**
-
-* **Wrong items** – Offering non-food items to wild cats may upset them (*hiss!*)
-* **Feeding** – Tamed cats can be fed fish to keep them happy (fish gets consumed)
-* **Petting** – Press F (interact) with your tamed cat using an empty hand to pet them
-* **Creative mode block** – Players in Creative mode cannot tame or interact with cats to prevent
-  exploits
+**Tips:**
+* Enable "Allow NPC Detection" in Creative Mode Quick Settings (TAB) to interact in Creative
+* Tamed cats can be fed fish to keep them happy
+* Use empty hand to pet your cat (press F)
+* Wrong items may upset wild cats (*hiss!*)
 
 ### Cat Furniture
 
@@ -167,34 +123,13 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 **Tip:** For best results, look directly at your cat when using commands.
 
-## 🔐 Permissions & LuckPerms
+## 🔐 Permissions
 
-The plugin includes built-in support for both Hytale's permission system and LuckPerms.
+The plugin supports both Hytale's permission system and LuckPerms.
 
-### Hytale permissions
+**Default Cat Limit:** Players can own up to 16 cats. Admins can adjust this using permissions like `markusbordihn.cats.limit.8` or `markusbordihn.cats.limit.unlimited`.
 
-Hytale evaluates permissions on the player by checking assigned groups and user entries.
-If a permission node is granted via a group or directly on a user, the command becomes usable.
-Permissions are additive, so a user inherits group permissions and can receive additional nodes.
-
-**Quick setup with Hytale permissions:**
-
-1. Run `/commands dump` as op to generate a full command list.
-2. Open `commands.dump.json` and search for `/cat` commands.
-3. Add the relevant permissions (e.g., `markusbordihn.cats.command.cat`,
-   `markusbordihn.cats.command.cat.follow`) to a group or user.
-
-The group or user can now use those commands without a server restart.
-
-### LuckPerms Integration
-
-If you have LuckPerms installed, the plugin will automatically detect it on startup and provide
-helpful tips and permission examples in the server console.
-This makes it easier to configure cat ownership limits and command permissions for your players.
-
-### Default Cat Limit
-
-Players can own up to 16 cats by default. Server admins can adjust this limit using permissions.
+For detailed permission configuration, see the [Permissions Documentation](PERMISSIONS.md).
 
 ## ⚠️ Known Limitations
 
@@ -235,6 +170,38 @@ Backup this file to preserve your cats when moving worlds.
 * Wild cats may occasionally get stuck while approaching players holding fish
 * Some animation transitions are not yet smooth
 * Pathfinding still needs refinement
+
+## 🔗 Related Plugins
+
+**🐶 Dogs Companion**
+
+Looking for loyal combat companions? Check out the Dogs Companion plugin! While cats are perfect for peaceful companionship and decoration, dogs are designed for active gameplay with combat support, guarding abilities, and adventure features.
+
+👉 [Download Dogs Companion](https://www.curseforge.com/hytale/mods/dogs-companion)
+
+## 🛠️ For Developers
+
+Want to build or modify this plugin? Check out the [Development Guide](DEVELOPMENT.md) for setup instructions, build tasks, and contribution guidelines.
+
+## 📜 License
+
+**This project is open source under the MIT License.**
+
+⚠️ **Important:** The license applies **only to the source code** in this repository.
+
+**Assets are excluded from the license:**
+
+* 3D models (`.bbmodel` files)
+* Textures and images
+* Sounds and music
+* Animations
+* Other creative/artistic content
+
+**These assets may not be redistributed, modified, or used in other projects without permission.**
+
+For the full license text, see [LICENSE.md](LICENSE.md).
+
+---
 
 Enjoy your new feline companions. 🐱
 

@@ -78,7 +78,7 @@ public class BuilderActionCatInteractionStranger extends BuilderActionCatInterac
       if (player == null) {
         return false;
       }
-      return !isOwner(entityRef, getPlayerUUID(player), store);
+      return !isOwner(entityRef, getPlayerUUID(role, store), store);
     }
 
     @Override

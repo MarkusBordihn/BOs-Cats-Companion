@@ -25,6 +25,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
@@ -74,11 +75,17 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       return ownerComponent != null && ownerComponent.hasOwner();
     }
 
-    protected java.util.UUID getPlayerUUID(Player player) {
-      if (player == null) {
+    protected java.util.UUID getPlayerUUID(Role role, Store<EntityStore> store) {
+      if (role == null || role.getStateSupport() == null) {
         return null;
       }
-      return player.getPlayerRef().getUuid();
+      Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+      if (playerEntityRef == null || !playerEntityRef.isValid()) {
+        return null;
+      }
+      PlayerRef playerRefComponent =
+          store.getComponent(playerEntityRef, PlayerRef.getComponentType());
+      return playerRefComponent != null ? playerRefComponent.getUuid() : null;
     }
 
     protected Player getPlayerFromInfoProvider(

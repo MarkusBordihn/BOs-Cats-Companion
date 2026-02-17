@@ -16,7 +16,8 @@ taming.gaining_trust=Die Katze scheint interessiert, ist aber noch vorsichtig...
 taming.likes_food=Die Katze fängt an dich zu mögen!
 taming.almost_there=Die Katze ist fast bereit dir zu vertrauen!
 taming.too_soon=Die Katze ist noch satt! Warte noch {seconds} Sekunden bevor du wieder fütterst.
-
+# Owner Interactions
+owner.petting.cooldown=Deine Katze möchte gerade nicht gestreichelt werden.
 # Hints
 hint.tame=Drücke [{key}] um zu zähmen
 hint.owner=Drücke [{key}] um mit deiner Katze zu interagieren

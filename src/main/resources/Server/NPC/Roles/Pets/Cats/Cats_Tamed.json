@@ -62,6 +62,162 @@
           },
           "Instructions": [
             {
+              "$Comment": "Day/night cycle - cats sleep at night automatically",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Time",
+                    "Period": [17.99, 6.01]
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Sleeping"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".GoingToBed"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Attacking"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Dying"
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": ".Sleeping"
+                }
+              ]
+            },
+            {
+              "$Comment": "Greet owner when nearby (cooldown via alarm to prevent spam)",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "CatOwner"
+                  },
+                  {
+                    "Type": "Alarm",
+                    "Name": "Greet_Ready",
+                    "State": "Unset"
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Sleeping"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Attacking"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Fleeing"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Dying"
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": ".Greeting"
+                }
+              ]
+            },
+            {
+              "$Comment": "Clear greeting alarm when it has passed",
+              "Continue": true,
+              "Sensor": {
+                "Type": "Alarm",
+                "Name": "Greet_Ready",
+                "State": "Passed",
+                "Clear": true
+              },
+              "Actions": [
+                {
+                  "Type": "Nothing"
+                }
+              ]
+            },
+            {
+              "$Comment": "Flee from hostile mobs - cats run away from danger",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Mob",
+                    "Range": 8,
+                    "Filters": [
+                      {
+                        "Type": "Attitude",
+                        "Attitudes": ["Hostile"]
+                      }
+                    ]
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Fleeing"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Attacking"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".Dying"
+                    }
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": ".Fleeing"
+                }
+              ]
+            },
+            {
               "$Comment": "Sitting behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
@@ -310,9 +466,6 @@
                     "SlowDownDistance": 4,
                     "StopDistance": 2,
                     "RelativeSpeed": 1.0
-                  },
-                  "HeadMotion": {
-                    "Type": "Watch"
                   }
                 },
                 {
@@ -341,6 +494,136 @@
                     "Type": "Any"
                   },
                   "Actions": [
+                    {
+                      "Type": "State",
+                      "State": ".Default"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "$Comment": "Fleeing behavior - runs away from hostile entities",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Fleeing"
+              },
+              "Instructions": [
+                {
+                  "$Comment": "Flee from nearby hostile entity",
+                  "Sensor": {
+                    "Type": "Mob",
+                    "Range": 12,
+                    "Filters": [
+                      {
+                        "Type": "Attitude",
+                        "Attitudes": ["Hostile"]
+                      }
+                    ]
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Run",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Flee",
+                    "RelativeSpeed": 1.2
+                  }
+                },
+                {
+                  "$Comment": "No more threats nearby - return to waiting",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "Timeout",
+                      "Delay": [2, 4],
+                      "Action": {
+                        "Type": "State",
+                        "State": ".Waiting"
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                }
+              ]
+            },
+            {
+              "$Comment": "Greeting behavior - cat greets owner with animation, then cooldown",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Greeting"
+              },
+              "Instructions": [
+                {
+                  "$Comment": "Play greeting animation and set cooldown alarm",
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Alerted",
+                      "Slot": "Status"
+                    },
+                    {
+                      "Type": "PlaySound",
+                      "SoundEventId": "SFX_Leopard_Snow_Run"
+                    },
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.8, 0],
+                      "ParticleSystem": "Hearts_Subtle"
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Watch owner during greeting, then return to default",
+                  "Sensor": {
+                    "Type": "CatOwner"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "Timeout",
+                      "Delay": [3, 6],
+                      "Action": {
+                        "Type": "Sequence",
+                        "Actions": [
+                          {
+                            "Type": "SetAlarm",
+                            "Name": "Greet_Ready",
+                            "DurationRange": ["PT2H", "PT12H"]
+                          },
+                          {
+                            "Type": "State",
+                            "State": ".Default"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
+                },
+                {
+                  "$Comment": "Owner not nearby anymore - end greeting early",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "SetAlarm",
+                      "Name": "Greet_Ready",
+                      "DurationRange": ["PT2H", "PT12H"]
+                    },
                     {
                       "Type": "State",
                       "State": ".Default"
@@ -550,6 +833,8 @@
                 {"Type": "State", "State": ".Playing"},
                 {"Type": "State", "State": ".Searching"},
                 {"Type": "State", "State": ".Attacking"},
+                {"Type": "State", "State": ".Fleeing"},
+                {"Type": "State", "State": ".Greeting"},
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
                 {"Type": "State", "State": ".Dying"},

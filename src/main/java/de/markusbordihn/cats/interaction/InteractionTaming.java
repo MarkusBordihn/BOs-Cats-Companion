@@ -92,7 +92,7 @@ public class InteractionTaming {
         progressComponent.getCurrentProgress(), progressComponent.getRequiredProgress());
 
     if (progressComponent.isReadyToTame()) {
-      handleSuccessfulTaming(entityRef, store, player, heldItem);
+      handleSuccessfulTaming(entityRef, role, store, player, heldItem);
       store.removeComponent(entityRef, CatTamingProgressComponent.getComponentType());
     } else {
       handleProgressFeedback(
@@ -148,22 +148,28 @@ public class InteractionTaming {
   }
 
   private static void handleSuccessfulTaming(
-      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
+      Ref<EntityStore> entityRef,
+      Role role,
+      Store<EntityStore> store,
+      Player player,
+      ItemStack heldItem) {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     if (player == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player is null");
       return;
     }
 
-    PlayerRef playerRef = player.getPlayerRef();
-    if (playerRef == null) {
-      LOGGER.at(Level.WARNING).log("Cannot tame cat - player ref is null");
+    // Get player entity ref from the interaction target (non-deprecated path)
+    Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+    if (playerEntityRef == null || !playerEntityRef.isValid()) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
       return;
     }
 
-    Ref<EntityStore> playerEntityRef = playerRef.getReference();
-    if (playerEntityRef == null) {
-      LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
+    // Get PlayerRef as an ECS component (replaces deprecated Player.getPlayerRef())
+    PlayerRef playerRef = store.getComponent(playerEntityRef, PlayerRef.getComponentType());
+    if (playerRef == null) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - PlayerRef component is null");
       return;
     }
 

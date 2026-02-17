@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
@@ -100,7 +101,12 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
         return false;
       }
 
-      UUID playerUUID = player.getPlayerRef().getUuid();
+      PlayerRef playerRefComponent = store.getComponent(playerRef, PlayerRef.getComponentType());
+      if (playerRefComponent == null) {
+        return false;
+      }
+
+      UUID playerUUID = playerRefComponent.getUuid();
       return ownerComponent.getOwnerUUID().equals(playerUUID);
     }
 

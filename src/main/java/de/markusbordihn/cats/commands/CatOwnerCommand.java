@@ -26,7 +26,7 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
@@ -61,10 +61,9 @@ final class CatOwnerCommand extends CatCommand {
     }
 
     UUID newOwnerId = null;
-    for (Player player : world.getPlayers()) {
-      if (player.getPlayerRef() != null
-          && ownerName.equalsIgnoreCase(player.getPlayerRef().getUsername())) {
-        newOwnerId = player.getPlayerRef().getUuid();
+    for (PlayerRef playerRef : world.getPlayerRefs()) {
+      if (playerRef != null && ownerName.equalsIgnoreCase(playerRef.getUsername())) {
+        newOwnerId = playerRef.getUuid();
         break;
       }
     }

@@ -7,6 +7,14 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.1.0
+
+- Added petting interaction for owned cats (empty hand, 5-minute cooldown).
+- Added greeting behavior when cats see their owner nearby.
+- Added automatic day/night cycle for tamed cats (sleep at night, active during day).
+- Added fleeing behavior when hostile mobs are nearby (cats run away from danger).
+- Improved wild cat AI by using vanilla animal behavior template.
+
 ### 2.0.0
 
 #### ⚠️ MAJOR UPDATE - BREAKING CHANGES

@@ -244,7 +244,19 @@ tasks.register('extractHytaleResources') {
 
 tasks.register('decompile') {
   group = 'hytale'
-  description = 'Decompile Hytale developer resources for reference'
+  description = 'Decompile Hytale developer resources for reference (requires valid Hytale license)'
+
+  doFirst {
+    logger.warn("")
+    logger.warn("=" * 80)
+    logger.warn("IMPORTANT NOTICE: Decompilation is for development purposes only!")
+    logger.warn("- Requires a valid Hytale installation and license")
+    logger.warn("- Decompiled code is NOT redistributable")
+    logger.warn("- Only for API reference during plugin development")
+    logger.warn("- Output files are excluded from version control (.gitignore)")
+    logger.warn("=" * 80)
+    logger.warn("")
+  }
 
   dependsOn decompileHytaleApi, extractHytaleResources
 
@@ -252,5 +264,7 @@ tasks.register('decompile') {
     println "\n✅ Hytale extraction complete!"
     println "   - Decompiled API sources available in hytale-api/"
     println "   - Resources available in hytale-resources/"
+    println "\n⚠️  Remember: These files are for development reference only."
+    println "   Do not redistribute or commit them to version control."
   }
 }

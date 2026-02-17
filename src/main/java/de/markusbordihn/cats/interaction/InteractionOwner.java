@@ -21,19 +21,51 @@ package de.markusbordihn.cats.interaction;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.util.Alarm;
+import java.time.Duration;
 
 public class InteractionOwner {
 
+  private static final String PET_COOLDOWN_ALARM = "PetCooldown";
+  private static final Duration PET_COOLDOWN_DURATION = Duration.ofMinutes(5);
+
   public static boolean handle(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+
+    // Get the NPC entity to access alarm store
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+    if (npcEntity == null) {
+      return false;
+    }
+
+    // Get or create the petting cooldown alarm
+    Alarm petAlarm = npcEntity.getAlarmStore().get(npcEntity, PET_COOLDOWN_ALARM);
+
+    // Get current world time for alarm check
+    WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
+
+    // Check if petting cooldown is active (alarm is set and has not passed)
+    if (petAlarm.isSet() && !petAlarm.hasPassed(worldTimeResource.getGameTime())) {
+      // Send message to player that cat doesn't want petting right now
+      player.sendMessage(
+          Message.translation("cats.interactions.owner.petting.cooldown").color("#AAAAAA"));
+      return true; // Interaction handled, prevent further processing
+    }
+
     InteractionLogger.logInteraction(
         "OWNER: Petting Interaction", entityRef, role, store, player, null);
 
     // Trigger Petting animation state (purring, happy animation)
     role.getStateSupport().setState(entityRef, "Petting", "Default", store);
+
+    // Set petting cooldown alarm (current time + cooldown duration)
+    petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);
 
     return false;
   }

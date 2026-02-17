@@ -23,6 +23,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.component.CatOwnerComponent;
@@ -48,9 +49,21 @@ public class InteractionLogger {
     LOGGER.at(Level.FINE).log("Entity: %s", entityRef);
     LOGGER.at(Level.FINE).log("Role: %s", role.getRoleName());
 
-    if (player != null) {
-      LOGGER.at(Level.FINE).log(
-          "Player: %s (UUID: %s)", player.getPlayerRef(), player.getPlayerRef().getUuid());
+    if (player != null && role != null && role.getStateSupport() != null) {
+      Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+      if (playerEntityRef != null && playerEntityRef.isValid()) {
+        PlayerRef playerRefComponent =
+            store.getComponent(playerEntityRef, PlayerRef.getComponentType());
+        if (playerRefComponent != null) {
+          LOGGER.at(Level.FINE).log(
+              "Player: %s (UUID: %s)",
+              playerRefComponent.getUsername(), playerRefComponent.getUuid());
+        } else {
+          LOGGER.at(Level.FINE).log("Player: (PlayerRef component not found)");
+        }
+      } else {
+        LOGGER.at(Level.FINE).log("Player: (no interaction target)");
+      }
     } else {
       LOGGER.at(Level.FINE).log("Player: NULL");
     }
