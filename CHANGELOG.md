@@ -7,6 +7,10 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.1.1
+
+- Fixed mod warning by using fixed ServerVersion.
+
 ### 2.1.0
 
 - Added petting interaction for owned cats (empty hand, 5-minute cooldown).
