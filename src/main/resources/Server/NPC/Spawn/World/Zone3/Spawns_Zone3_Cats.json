@@ -6,7 +6,7 @@
   ],
   "NPCs": [
     {
-      "Weight": 4,
+      "Weight": 2,
       "SpawnBlockSet": "Soil_NoSnow",
       "Id": "Cats_LonghairedRussianBlue_Wild",
       "Flock": "One_Or_Two"

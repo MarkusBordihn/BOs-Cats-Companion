@@ -92,7 +92,8 @@ The compiled JAR will be in `build/libs/`.
 4. Connect with your Hytale client to `localhost`
 5. Test your changes in-game
 
-**Note:** The plugin source files in `src/main/` are automatically loaded via the `--mods` parameter in the IntelliJ run configuration. No need to copy JAR files manually during development.
+**Note:** The plugin source files in `src/main/` are automatically loaded via the `--mods` parameter
+in the IntelliJ run configuration. No need to copy JAR files manually during development.
 
 ## License
 

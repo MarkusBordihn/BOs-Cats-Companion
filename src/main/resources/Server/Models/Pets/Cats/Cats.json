@@ -122,11 +122,47 @@
         }
       ]
     },
+    "Laydown": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cats/Animations/Laydown.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "Wake": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cats/Animations/Wake.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": false
+        }
+      ]
+    },
+    "Eat": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cats/Animations/Eat.blockyanim",
+          "BlendingDuration": 0.2
+        }
+      ]
+    },
     "Sit": {
       "Animations": [
         {
           "Animation": "NPC/Pets/Cats/Animations/Idles/Sit.blockyanim",
           "BlendingDuration": 0.2
+        }
+      ]
+    },
+    "Curious": {
+      "Animations": [
+        {
+          "Animation": "NPC/Pets/Cat/Animations/Search.blockyanim",
+          "BlendingDuration": 0.2,
+          "Looping": true,
+          "Speed": 0.8
         }
       ]
     },

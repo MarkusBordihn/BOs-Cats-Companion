@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
+import de.markusbordihn.cats.Constants;
 import java.util.Set;
 
 public class ItemInteractionOwner {
@@ -46,8 +47,6 @@ public class ItemInteractionOwner {
           "Fish_Bluegill_Item",
           "Fish_Minnow_Item");
 
-  private static final String YARN_BALL_ITEM = "Cat_Yarn_Ball";
-
   public static boolean handle(
       Ref<EntityStore> entityRef,
       Role role,
@@ -61,8 +60,15 @@ public class ItemInteractionOwner {
       return InteractionFeeding.handle(entityRef, role, store, player, heldItem, true);
     }
 
-    if (YARN_BALL_ITEM.equals(itemName)) {
+    if (Constants.CAT_YARN_BALL_ITEM.equals(itemName)) {
       return InteractionPlayingWithYarnBall.handle(entityRef, role, store, player);
+    }
+
+    if (Constants.CAT_CARRIER_ITEM.equals(itemName)) {
+      if (CatCarrierInteraction.hasStoredCat(heldItem)) {
+        return CatCarrierInteraction.handleRelease(store, player, heldItem);
+      }
+      return CatCarrierInteraction.handleCapture(entityRef, role, store, player, heldItem);
     }
 
     if (player != null) {

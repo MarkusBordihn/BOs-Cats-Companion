@@ -7,6 +7,25 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.2.0
+
+- Fixed wild cats not reacting to players holding fish (restored direct Player sensor for food
+  attraction).
+- Fixed wild cats running away during feeding and rejection animations (added blocking to
+  Feeding/Rejection states).
+- Fixed wild cats dying too quickly in fire (MaxHealth 20 → 40).
+- Fixed alerted timeout too short for food attraction to trigger (5–8 s → 15–25 s).
+- Added basic Cat Carrier item to pick up and transport tamed cats (recipe: 2x Wood Planks + 1x
+  Leather + 1x White Wool + 1x Red Wool at Farming Workbench).
+- Added server-side config files (`config/cats/`): `general.cfg` (cat limit), `protection.cfg` (
+  damage filters), `spawn.cfg` (spawn enable/weight).
+- Added `/cat reload` command to reload config files without a server restart.
+- Added damage filter system for tamed cats: configurable protection from owner, other players, and
+  mobs (default: protected from players, vulnerable to mobs).
+- Added `CatSpawnConfigSystem` to apply spawn weight multiplier and enable/disable spawning via
+  config.
+- Added new cat animations: Eat, Laydown, Wake.
+
 ### 2.1.1
 
 - Fixed mod warning by using fixed ServerVersion.

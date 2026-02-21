@@ -5,13 +5,13 @@
   ],
   "NPCs": [
     {
-      "Weight": 5,
+      "Weight": 3,
       "SpawnBlockSet": "Soil",
       "Id": "Cats_Calico_Wild",
       "Flock": "One_Or_Two"
     },
     {
-      "Weight": 6,
+      "Weight": 3,
       "SpawnBlockSet": "Soil",
       "Id": "Cats_Black_Wild",
       "Flock": "One_Or_Two"

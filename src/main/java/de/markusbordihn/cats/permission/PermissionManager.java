@@ -22,7 +22,7 @@ package de.markusbordihn.cats.permission;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.exceptions.NoPermissionException;
 import com.hypixel.hytale.server.core.permissions.PermissionHolder;
-import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.config.GeneralConfig;
 import javax.annotation.Nonnull;
 
 public class PermissionManager {
@@ -73,7 +73,7 @@ public class PermissionManager {
       }
     }
 
-    return hasAnyLimit ? maxLimit : Constants.DEFAULT_CAT_LIMIT;
+    return hasAnyLimit ? maxLimit : GeneralConfig.CAT_LIMIT;
   }
 
   public static int getCatLimit(@Nonnull CommandContext context) {
@@ -82,7 +82,7 @@ public class PermissionManager {
     }
 
     if (!(context.sender() instanceof PermissionHolder permissionHolder)) {
-      return Constants.DEFAULT_CAT_LIMIT;
+      return GeneralConfig.CAT_LIMIT;
     }
 
     return getCatLimit(permissionHolder);

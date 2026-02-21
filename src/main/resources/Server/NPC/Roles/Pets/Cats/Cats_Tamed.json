@@ -975,10 +975,33 @@
   "InteractionInstruction": {
     "Instructions": [
       {
-        "$Comment": "Tamed cat + Owner - show owner interaction hint",
+        "$Comment": "Tamed cat + Owner holding carrier - show capture/release hint",
         "Continue": true,
         "Sensor": {
-          "Type": "CatOwner"
+          "Type": "And",
+          "Sensors": [
+            {"Type": "CatOwner"},
+            {"Type": "IsHoldingCarrier"}
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.carrier",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Tamed cat + Owner (no carrier) - show owner interaction hint",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {"Type": "CatOwner"},
+            {"Type": "Not", "Sensor": {"Type": "IsHoldingCarrier"}}
+          ]
         },
         "Actions": [
           {

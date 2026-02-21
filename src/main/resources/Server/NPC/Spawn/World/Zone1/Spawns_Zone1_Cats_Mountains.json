@@ -6,19 +6,19 @@
   ],
   "NPCs": [
     {
-      "Weight": 6,
+      "Weight": 3,
       "SpawnBlockSet": "Soil",
       "Id": "Cats_GrayTabby_Wild",
       "Flock": "One_Or_Two"
     },
     {
-      "Weight": 6,
+      "Weight": 3,
       "SpawnBlockSet": "Soil",
       "Id": "Cats_Tuxedo_Wild",
       "Flock": "One_Or_Two"
     },
     {
-      "Weight": 4,
+      "Weight": 2,
       "SpawnBlockSet": "Soil",
       "Id": "Cats_Kitten_Wild",
       "Flock": "One_Or_Two"

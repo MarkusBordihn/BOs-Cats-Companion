@@ -55,8 +55,8 @@ task updateManifest {
     if (manifestFile.exists()) {
       def manifestText = manifestFile.text
       def updatedManifest = manifestText.replaceAll(
-        /"Version"\s*:\s*"[^"]*"/,
-        "\"Version\": \"${project.version}\""
+          /"Version"\s*:\s*"[^"]*"/,
+          "\"Version\": \"${project.version}\""
       )
       manifestFile.text = updatedManifest
       println "Updated manifest.json version to ${project.version}"

@@ -37,3 +37,7 @@ error.data_not_available=Cats data not available
 error.cat_not_found=Cat data not found
 error.player_ref_not_found=Unable to get player reference
 error.player_pos_not_found=Unable to get player position
+
+# Reload Command
+reload.success=✓ Cats configuration reloaded successfully!
+reload.failed=Failed to reload configuration

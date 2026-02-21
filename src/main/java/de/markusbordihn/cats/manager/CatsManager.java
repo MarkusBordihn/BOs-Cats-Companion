@@ -45,7 +45,6 @@ import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.CatStatus;
 import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -224,11 +223,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       return;
     }
 
-    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-    if (npcEntity != null && npcEntity.getRole() != null) {
-      setInvulnerable(npcEntity, false, catUuid);
-    }
-
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
       CatDataEntry catDataEntry = resource.getCat(catUuid);
@@ -334,7 +328,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
       if (npcEntity != null && npcEntity.getRole() != null) {
         npcEntity.getRole().getStateSupport().setState(catRef, targetState, "Default", store);
-        setInvulnerable(npcEntity, true, catUuid);
       }
     }
 
@@ -461,24 +454,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       return new Vector3i((int) pos.x, (int) pos.y, (int) pos.z);
     }
     return null;
-  }
-
-  private void setInvulnerable(
-      @Nonnull NPCEntity npcEntity, boolean invulnerable, @Nonnull UUID catUuid) {
-    try {
-      Field invulnerableField = npcEntity.getRole().getClass().getDeclaredField("invulnerable");
-      invulnerableField.setAccessible(true);
-      invulnerableField.setBoolean(npcEntity.getRole(), invulnerable);
-      LOGGER.at(Level.FINE).log("Set invulnerable=%s for cat %s", invulnerable, catUuid);
-    } catch (NoSuchFieldException e) {
-      LOGGER.at(Level.WARNING).log(
-          "Failed to find invulnerable field in Role class: %s", e.getMessage());
-    } catch (IllegalAccessException e) {
-      LOGGER.at(Level.WARNING).log("Failed to access invulnerable field: %s", e.getMessage());
-    } catch (Exception e) {
-      LOGGER.at(Level.WARNING).log(
-          "Unexpected error setting invulnerable state: %s", e.getMessage());
-    }
   }
 
   public boolean isCatAliveInWorld(@Nonnull UUID catUuid, @Nonnull Store<EntityStore> store) {

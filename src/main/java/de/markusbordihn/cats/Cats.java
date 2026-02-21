@@ -19,9 +19,18 @@
 
 package de.markusbordihn.cats;
 
+import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.math.vector.Vector3d;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.event.PluginSetupEvent;
@@ -31,6 +40,7 @@ import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
 import com.hypixel.hytale.server.npc.instructions.Action;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
+import com.hypixel.hytale.server.spawning.assets.spawns.config.WorldNPCSpawn;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
@@ -44,10 +54,18 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
 import de.markusbordihn.cats.component.CatTargetComponent;
+import de.markusbordihn.cats.config.GeneralConfig;
+import de.markusbordihn.cats.config.ProtectionConfig;
+import de.markusbordihn.cats.config.SpawnConfig;
+import de.markusbordihn.cats.damage.CatDamageFilterSystem;
+import de.markusbordihn.cats.interaction.CatCarrierInteraction;
+import de.markusbordihn.cats.interaction.UseCatCarrierInteraction;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
 import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
+import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingCarrier;
 import de.markusbordihn.cats.sensors.BuilderSensorIsOwner;
+import de.markusbordihn.cats.spawn.CatSpawnConfigSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
@@ -73,6 +91,7 @@ public class Cats extends JavaPlugin {
   public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
+  private boolean damageFilterRegistered = false;
 
   public Cats(JavaPluginInit init) {
     super(init);
@@ -168,6 +187,15 @@ public class Cats extends JavaPlugin {
           "Failed to register sensor: %s", BuilderSensorIsOwner.SENSOR_ID, e);
     }
 
+    try {
+      sensorFactory.add(
+          BuilderSensorIsHoldingCarrier.SENSOR_ID, BuilderSensorIsHoldingCarrier::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingCarrier.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsHoldingCarrier.SENSOR_ID, e);
+    }
+
     sensorsRegistered = true;
     LOGGER.at(Level.INFO).log("Finished registering custom cat sensors");
   }
@@ -218,7 +246,39 @@ public class Cats extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Registering cats manager...");
     getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
 
-    // Initialize cat names manager
+    // Register damage filter system for tamed cat protection (deferred until DamageModule is ready)
+    LOGGER.at(Level.INFO).log("Registering cat damage filter system...");
+    DamageModule damageModule = DamageModule.get();
+    if (damageModule != null && damageModule.getFilterDamageGroup() != null) {
+      getEntityStoreRegistry().registerSystem(new CatDamageFilterSystem());
+      damageFilterRegistered = true;
+    } else if (getEventRegistry() != null) {
+      LOGGER.at(Level.INFO).log(
+          "DamageModule not ready yet, deferring damage filter registration...");
+      getEventRegistry()
+          .registerGlobal(
+              PluginSetupEvent.class,
+              event -> {
+                if (!damageFilterRegistered && event.getPlugin() instanceof DamageModule) {
+                  getEntityStoreRegistry().registerSystem(new CatDamageFilterSystem());
+                  damageFilterRegistered = true;
+                  LOGGER.at(Level.INFO).log("Cat damage filter system registered (deferred)");
+                }
+              });
+    } else {
+      LOGGER.at(Level.WARNING).log(
+          "Cannot register damage filter system: event registry not available");
+    }
+
+    LOGGER.at(Level.INFO).log("Registering custom item interaction types...");
+    this.getCodecRegistry(Interaction.CODEC)
+        .register("UseCatCarrier", UseCatCarrierInteraction.class, UseCatCarrierInteraction.CODEC);
+
+    LOGGER.at(Level.INFO).log("Initializing configuration...");
+    GeneralConfig.initialize();
+    SpawnConfig.initialize();
+    ProtectionConfig.initialize();
+
     LOGGER.at(Level.INFO).log("Initializing cat names manager...");
     CatsNamesManager.initialize();
 
@@ -246,6 +306,65 @@ public class Cats extends JavaPlugin {
     // Register commands
     LOGGER.at(Level.INFO).log("Registering commands...");
     this.getCommandRegistry().registerCommand(new CatCommands());
+
+    // Register spawn config event listener
+    LOGGER.at(Level.INFO).log("Registering spawn config system...");
+    if (getEventRegistry() != null) {
+      getEventRegistry()
+          .register(
+              LoadedAssetsEvent.class,
+              WorldNPCSpawn.class,
+              CatSpawnConfigSystem::onWorldNPCSpawnsLoaded);
+    } else {
+      LOGGER.at(Level.WARNING).log(
+          "Event registry not available, spawn config modifications will not be applied");
+    }
+
+    // Register carrier release event listener
+    LOGGER.at(Level.INFO).log("Registering cat carrier interaction listener...");
+    if (getEventRegistry() != null) {
+      getEventRegistry()
+          .registerGlobal(PlayerInteractEvent.class, this::onPlayerInteractCarrierRelease);
+    }
+  }
+
+  private void onPlayerInteractCarrierRelease(PlayerInteractEvent event) {
+    if (event.isCancelled()) {
+      return;
+    }
+
+    ItemStack heldItem = event.getItemInHand();
+    if (heldItem == null || !Constants.CAT_CARRIER_ITEM.equals(heldItem.getItemId())) {
+      return;
+    }
+
+    if (!CatCarrierInteraction.hasStoredCat(heldItem)) {
+      return;
+    }
+
+    // Skip if targeting a cat entity — that's handled by NPC action (ItemInteractionOwner)
+    if (event.getTargetEntity() != null) {
+      return;
+    }
+
+    InteractionType actionType = event.getActionType();
+    LOGGER.at(Level.INFO).log(
+        "Carrier release event: actionType=%s, targetBlock=%s", actionType, event.getTargetBlock());
+
+    Player player = event.getPlayer();
+    com.hypixel.hytale.component.Store<EntityStore> store = event.getPlayerRef().getStore();
+
+    // Use target block coordinates for spawn position if available
+    Vector3d targetPos = null;
+    Vector3i targetBlock = event.getTargetBlock();
+    if (targetBlock != null) {
+      targetPos = new Vector3d(targetBlock.getX(), targetBlock.getY(), targetBlock.getZ());
+    }
+
+    boolean consumed = CatCarrierInteraction.handleRelease(store, player, heldItem, targetPos);
+    if (consumed) {
+      event.setCancelled(true);
+    }
   }
 
   @Override

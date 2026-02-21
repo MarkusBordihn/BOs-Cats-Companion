@@ -38,6 +38,11 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Full command-based interaction via `/cat`
 * Custom cat names with `/cat name`
 * Cat ownership limits configurable via permissions
+* Cat Carrier item for transporting tamed cats (pick up with F, release on ground)
+* Server-side config files for cat limit, spawn settings, and damage protection (`config/cats/`)
+* `/cat reload` command to reload config without server restart
+* Configurable damage protection for tamed cats (protected from players by default, vulnerable to
+  mobs)
 * Multiple behavior states: sitting, following, waiting, wandering, sleeping, playing, searching
 * Matching animations for each behavior
 * Cat sounds
@@ -51,11 +56,14 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 
 ### How to Get a Cat
 
-**Natural Spawning:** Cats spawn naturally across all zones (Zone 1-4) with breed distributions based on climate. Simply explore and you'll find them!
+**Natural Spawning:** Cats spawn naturally across all zones (Zone 1-4) with breed distributions
+based on climate. Simply explore and you'll find them!
 
-**Manual Spawning:** Use `/npc spawn Cats_<Breed>` (e.g., `/npc spawn Cats_Black`, `/npc spawn Cats_Siamese`)
+**Manual Spawning:** Use `/npc spawn Cats_<Breed>` (e.g., `/npc spawn Cats_Black`,
+`/npc spawn Cats_Siamese`)
 
-**Spawn Eggs:** Each breed has a spawn egg: `Egg_Spawner_Cats_<Breed>` (e.g., `Egg_Spawner_Cats_Calico`)
+**Spawn Eggs:** Each breed has a spawn egg: `Egg_Spawner_Cats_<Breed>` (e.g.,
+`Egg_Spawner_Cats_Calico`)
 
 ### How to Tame a Cat
 
@@ -65,12 +73,28 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 4. Your cat gets an automatic unique name (e.g., "Whiskers", "Luna", "Shadow")
 
 **Tips:**
+
 * Enable "Allow NPC Detection" in Creative Mode Quick Settings (TAB) to interact in Creative
 * Tamed cats can be fed fish to keep them happy
 * Use empty hand to pet your cat (press F)
 * Wrong items may upset wild cats (*hiss!*)
 
 ### Cat Furniture
+
+#### Cat Carrier
+
+Craft a Cat Carrier to pick up and transport your tamed cats:
+
+**Crafting Recipe (at Farming Workbench):**
+
+* 2x Wood Planks (any type)
+* 1x Leather
+* 1x White Wool
+* 1x Red Wool
+
+Use the carrier on your tamed cat (press F) to pick it up. The carrier icon changes to show it is
+occupied.
+Right-click on the ground to release the cat at a new location.
 
 #### Cat Bed
 
@@ -98,6 +122,8 @@ Your cat will show affection with heart particles and happy sounds.
 
 ### Available Commands
 
+* `/cat reload` – Reload all config files without server restart
+
 #### General Commands
 
 * `/cat info` – Show detailed cat information (works on any cat)
@@ -123,11 +149,24 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 **Tip:** For best results, look directly at your cat when using commands.
 
+## ⚙️ Configuration
+
+Config files are created in `config/cats/` on first startup and can be edited while the server is
+running:
+
+* `general.cfg` – Default cat limit per player (default: 16)
+* `protection.cfg` – Damage filters: protect tamed cats from owner hits, other players, mobs (
+  defaults: players protected, mobs deal damage)
+* `spawn.cfg` – Enable/disable natural spawning and adjust spawn weight multiplier
+
+Apply changes with `/cat reload` — no restart required.
+
 ## 🔐 Permissions
 
 The plugin supports both Hytale's permission system and LuckPerms.
 
-**Default Cat Limit:** Players can own up to 16 cats. Admins can adjust this using permissions like `markusbordihn.cats.limit.8` or `markusbordihn.cats.limit.unlimited`.
+**Default Cat Limit:** Players can own up to 16 cats. Admins can adjust this using permissions like
+`markusbordihn.cats.limit.8` or `markusbordihn.cats.limit.unlimited`.
 
 For detailed permission configuration, see the [Permissions Documentation](PERMISSIONS.md).
 
@@ -167,7 +206,6 @@ Backup this file to preserve your cats when moving worlds.
 
 ## 🐛 Known Issues
 
-* Wild cats may occasionally get stuck while approaching players holding fish
 * Some animation transitions are not yet smooth
 * Pathfinding still needs refinement
 
@@ -175,13 +213,16 @@ Backup this file to preserve your cats when moving worlds.
 
 **🐶 Dogs Companion**
 
-Looking for loyal combat companions? Check out the Dogs Companion plugin! While cats are perfect for peaceful companionship and decoration, dogs are designed for active gameplay with combat support, guarding abilities, and adventure features.
+Looking for loyal combat companions? Check out the Dogs Companion plugin! While cats are perfect for
+peaceful companionship and decoration, dogs are designed for active gameplay with combat support,
+guarding abilities, and adventure features.
 
 👉 [Download Dogs Companion](https://www.curseforge.com/hytale/mods/dogs-companion)
 
 ## 🛠️ For Developers
 
-Want to build or modify this plugin? Check out the [Development Guide](DEVELOPMENT.md) for setup instructions, build tasks, and contribution guidelines.
+Want to build or modify this plugin? Check out the [Development Guide](DEVELOPMENT.md) for setup
+instructions, build tasks, and contribution guidelines.
 
 ## 📜 License
 

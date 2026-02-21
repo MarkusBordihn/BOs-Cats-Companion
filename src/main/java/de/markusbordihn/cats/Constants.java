@@ -32,5 +32,8 @@ public final class Constants {
 
   public static final int DEFAULT_CAT_LIMIT = 16;
 
+  public static final String CAT_CARRIER_ITEM = "Cat_Carrier";
+  public static final String CAT_YARN_BALL_ITEM = "Cat_Yarn_Ball";
+
   private Constants() {}
 }

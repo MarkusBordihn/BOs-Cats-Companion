@@ -35,6 +35,7 @@ public final class CatCommands extends AbstractCommandCollection {
     this.addSubCommand(new CatNameCommand());
     this.addSubCommand(new CatOwnerCommand());
     this.addSubCommand(new CatPlayCommand());
+    this.addSubCommand(new CatReloadCommand());
     this.addSubCommand(new CatReleaseCommand());
     this.addSubCommand(new CatSearchCommand());
     this.addSubCommand(new CatSitCommand());

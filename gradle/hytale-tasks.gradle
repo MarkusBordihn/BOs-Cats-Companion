@@ -5,7 +5,6 @@ tasks.register('extractHytaleApi') {
   def hytaleJar = file(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
   def outputDir = file("$buildDir/tmp/hytale-classes")
 
-  // Define inputs and outputs for Gradle caching
   inputs.file(hytaleJar)
   outputs.dir(outputDir)
 
@@ -25,7 +24,6 @@ tasks.register('extractHytaleApi') {
       include 'com/hypixel/hytale/**/*.class'
     }
 
-    // Count extracted classes
     def classCount = 0
     outputDir.eachFileRecurse { file ->
       if (file.name.endsWith('.class')) {
@@ -37,19 +35,19 @@ tasks.register('extractHytaleApi') {
   }
 }
 
-// Configuration for Vineflower decompiler
 def vineflowerConfig = configurations.create('vineflower') {
   visible = false
   transitive = true
 }
 
 dependencies {
-  vineflower 'org.vineflower:vineflower:1.10.1'
+  vineflower 'org.vineflower:vineflower:1.11.1'
+  vineflower 'org.benf:cfr:0.152'
 }
 
 tasks.register('runVineflower', JavaExec) {
   group = 'hytale'
-  description = 'Runs Vineflower decompiler on extracted Hytale API classes'
+  description = 'Runs Vineflower decompiler on extracted Hytale API classes (pass 1 - bulk)'
 
   def classesDir = file("$buildDir/tmp/hytale-classes")
   def outputDir = file("$projectDir/hytale-api")
@@ -57,48 +55,212 @@ tasks.register('runVineflower', JavaExec) {
   mainClass = 'org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler'
   classpath = vineflowerConfig
 
-  // Increase JVM memory and stack size to handle complex/nested classes
-  jvmArgs = [
-      '-Xmx2G',           // Maximum heap size
-      '-Xss16M',          // Stack size (default is usually 1M, increase to prevent StackOverflowError)
-      '-XX:+UseParallelGC' // Use parallel garbage collector for better performance
-  ]
+  jvmArgs = ['-Xmx4G', '-Xss128M', '-XX:+UseParallelGC', '-XX:MaxMetaspaceSize=512M']
+
+  def threadCount = Math.max(4, Runtime.runtime.availableProcessors())
 
   args = [
-      '-dgs=1',  // Decompile generic signatures
-      '-hdc=0',  // Hide default constructor
-      '-asc=1',  // Encode non-ASCII characters
-      '-rsy=1',  // Remove synthetic class members
-      '-lit=1',  // Output numeric literals as-is
-      '-nns=1',  // Assume no custom classes implement standard interfaces
-      '-mpm=60', // Max processing time per method in seconds (prevent hangs)
-      '-log=ERROR', // Only show errors (suppress warnings about individual class failures)
+      '-dgs=1', '-hdc=0', '-asc=1', '-rsy=1', '-lit=1', '-nns=1',
+      '-mpm=120',
+      "-thr=${threadCount}",
+      '-iec=1',
+      '-log=ERROR',
       classesDir.absolutePath,
       outputDir.absolutePath
   ]
 
-  // Ignore exit value - some classes may fail but we want to continue
   ignoreExitValue = true
 
   doFirst {
     delete outputDir
     outputDir.mkdirs()
-    println "Decompiling Hytale API classes using Vineflower..."
-    println "Note: Some complex classes may fail to decompile - this is expected"
+    println "═══════════════════════════════════════════════════════════════"
+    println "Pass 1: Decompilation with generic signatures enabled"
+    println "   Heap: 4G | Stack: 128M | Threads: ${threadCount} | Timeout: 120s/method"
+    println "═══════════════════════════════════════════════════════════════"
+  }
+}
+
+tasks.register('retryFailedDecompilation') {
+  group = 'hytale'
+  description = 'Retries failed classes using CFR decompiler as fallback (pass 2)'
+
+  def classesDir = file("$buildDir/tmp/hytale-classes")
+  def outputDir = file("$projectDir/hytale-api")
+
+  dependsOn runVineflower
+
+  doLast {
+    // Vineflower silently skips failed classes, detect them by comparing input vs output
+    def nestedOutputDir = new File(outputDir, classesDir.name)
+    def effectiveOutputDir = nestedOutputDir.exists() ? nestedOutputDir : outputDir
+
+    def decompiledClasses = [] as Set
+    effectiveOutputDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.java')) {
+        def relativePath = file.absolutePath
+            .replace(effectiveOutputDir.absolutePath + File.separator, '')
+            .replace('.java', '.class')
+        decompiledClasses << relativePath
+      }
+    }
+
+    def failedClassPaths = []
+    classesDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.class')) {
+        def relativePath = file.absolutePath
+            .replace(classesDir.absolutePath + File.separator, '')
+        if (!decompiledClasses.contains(relativePath)) {
+          failedClassPaths << relativePath
+        }
+      }
+    }
+
+    if (failedClassPaths.isEmpty()) {
+      println "✅ No failed classes to retry!"
+      return
+    }
+
+    println ""
+    println "═══════════════════════════════════════════════════════════════"
+    println "Pass 2: Retrying ${failedClassPaths.size()} failed classes with CFR"
+    println "   CFR uses a different decompilation engine than Vineflower"
+    println "═══════════════════════════════════════════════════════════════"
+
+    def cfrJar = vineflowerConfig.resolve().find { it.name.contains('cfr') }
+    if (!cfrJar) {
+      println "⚠️  CFR jar not found, skipping pass 2"
+      return
+    }
+
+    def javaBin = "${System.getProperty('java.home')}${File.separator}bin${File.separator}java"
+    def recoveredCount = new java.util.concurrent.atomic.AtomicInteger(0)
+    def stillFailedCount = new java.util.concurrent.atomic.AtomicInteger(0)
+    def processedCount = new java.util.concurrent.atomic.AtomicInteger(0)
+    def totalFailed = failedClassPaths.size()
+    def startTime = System.currentTimeMillis()
+    def threadCount = Math.max(4, Runtime.runtime.availableProcessors())
+
+    println "   Using ${threadCount} parallel threads"
+
+    def executor = java.util.concurrent.Executors.newFixedThreadPool(threadCount)
+    def activeProcesses = java.util.Collections.synchronizedList([])
+    def futures = []
+
+    def shutdownHook = new Thread({
+      println "\n⚠️  Interrupted - shutting down CFR processes..."
+      executor.shutdownNow()
+      activeProcesses.each { proc ->
+        try {
+          proc.destroyForcibly()
+        } catch (Exception ignored) {
+        }
+      }
+    })
+    Runtime.runtime.addShutdownHook(shutdownHook)
+
+    try {
+      failedClassPaths.each { relativePath ->
+        futures << executor.submit({
+          if (Thread.currentThread().isInterrupted()) return
+
+          def classFile = new File(classesDir, relativePath)
+          def javaRelativePath = relativePath.replace('.class', '.java')
+          def targetJavaFile = new File(effectiveOutputDir, javaRelativePath)
+
+          try {
+            def cmd = ([
+                javaBin, '-Xmx512M', '-Xss8M',
+                '-jar', cfrJar.absolutePath,
+                classFile.absolutePath,
+                '--extraclasspath', classesDir.absolutePath,
+                '--silent', 'true'
+            ] as List).collect { it.toString() }
+
+            def process = new ProcessBuilder(cmd).redirectErrorStream(true).start()
+            activeProcesses << process
+            def output = new StringBuilder()
+            process.inputStream.eachLine { line -> output.append(line).append('\n') }
+            def exitCode = process.waitFor()
+            activeProcesses.remove(process)
+
+            if (Thread.currentThread().isInterrupted()) return
+
+            if (exitCode == 0 && output.length() > 50) {
+              targetJavaFile.parentFile.mkdirs()
+              targetJavaFile.text = output.toString()
+              recoveredCount.incrementAndGet()
+            } else {
+              stillFailedCount.incrementAndGet()
+            }
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt()
+          } catch (Exception e) {
+            stillFailedCount.incrementAndGet()
+          }
+
+          def current = processedCount.incrementAndGet()
+          if (current % 100 == 0 || current == totalFailed) {
+            def pct = Math.min(100, (int) (current * 100 / totalFailed))
+            def elapsed = (System.currentTimeMillis() - startTime) / 1000
+            def barLen = 30
+            def filled = Math.min(barLen, (int) (barLen * current / totalFailed))
+            def empty = Math.max(0, barLen - filled)
+            def bar = ('\u2588' * filled) + ('\u2591' * empty)
+            println "   [${bar}] ${pct}% (${current}/${totalFailed}) ${(int) elapsed}s | recovered: ${recoveredCount.get()}"
+          }
+        } as Runnable)
+      }
+
+      futures.each { it.get() }
+    } catch (Exception e) {
+      println "\n⚠️  Pass 2 interrupted - cleaning up..."
+      futures.each { future ->
+        try {
+          future.cancel(true)
+        } catch (Exception ignored) {
+        }
+      }
+      activeProcesses.each { proc ->
+        try {
+          proc.destroyForcibly()
+        } catch (Exception ignored) {
+        }
+      }
+    } finally {
+      executor.shutdownNow()
+      executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)
+      activeProcesses.each { proc ->
+        try {
+          proc.destroyForcibly()
+        } catch (Exception ignored) {
+        }
+      }
+      try {
+        Runtime.runtime.removeShutdownHook(shutdownHook)
+      } catch (Exception ignored) {
+      }
+    }
+
+    println ""
+    println "Pass 2 Results (CFR):"
+    println "   \u2705 Recovered: ${recoveredCount.get()} classes"
+    if (stillFailedCount.get() > 0) {
+      println "   \u26a0\ufe0f  Still failed: ${stillFailedCount.get()} classes (kept as .class)"
+    }
   }
 }
 
 tasks.register('decompileHytaleApi') {
   group = 'hytale'
-  description = 'Decompiles extracted Hytale API class files to Java sources'
+  description = 'Decompiles extracted Hytale API class files to Java sources (2-pass with retry)'
 
-  dependsOn extractHytaleApi, runVineflower
+  dependsOn extractHytaleApi, retryFailedDecompilation
 
   def classesDir = file("$buildDir/tmp/hytale-classes")
   def outputDir = file("$projectDir/hytale-api")
 
   doLast {
-    // Vineflower creates a nested directory structure, move files up
     def decompDir = new File(outputDir, classesDir.name)
     if (decompDir.exists()) {
       copy {
@@ -108,11 +270,8 @@ tasks.register('decompileHytaleApi') {
       delete decompDir
     }
 
-    // Count decompiled files and identify failed classes
     def javaFiles = []
     def classFiles = []
-
-    // Count all original class files
     def totalClasses = 0
     classesDir.eachFileRecurse { file ->
       if (file.name.endsWith('.class')) {
@@ -120,7 +279,35 @@ tasks.register('decompileHytaleApi') {
       }
     }
 
-    // Count successfully decompiled files
+    def decompiledSet = [] as Set
+    outputDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.java')) {
+        def relativePath = file.absolutePath
+            .replace(outputDir.absolutePath + File.separator, '')
+            .replace('.java', '.class')
+        decompiledSet << relativePath
+      }
+    }
+
+    def copiedClassCount = 0
+    classesDir.eachFileRecurse { file ->
+      if (file.name.endsWith('.class')) {
+        def relativePath = file.absolutePath
+            .replace(classesDir.absolutePath + File.separator, '')
+        if (!decompiledSet.contains(relativePath)) {
+          def targetFile = new File(outputDir, relativePath)
+          targetFile.parentFile.mkdirs()
+          java.nio.file.Files.copy(file.toPath(), targetFile.toPath(),
+              java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+          copiedClassCount++
+        }
+      }
+    }
+
+    if (copiedClassCount > 0) {
+      println "📦 Copied ${copiedClassCount} non-decompiled .class files to output"
+    }
+
     outputDir.eachFileRecurse { file ->
       if (file.name.endsWith('.java')) {
         def className = file.absolutePath
@@ -137,7 +324,6 @@ tasks.register('decompileHytaleApi') {
       }
     }
 
-    // Create index file with statistics
     def indexFile = new File(outputDir, 'API_INDEX.txt')
     def sortedFiles = javaFiles.sort()
     def grouped = [:]
@@ -197,7 +383,6 @@ tasks.register('decompileHytaleApi') {
     println "📁 Output: ${outputDir}"
     println "📄 Index: ${indexFile}"
 
-    // Clean up temporary class files
     println "🧹 Cleaning up temporary class files..."
     delete classesDir
     println "✅ Temporary class files removed"
@@ -216,19 +401,16 @@ tasks.register('extractHytaleResources') {
       throw new GradleException("Hytale Assets.zip not found at: ${assetsZip}")
     }
 
-    // Clean output directory
     delete outputDir
     outputDir.mkdirs()
 
     println "Extracting from ${assetsZip.name}..."
 
-    // Extract all assets
     copy {
       from zipTree(assetsZip)
       into outputDir
     }
 
-    // Count extracted files
     def fileCount = 0
     outputDir.eachFileRecurse { file ->
       if (file.isFile()) {
