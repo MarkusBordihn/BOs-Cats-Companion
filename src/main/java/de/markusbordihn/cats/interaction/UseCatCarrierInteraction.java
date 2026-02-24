@@ -55,6 +55,7 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
               (o, p) -> o.fullIcon = p.fullIcon)
           .add()
           .build();
+
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   protected String fullIcon;
 

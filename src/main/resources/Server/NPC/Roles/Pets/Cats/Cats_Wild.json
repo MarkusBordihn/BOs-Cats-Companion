@@ -676,7 +676,7 @@
                       "Actions": [
                         {
                           "Type": "PlaySound",
-                          "SoundEventId": "SFX_Wolf_Sleep"
+                          "SoundEventId": "SFX_Fox_Sleep"
                         },
                         {
                           "Type": "State",
@@ -1450,7 +1450,7 @@
             },
             {
               "Type": "PlaySound",
-              "SoundEventId": "SFX_Fox_Sleep"
+              "SoundEventId": "SFX_Meerkat_Idle"
             },
             {
               "Type": "SpawnParticles",
@@ -1473,6 +1473,11 @@
               "Delay": [1, 1]
             },
             {
+              "Type": "PlayAnimation",
+              "Animation": "Idle",
+              "Slot": "Action"
+            },
+            {
               "Type": "State",
               "State": "Idle"
             }
@@ -1491,7 +1496,7 @@
           "Actions": [
             {
               "Type": "PlaySound",
-              "SoundEventId": "SFX_Leopard_Snow_Alerted"
+              "SoundEventId": "SFX_Fox_Alerted"
             },
             {
               "Type": "PlayAnimation",

@@ -7,6 +7,16 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.2.1
+
+- Fixed cats moving around while stuck in sitting animation after being fed, petted, or playing
+  with yarn ball (added animation reset before state transition).
+- Fixed Cat Carrier recipe using non-existent `Ingredient_Leather` (changed to
+  `Ingredient_Leather_Soft`).
+- Improved cat sounds by replacing leopard/wolf sounds with more cat-appropriate vanilla sounds:
+  fox breathing for sleeping/petting, fox yips for greeting/yarn ball, meerkat chirps for feeding,
+  and fox alert bark for wild cat rejection.
+
 ### 2.2.0
 
 - Fixed wild cats not reacting to players holding fish (restored direct Player sensor for food

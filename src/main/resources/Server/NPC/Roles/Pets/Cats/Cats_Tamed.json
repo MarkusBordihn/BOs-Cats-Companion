@@ -258,7 +258,7 @@
                 },
                 {
                   "Type": "PlaySound",
-                  "SoundEventId": "SFX_Wolf_Sleep"
+                  "SoundEventId": "SFX_Fox_Sleep"
                 },
                 {
                   "Type": "Timeout",
@@ -575,7 +575,7 @@
                     },
                     {
                       "Type": "PlaySound",
-                      "SoundEventId": "SFX_Leopard_Snow_Run"
+                      "SoundEventId": "SFX_Fox_Run"
                     },
                     {
                       "Type": "SpawnParticles",
@@ -861,7 +861,7 @@
             },
             {
               "Type": "PlaySound",
-              "SoundEventId": "SFX_Fox_Sleep"
+              "SoundEventId": "SFX_Meerkat_Idle"
             },
             {
               "Type": "SpawnParticles",
@@ -877,8 +877,18 @@
               "Type": "Timeout",
               "Delay": [2, 2],
               "Action": {
-                "Type": "State",
-                "State": "Pet"
+                "Type": "Sequence",
+                "Actions": [
+                  {
+                    "Type": "PlayAnimation",
+                    "Animation": "Idle",
+                    "Slot": "Action"
+                  },
+                  {
+                    "Type": "State",
+                    "State": "Pet"
+                  }
+                ]
               }
             }
           ],
@@ -901,7 +911,7 @@
             },
             {
               "Type": "PlaySound",
-              "SoundEventId": "SFX_Leopard_Snow_Run"
+              "SoundEventId": "SFX_Fox_Sleep"
             },
             {
               "Type": "SpawnParticles",
@@ -912,8 +922,18 @@
               "Type": "Timeout",
               "Delay": [2, 2],
               "Action": {
-                "Type": "State",
-                "State": "Pet"
+                "Type": "Sequence",
+                "Actions": [
+                  {
+                    "Type": "PlayAnimation",
+                    "Animation": "Idle",
+                    "Slot": "Action"
+                  },
+                  {
+                    "Type": "State",
+                    "State": "Pet"
+                  }
+                ]
               }
             }
           ],
@@ -936,7 +956,7 @@
             },
             {
               "Type": "PlaySound",
-              "SoundEventId": "SFX_Fox_Sleep"
+              "SoundEventId": "SFX_Fox_Run"
             },
             {
               "Type": "SpawnParticles",
@@ -947,8 +967,18 @@
               "Type": "Timeout",
               "Delay": [3, 3],
               "Action": {
-                "Type": "State",
-                "State": "Pet"
+                "Type": "Sequence",
+                "Actions": [
+                  {
+                    "Type": "PlayAnimation",
+                    "Animation": "Idle",
+                    "Slot": "Action"
+                  },
+                  {
+                    "Type": "State",
+                    "State": "Pet"
+                  }
+                ]
               }
             }
           ],
