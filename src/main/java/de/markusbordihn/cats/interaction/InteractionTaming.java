@@ -238,8 +238,13 @@ public class InteractionTaming {
                 null,
                 null,
                 store);
+
+            // Clear spawn configuration to prevent the engine's despawn system.
+            npcEntity.setSpawnConfiguration(Integer.MIN_VALUE);
+            npcEntity.updateSpawnTrackingState(false);
+
             LOGGER.at(Level.INFO).log(
-                "Cat role change requested from %s to %s",
+                "Cat role change requested from %s to %s (spawn tracking disabled)",
                 currentRole.getRoleName(), tamedRoleName);
           }
         }

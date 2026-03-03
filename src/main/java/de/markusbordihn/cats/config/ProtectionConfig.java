@@ -80,10 +80,15 @@ public class ProtectionConfig extends Config {
     LinkedHashMap<String, String> comments = new LinkedHashMap<>();
     comments.put(
         "damage.from_owner",
-        "Allow the cat's owner to damage their own tamed cats.\nDefault: false");
+        "Allow the cat's owner to damage their own tamed cats.\n"
+            + "When set to false (default), owner damage is completely blocked,\n"
+            + "including melee attacks and projectiles from the owner.\n"
+            + "Default: false (protected)");
     comments.put(
         "damage.from_players",
-        "Allow other players (non-owners) to damage tamed cats.\nDefault: false");
+        "Allow other players (non-owners) to damage tamed cats.\n"
+            + "When set to false (default), tamed cats are protected from all other players.\n"
+            + "Default: false (protected)");
     comments.put(
         "damage.from_mobs", "Allow mobs (hostile NPCs) to damage tamed cats.\nDefault: true");
     comments.put(

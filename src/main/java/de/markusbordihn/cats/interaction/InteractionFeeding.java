@@ -21,13 +21,24 @@ package de.markusbordihn.cats.interaction;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
+import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.inventory.InventoryHelper;
+import java.util.logging.Level;
 
 public class InteractionFeeding {
+
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
+  private static final float HEALING_AMOUNT_PER_FEEDING = 10.0f;
 
   public static boolean handle(
       Ref<EntityStore> entityRef,
@@ -42,8 +53,56 @@ public class InteractionFeeding {
 
     role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
 
+    if (isOwner) {
+      healCat(entityRef, store, player);
+    }
+
     InventoryHelper.consumeActiveHotbarItem(player, heldItem);
 
     return false;
+  }
+
+  private static void healCat(
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
+    EntityStatMap statMap = store.getComponent(entityRef, EntityStatMap.getComponentType());
+    if (statMap == null) {
+      LOGGER.at(Level.FINE).log("Cannot heal cat: EntityStatMap not found");
+      return;
+    }
+
+    int healthIndex = DefaultEntityStatTypes.getHealth();
+    EntityStatValue healthStat = statMap.get(healthIndex);
+    if (healthStat == null) {
+      LOGGER.at(Level.FINE).log("Cannot heal cat: health stat not found");
+      return;
+    }
+
+    float currentHealth = healthStat.get();
+    float maxHealth = healthStat.getMax();
+
+    if (currentHealth >= maxHealth) {
+      if (player != null) {
+        player.sendMessage(
+            Message.translation("cats.interactions.feeding.full_health")
+                .color(Constants.COLOR_INFO));
+      }
+      return;
+    }
+
+    float newHealth = statMap.addStatValue(healthIndex, HEALING_AMOUNT_PER_FEEDING);
+    float healedAmount = newHealth - currentHealth;
+
+    LOGGER.at(Level.FINE).log(
+        "Healed cat by %.1f HP (%.1f -> %.1f / %.1f)",
+        healedAmount, currentHealth, newHealth, maxHealth);
+
+    if (player != null) {
+      player.sendMessage(
+          Message.translation("cats.interactions.feeding.healed")
+              .param("amount", String.valueOf((int) healedAmount))
+              .param("health", String.valueOf((int) newHealth))
+              .param("maxHealth", String.valueOf((int) maxHealth))
+              .color(Constants.COLOR_SUCCESS));
+    }
   }
 }

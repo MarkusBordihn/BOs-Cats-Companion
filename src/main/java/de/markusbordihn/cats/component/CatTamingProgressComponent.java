@@ -40,27 +40,27 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   private static final int MAX_REQUIRED_FISH = 5;
 
   @Nonnull
-  public static final BuilderCodec<CatTamingProgressComponent> CODEC =
-      BuilderCodec.builder(CatTamingProgressComponent.class, CatTamingProgressComponent::new)
-          .append(
-              new KeyedCodec<>(CURRENT_PROGRESS_TAG, new IntegerCodec()),
-              (component, value) -> component.currentProgress = value,
-              component -> component.currentProgress)
-          .documentation("The current taming progress (number of fish fed).")
-          .add()
-          .append(
-              new KeyedCodec<>(REQUIRED_PROGRESS_TAG, new IntegerCodec()),
-              (component, value) -> component.requiredProgress = value,
-              component -> component.requiredProgress)
-          .documentation("The required progress to tame the cat (random between 2-5).")
-          .add()
-          .append(
-              new KeyedCodec<>(LAST_FED_TIMESTAMP_TAG, new LongCodec()),
-              (component, value) -> component.lastFedTimestamp = value,
-              component -> component.lastFedTimestamp)
-          .documentation("The timestamp when the cat was last fed.")
-          .add()
-          .build();
+  public static final BuilderCodec<CatTamingProgressComponent> CODEC = BuilderCodec
+      .builder(CatTamingProgressComponent.class, CatTamingProgressComponent::new)
+      .append(
+          new KeyedCodec<>(CURRENT_PROGRESS_TAG, new IntegerCodec()),
+          (component, value) -> component.currentProgress = value,
+          component -> component.currentProgress)
+      .documentation("The current taming progress (number of fish fed).")
+      .add()
+      .append(
+          new KeyedCodec<>(REQUIRED_PROGRESS_TAG, new IntegerCodec()),
+          (component, value) -> component.requiredProgress = value,
+          component -> component.requiredProgress)
+      .documentation("The required progress to tame the cat (random between 2-5).")
+      .add()
+      .append(
+          new KeyedCodec<>(LAST_FED_TIMESTAMP_TAG, new LongCodec()),
+          (component, value) -> component.lastFedTimestamp = value,
+          component -> component.lastFedTimestamp)
+      .documentation("The timestamp when the cat was last fed.")
+      .add()
+      .build();
 
   private int currentProgress;
   private int requiredProgress;
@@ -68,8 +68,7 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
 
   public CatTamingProgressComponent() {
     this.currentProgress = 0;
-    this.requiredProgress =
-        MIN_REQUIRED_FISH + RANDOM.nextInt(MAX_REQUIRED_FISH - MIN_REQUIRED_FISH + 1);
+    this.requiredProgress = MIN_REQUIRED_FISH + RANDOM.nextInt(MAX_REQUIRED_FISH - MIN_REQUIRED_FISH + 1);
     this.lastFedTimestamp = 0L;
   }
 
@@ -77,11 +76,11 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
     return Cats.getInstance().catTamingProgressComponentType;
   }
 
-  public long getCurrentProgress() {
+  public int getCurrentProgress() {
     return currentProgress;
   }
 
-  public long getRequiredProgress() {
+  public int getRequiredProgress() {
     return requiredProgress;
   }
 

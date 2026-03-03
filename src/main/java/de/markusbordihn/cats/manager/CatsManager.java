@@ -68,7 +68,7 @@ public class CatsManager extends RefSystem<EntityStore> {
     instance = this;
   }
 
-  @Nonnull
+  @Nullable
   public static CatsManager getInstance() {
     return instance;
   }
@@ -88,9 +88,17 @@ public class CatsManager extends RefSystem<EntityStore> {
     UUID entityUuid = getUuid(ref, store);
     if (entityUuid != null) {
       catRefCache.put(entityUuid, ref);
-      CatOwnerComponent ownerComponent =
-          store.getComponent(ref, CatOwnerComponent.getComponentType());
+      CatOwnerComponent ownerComponent = store.getComponent(ref, CatOwnerComponent.getComponentType());
       if (ownerComponent != null) {
+        NPCEntity npcEntity = store.getComponent(ref, NPCEntity.getComponentType());
+        if (npcEntity != null && ownerComponent.hasOwner()) {
+          npcEntity.setSpawnConfiguration(Integer.MIN_VALUE);
+          npcEntity.updateSpawnTrackingState(false);
+          LOGGER.at(Level.FINE).log(
+              "Disabled spawn tracking for tamed cat UUID %s (Owner: %s)",
+              entityUuid, ownerComponent.getOwnerName());
+        }
+
         CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
         if (resource != null && resource.getCat(entityUuid) == null) {
           registerCat(ref, store);
@@ -256,16 +264,14 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
 
     // Read current cat data from components
-    CatOwnerComponent ownerComponent =
-        store.getComponent(catRef, CatOwnerComponent.getComponentType());
+    CatOwnerComponent ownerComponent = store.getComponent(catRef, CatOwnerComponent.getComponentType());
     UUID ownerUuid = ownerComponent != null ? ownerComponent.getOwnerUUID() : null;
     String ownerName = ownerComponent != null ? ownerComponent.getOwnerName() : null;
 
     Nameplate nameplate = store.getComponent(catRef, Nameplate.getComponentType());
     String catName = nameplate != null ? nameplate.getText() : null;
 
-    CatStateComponent stateComponent =
-        store.getComponent(catRef, CatStateComponent.getComponentType());
+    CatStateComponent stateComponent = store.getComponent(catRef, CatStateComponent.getComponentType());
     CatState catState = stateComponent != null ? stateComponent.getState() : CatState.FOLLOWING;
 
     NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
@@ -285,16 +291,15 @@ public class CatsManager extends RefSystem<EntityStore> {
               .withState(catState)
               .withStatus(CatStatus.SPAWNED));
     } else {
-      CatDataEntry newEntry =
-          new CatDataEntry(
-              catUuid,
-              ownerUuid,
-              ownerName,
-              catType,
-              catName,
-              catState,
-              getPosition(catRef, store),
-              CatStatus.SPAWNED);
+      CatDataEntry newEntry = new CatDataEntry(
+          catUuid,
+          ownerUuid,
+          ownerName,
+          catType,
+          catName,
+          catState,
+          getPosition(catRef, store),
+          CatStatus.SPAWNED);
       resource.addCat(newEntry);
     }
   }

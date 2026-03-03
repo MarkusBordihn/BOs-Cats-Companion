@@ -1092,8 +1092,8 @@
       "Description": "The memories category for grouping NPCs"
     },
     "MaxHealth": {
-      "Value": 20,
-      "Description": "Maximum health points for cats"
+      "Value": 60,
+      "Description": "Maximum health points for tamed cats (higher than wild cats for durability)"
     },
     "AttractiveItems": {
       "Value": [

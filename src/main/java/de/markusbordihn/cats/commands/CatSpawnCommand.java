@@ -49,15 +49,15 @@ final class CatSpawnCommand extends CatCommand {
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static final double MAX_SPAWN_DISTANCE = 32.0;
-  @Nonnull private final OptionalArg<String> filterArg;
+  @Nonnull
+  private final OptionalArg<String> filterArg;
 
   public CatSpawnCommand() {
     super("spawn", "Spawns your despawned cats (optionally filter by name or UUID)");
-    this.filterArg =
-        this.withOptionalArg(
-            "name_or_uuid",
-            "Optional: cat name or UUID to spawn (use quotes for names with spaces)",
-            ArgTypes.STRING);
+    this.filterArg = this.withOptionalArg(
+        "name_or_uuid",
+        "Optional: cat name or UUID to spawn (use quotes for names with spaces)",
+        ArgTypes.STRING);
   }
 
   private static boolean matchesFilter(@Nonnull CatDataEntry cat, @Nonnull String filterLower) {
@@ -90,19 +90,18 @@ final class CatSpawnCommand extends CatCommand {
 
       Collection<CatDataEntry> allCats = catsManager.getCatDataByOwner(playerUuid, store);
       for (CatDataEntry cat : allCats) {
-        boolean isInWorld = catsManager.getCatByUuid(cat.uuid(), store) != null;
+        Ref<EntityStore> catRef = catsManager.getCatByUuid(cat.uuid(), store);
+        boolean isInWorld = catRef != null;
         boolean isAlive = isInWorld && catsManager.isCatAliveInWorld(cat.uuid(), store);
 
         if (isInWorld && isAlive && matchesFilter(cat, filterLower)) {
-          Ref<EntityStore> catRef = catsManager.getCatByUuid(cat.uuid(), store);
-          if (catRef != null && catRef.isValid()) {
-            TransformComponent catTransform =
-                store.getComponent(catRef, TransformComponent.getComponentType());
+          if (catRef.isValid()) {
+            TransformComponent catTransform = store.getComponent(catRef, TransformComponent.getComponentType());
             if (catTransform != null) {
               Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
               if (playerRef != null && playerRef.isValid()) {
-                TransformComponent playerTransform =
-                    store.getComponent(playerRef, TransformComponent.getComponentType());
+                TransformComponent playerTransform = store.getComponent(playerRef,
+                    TransformComponent.getComponentType());
                 if (playerTransform != null) {
                   Vector3d playerPos = playerTransform.getPosition();
                   catTransform.setPosition(playerPos);
@@ -120,20 +119,18 @@ final class CatSpawnCommand extends CatCommand {
       }
     }
 
-    Collection<CatDataEntry> despawnedCats =
-        catsManager.getCatDataByOwner(playerUuid, store).stream()
-            .filter(
-                cat -> {
-                  boolean isInWorld = catsManager.getCatByUuid(cat.uuid(), store) != null;
-                  boolean isAlive = isInWorld && catsManager.isCatAliveInWorld(cat.uuid(), store);
-                  return !isInWorld || !isAlive;
-                })
-            .toList();
+    Collection<CatDataEntry> despawnedCats = catsManager.getCatDataByOwner(playerUuid, store).stream()
+        .filter(
+            cat -> {
+              boolean isInWorld = catsManager.getCatByUuid(cat.uuid(), store) != null;
+              boolean isAlive = isInWorld && catsManager.isCatAliveInWorld(cat.uuid(), store);
+              return !isInWorld || !isAlive;
+            })
+        .toList();
 
     if (filter != null && !filter.isEmpty()) {
       String filterLower = filter.toLowerCase(java.util.Locale.ROOT);
-      despawnedCats =
-          despawnedCats.stream().filter(cat -> matchesFilter(cat, filterLower)).toList();
+      despawnedCats = despawnedCats.stream().filter(cat -> matchesFilter(cat, filterLower)).toList();
 
       if (despawnedCats.isEmpty()) {
         context.sendMessage(
@@ -158,8 +155,7 @@ final class CatSpawnCommand extends CatCommand {
       return;
     }
 
-    TransformComponent playerTransform =
-        store.getComponent(playerRef, TransformComponent.getComponentType());
+    TransformComponent playerTransform = store.getComponent(playerRef, TransformComponent.getComponentType());
     if (playerTransform == null) {
       context.sendMessage(
           Message.translation("cats.commands.error.player_pos_not_found")
@@ -191,8 +187,7 @@ final class CatSpawnCommand extends CatCommand {
   private Vector3d calculateSpawnPosition(
       @Nonnull CatDataEntry catData, @Nonnull Vector3d playerPos) {
     if (catData.position() != null) {
-      Vector3d savedPos =
-          new Vector3d(catData.position().x, catData.position().y, catData.position().z);
+      Vector3d savedPos = new Vector3d(catData.position().x, catData.position().y, catData.position().z);
       double dx = playerPos.x - savedPos.x;
       double dy = playerPos.y - savedPos.y;
       double dz = playerPos.z - savedPos.z;
@@ -239,8 +234,8 @@ final class CatSpawnCommand extends CatCommand {
       }
 
       Vector3f rotation = new Vector3f();
-      Pair<Ref<EntityStore>, NPCEntity> spawnResult =
-          npcPlugin.spawnEntity(store, roleIndex, position, rotation, null, null, null);
+      Pair<Ref<EntityStore>, NPCEntity> spawnResult = npcPlugin.spawnEntity(store, roleIndex, position, rotation, null,
+          null, null);
 
       if (spawnResult == null || spawnResult.left() == null || !spawnResult.left().isValid()) {
         LOGGER.at(Level.WARNING).log(
@@ -258,8 +253,7 @@ final class CatSpawnCommand extends CatCommand {
 
       // Set owner
       if (catData.ownerUuid() != null) {
-        CatOwnerComponent ownerComponent =
-            new CatOwnerComponent(catData.ownerUuid(), catData.ownerName());
+        CatOwnerComponent ownerComponent = new CatOwnerComponent(catData.ownerUuid(), catData.ownerName());
         store.putComponent(catRef, CatOwnerComponent.getComponentType(), ownerComponent);
       }
 

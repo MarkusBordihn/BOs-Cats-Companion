@@ -30,6 +30,10 @@ carrier.empty=The carrier is empty. Use it on your tamed cat to pick it up.
 # Owner Interactions
 owner.petting.cooldown=Your cat doesn't want to be petted right now.
 
+# Feeding
+feeding.healed=Your cat has been healed! (+{amount} HP, now {health}/{maxHealth})
+feeding.full_health=Your cat is already at full health!
+
 # Hints
 hint.tame=Press [{key}] to tame
 hint.owner=Press [{key}] to interact with your cat
