@@ -39,33 +39,33 @@ public class CatBedTargetComponent implements Component<EntityStore> {
   private static final String HAS_TARGET_TAG = "HasTarget";
 
   @Nonnull
-  public static final BuilderCodec<CatBedTargetComponent> CODEC = BuilderCodec
-      .builder(CatBedTargetComponent.class, CatBedTargetComponent::new)
-      .append(
-          new KeyedCodec<>(HAS_TARGET_TAG, new BooleanCodec()),
-          (component, value) -> component.hasTarget = value,
-          component -> component.hasTarget)
-      .documentation("Whether a bed target has been explicitly set")
-      .add()
-      .append(
-          new KeyedCodec<>(X_TAG, new DoubleCodec()),
-          (component, value) -> component.x = value,
-          component -> component.x)
-      .documentation("Target bed X coordinate")
-      .add()
-      .append(
-          new KeyedCodec<>(Y_TAG, new DoubleCodec()),
-          (component, value) -> component.y = value,
-          component -> component.y)
-      .documentation("Target bed Y coordinate")
-      .add()
-      .append(
-          new KeyedCodec<>(Z_TAG, new DoubleCodec()),
-          (component, value) -> component.z = value,
-          component -> component.z)
-      .documentation("Target bed Z coordinate")
-      .add()
-      .build();
+  public static final BuilderCodec<CatBedTargetComponent> CODEC =
+      BuilderCodec.builder(CatBedTargetComponent.class, CatBedTargetComponent::new)
+          .append(
+              new KeyedCodec<>(HAS_TARGET_TAG, new BooleanCodec()),
+              (component, value) -> component.hasTarget = value,
+              component -> component.hasTarget)
+          .documentation("Whether a bed target has been explicitly set")
+          .add()
+          .append(
+              new KeyedCodec<>(X_TAG, new DoubleCodec()),
+              (component, value) -> component.x = value,
+              component -> component.x)
+          .documentation("Target bed X coordinate")
+          .add()
+          .append(
+              new KeyedCodec<>(Y_TAG, new DoubleCodec()),
+              (component, value) -> component.y = value,
+              component -> component.y)
+          .documentation("Target bed Y coordinate")
+          .add()
+          .append(
+              new KeyedCodec<>(Z_TAG, new DoubleCodec()),
+              (component, value) -> component.z = value,
+              component -> component.z)
+          .documentation("Target bed Z coordinate")
+          .add()
+          .build();
 
   private double x;
   private double y;

@@ -15,10 +15,15 @@ AI tools are used primarily for:
 
 - Rewriting or improving documentation and comments
 - Creating translation drafts
-- Assisting with repetitive or boilerplate code patterns
-- Generating early concept sketches or placeholder ideas for artwork
+- Assisting with repetitive or boilerplate code patterns (e.g. autocomplete suggestions, registry
+  registrations, configuration structures, simple data mappings, or similar repetitive tasks)
+- Generating early conceptual references for ideas
 
-These AI-generated concepts are used only as references and are not included as final assets.
+AI-generated visual outputs are **not used as final assets in this project**.
+Any visual concepts explored with AI are used only as loose references and are
+fully recreated manually.
+
+AI-assisted code suggestions are reviewed and manually adapted before being included in the project.
 
 ### Manual Work and Creative Control
 
@@ -28,11 +33,19 @@ AI is not used to define system behavior or make engineering decisions, but rath
 productivity and clarity where appropriate.
 
 The same applies to artistic work:  
-Final pixel art, 3D models, textures, icons, and other creative assets are hand-crafted.  
-AI may be used to explore ideas at a conceptual level, but final assets are created manually.
+Final pixel art, 3D models, textures, icons, logos, and other visual assets
+included in this project are hand-crafted and manually edited.
 
 Some artwork may be created by commissioned artists. These assets follow their own copyright terms
-and are normally not AI-generated.
+and are expected to be non-AI-generated.
+
+### Development Placeholders
+
+During early development phases (e.g. prototype or alpha builds),
+temporary placeholder assets may occasionally be used to explore ideas.
+
+These placeholders are not part of final releases and are replaced with
+hand-crafted assets before public release versions.
 
 ### Licensing
 

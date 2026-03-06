@@ -92,7 +92,8 @@ public class CatDamageFilterSystem extends DamageEventSystem {
       return;
     }
 
-    CatOwnerComponent ownerComponent = store.getComponent(targetRef, CatOwnerComponent.getComponentType());
+    CatOwnerComponent ownerComponent =
+        store.getComponent(targetRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
       return;
     }
@@ -156,8 +157,7 @@ public class CatDamageFilterSystem extends DamageEventSystem {
           LOGGER.at(Level.FINE).log("Blocked environment damage to tamed cat");
         }
       }
-      case Damage.CommandSource commandSource -> {
-      }
+      case Damage.CommandSource commandSource -> {}
       default -> {
         if (!ProtectionConfig.DAMAGE_FROM_MOBS) {
           damage.setCancelled(true);

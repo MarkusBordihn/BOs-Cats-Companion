@@ -7,10 +7,17 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.3.1
+
+- Fixed missing pixels in cat textures.
+- Refined shading and clean up stray and semi-transparent pixels.
+
 ### 2.3.0
 
-- Fixed tamed cats despawning due to retained world-spawn tracking after taming. Spawn tracking is now cleared on taming, carrier release, and chunk load.
-- Fixed Cat Carrier recipe using unobtainable `Ingredient_Leather_Soft` (changed to `Ingredient_Fibre` x3).
+- Fixed tamed cats despawning due to retained world-spawn tracking after taming. Spawn tracking is
+  now cleared on taming, carrier release, and chunk load.
+- Fixed Cat Carrier recipe using unobtainable `Ingredient_Leather_Soft` (changed to
+  `Ingredient_Fibre` x3).
 - Increased tamed cat health from 20 → 60 HP (wild cats remain at 40 HP).
 - Added healing on feeding: fish restores 10 HP per feeding (owner only) with status messages.
 - Improved protection config comments to clarify owner damage is blocked by default.

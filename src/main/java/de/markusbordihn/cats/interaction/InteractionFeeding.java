@@ -62,8 +62,7 @@ public class InteractionFeeding {
     return false;
   }
 
-  private static void healCat(
-      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
+  private static void healCat(Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
     EntityStatMap statMap = store.getComponent(entityRef, EntityStatMap.getComponentType());
     if (statMap == null) {
       LOGGER.at(Level.FINE).log("Cannot heal cat: EntityStatMap not found");

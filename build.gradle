@@ -4,16 +4,22 @@ plugins {
   id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
 }
 
-// Apply external configuration
-apply from: 'gradle/hytale-config.gradle'
-apply from: 'gradle/hytale-tasks.gradle'
-
 group = project.group
 version = project.version
 
 base {
   archivesName = "${project.mod_id}-hytale"
 }
+
+def hytaleHomePath = project.findProperty('hytaleHome')
+def hytaleServerJarPath = project.findProperty('hytaleServerJar')
+def hasLocalServer = hytaleServerJarPath && file(hytaleServerJarPath).exists()
+if (!hasLocalServer) {
+  logger.lifecycle("Local Hytale server not found; using compileOnly for CI builds.")
+}
+
+def ghostRefScript = file(findProperty('ghostRefIndex') ?: '')
+if (ghostRefScript.exists()) apply from: ghostRefScript
 
 java {
   toolchain {
@@ -24,18 +30,24 @@ java {
 
 repositories {
   mavenCentral()
+  maven {
+    name = "hytale-release"
+    url = uri("https://maven.hytale.com/release")
+  }
+  maven {
+    name = "hytale-pre-release"
+    url = uri("https://maven.hytale.com/pre-release")
+  }
 }
 
 dependencies {
   testImplementation platform('org.junit:junit-bom:5.10.0')
   testImplementation 'org.junit.jupiter:junit-jupiter'
 
-  // Hytale Server dependency
-  compileOnly files(project.findProperty('hytaleServerJar') ?: 'HytaleServer.jar')
-}
-
-if (!file("$projectDir/run").exists()) {
-  file("$projectDir/run").mkdirs()
+  compileOnly("com.hypixel.hytale:Server:$hytale_build")
+  if (hasLocalServer) {
+    runtimeOnly(files(hytaleServerJarPath))
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -49,24 +61,25 @@ test {
   useJUnitPlatform()
 }
 
-task updateManifest {
+tasks.register('updatePluginManifest') {
+  def manifestFile = file('src/main/resources/manifest.json')
   doLast {
-    def manifestFile = file("src/main/resources/manifest.json")
-    if (manifestFile.exists()) {
-      def manifestText = manifestFile.text
-      def updatedManifest = manifestText.replaceAll(
-          /"Version"\s*:\s*"[^"]*"/,
-          "\"Version\": \"${project.version}\""
-      )
-      manifestFile.text = updatedManifest
-      println "Updated manifest.json version to ${project.version}"
+    if (!manifestFile.exists()) {
+      throw new GradleException("manifest.json not found at ${manifestFile.path}")
     }
+    def manifest = new groovy.json.JsonSlurper().parseText(manifestFile.text)
+    manifest.Version = project.version
+    manifest.ServerVersion = project.hytale_build
+    manifestFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest))
+    logger.lifecycle("Updated manifest.json: Version=${project.version}, ServerVersion=${project.hytale_build}")
   }
 }
 
-jar {
-  dependsOn updateManifest
+tasks.named('processResources') {
+  dependsOn 'updatePluginManifest'
+}
 
+jar {
   manifest {
     attributes([
         'Specification-Title'   : project.mod_name,
@@ -79,29 +92,22 @@ jar {
   }
 }
 
-// IntelliJ IDEA run configuration
-def serverRunDir = file("$projectDir/run")
+if (hasLocalServer) {
+  def serverRunDir = file("$projectDir/run")
+  if (!serverRunDir.exists()) {
+    serverRunDir.mkdirs()
+  }
 
-// IntelliJ run configuration using Application (not Gradle task)
-idea {
-  project {
-    settings {
-      runConfigurations {
-        'HytaleServer'(org.jetbrains.gradle.ext.Application) {
-          mainClass = 'com.hypixel.hytale.Main'
-          moduleName = rootProject.name + '.main'
+  def patchline = project.findProperty('patchline') ?: 'package/game/latest'
+  def assetsPath = "${hytaleHomePath}/${patchline}/Assets.zip"
 
-          def hytaleHome = project.findProperty('hytaleHome') ?: 'G:/Hytale/install/release'
-          def patchline = project.findProperty('patchline') ?: 'package/game/latest'
-          def assetsPath = "${hytaleHome}/${patchline}/Assets.zip"
-          def modsPath = file("src/main/").absolutePath
-
-          programParameters = "--allow-op --assets=\"${assetsPath}\" --mods=\"${modsPath}\""
-          workingDirectory = serverRunDir.absolutePath
-
-          shortenCommandLine = 'MANIFEST'
-        }
-      }
+  idea.project.settings.runConfigurations {
+    'HytaleServer'(org.jetbrains.gradle.ext.Application) {
+      mainClass = 'com.hypixel.hytale.Main'
+      moduleName = rootProject.name + '.main'
+      programParameters = "--allow-op --disable-sentry --assets=\"${assetsPath}\" --mods=\"${file('src/main/').absolutePath}\""
+      workingDirectory = serverRunDir.absolutePath
+      shortenCommandLine = 'MANIFEST'
     }
   }
 }

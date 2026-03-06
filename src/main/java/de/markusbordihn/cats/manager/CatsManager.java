@@ -88,7 +88,8 @@ public class CatsManager extends RefSystem<EntityStore> {
     UUID entityUuid = getUuid(ref, store);
     if (entityUuid != null) {
       catRefCache.put(entityUuid, ref);
-      CatOwnerComponent ownerComponent = store.getComponent(ref, CatOwnerComponent.getComponentType());
+      CatOwnerComponent ownerComponent =
+          store.getComponent(ref, CatOwnerComponent.getComponentType());
       if (ownerComponent != null) {
         NPCEntity npcEntity = store.getComponent(ref, NPCEntity.getComponentType());
         if (npcEntity != null && ownerComponent.hasOwner()) {
@@ -264,14 +265,16 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
 
     // Read current cat data from components
-    CatOwnerComponent ownerComponent = store.getComponent(catRef, CatOwnerComponent.getComponentType());
+    CatOwnerComponent ownerComponent =
+        store.getComponent(catRef, CatOwnerComponent.getComponentType());
     UUID ownerUuid = ownerComponent != null ? ownerComponent.getOwnerUUID() : null;
     String ownerName = ownerComponent != null ? ownerComponent.getOwnerName() : null;
 
     Nameplate nameplate = store.getComponent(catRef, Nameplate.getComponentType());
     String catName = nameplate != null ? nameplate.getText() : null;
 
-    CatStateComponent stateComponent = store.getComponent(catRef, CatStateComponent.getComponentType());
+    CatStateComponent stateComponent =
+        store.getComponent(catRef, CatStateComponent.getComponentType());
     CatState catState = stateComponent != null ? stateComponent.getState() : CatState.FOLLOWING;
 
     NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
@@ -291,15 +294,16 @@ public class CatsManager extends RefSystem<EntityStore> {
               .withState(catState)
               .withStatus(CatStatus.SPAWNED));
     } else {
-      CatDataEntry newEntry = new CatDataEntry(
-          catUuid,
-          ownerUuid,
-          ownerName,
-          catType,
-          catName,
-          catState,
-          getPosition(catRef, store),
-          CatStatus.SPAWNED);
+      CatDataEntry newEntry =
+          new CatDataEntry(
+              catUuid,
+              ownerUuid,
+              ownerName,
+              catType,
+              catName,
+              catState,
+              getPosition(catRef, store),
+              CatStatus.SPAWNED);
       resource.addCat(newEntry);
     }
   }

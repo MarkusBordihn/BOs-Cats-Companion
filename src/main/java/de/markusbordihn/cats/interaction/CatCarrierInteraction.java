@@ -62,8 +62,7 @@ public class CatCarrierInteraction {
   private static final String META_CAT_NAME = "CatName";
   private static final String FULL_CARRIER_ICON = "Icons/ItemsGenerated/Cat_Carrier_Full.png";
 
-  private CatCarrierInteraction() {
-  }
+  private CatCarrierInteraction() {}
 
   public static boolean handleCapture(
       @Nonnull Ref<EntityStore> entityRef,
@@ -86,7 +85,8 @@ public class CatCarrierInteraction {
       return true;
     }
 
-    CatOwnerComponent ownerComponent = store.getComponent(entityRef, CatOwnerComponent.getComponentType());
+    CatOwnerComponent ownerComponent =
+        store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
       player.sendMessage(
           Message.translation("cats.interactions.carrier.not_tamed")
@@ -124,10 +124,12 @@ public class CatCarrierInteraction {
       String displayNameForMeta = catName != null && !catName.isEmpty() ? catName : "Cat";
       capturedMeta.setNpcNameKey(displayNameForMeta);
 
-      PersistentModel persistentModel = store.getComponent(entityRef, PersistentModel.getComponentType());
+      PersistentModel persistentModel =
+          store.getComponent(entityRef, PersistentModel.getComponentType());
       if (persistentModel != null && persistentModel.getModelReference() != null) {
-        ModelAsset modelAsset = ModelAsset.getAssetMap()
-            .getAsset(persistentModel.getModelReference().getModelAssetId());
+        ModelAsset modelAsset =
+            ModelAsset.getAssetMap()
+                .getAsset(persistentModel.getModelReference().getModelAssetId());
         if (modelAsset != null && modelAsset.getIcon() != null) {
           capturedMeta.setIconPath(modelAsset.getIcon());
         }
@@ -208,7 +210,8 @@ public class CatCarrierInteraction {
 
     Vector3d spawnPos;
     if (targetPos != null) {
-      spawnPos = new Vector3d(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
+      spawnPos =
+          new Vector3d(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
     } else {
       Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
       if (playerRef == null || !playerRef.isValid()) {
@@ -216,7 +219,8 @@ public class CatCarrierInteraction {
             Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
         return true;
       }
-      TransformComponent playerTransform = store.getComponent(playerRef, TransformComponent.getComponentType());
+      TransformComponent playerTransform =
+          store.getComponent(playerRef, TransformComponent.getComponentType());
       if (playerTransform == null) {
         player.sendMessage(
             Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
@@ -280,8 +284,8 @@ public class CatCarrierInteraction {
       }
 
       Vector3f rotation = new Vector3f();
-      Pair<Ref<EntityStore>, NPCEntity> spawnResult = npcPlugin.spawnEntity(store, roleIndex, position, rotation, null,
-          null, null);
+      Pair<Ref<EntityStore>, NPCEntity> spawnResult =
+          npcPlugin.spawnEntity(store, roleIndex, position, rotation, null, null, null);
 
       if (spawnResult == null || spawnResult.left() == null || !spawnResult.left().isValid()) {
         LOGGER.at(Level.WARNING).log(
@@ -298,7 +302,8 @@ public class CatCarrierInteraction {
       }
 
       if (catData.ownerUuid() != null) {
-        CatOwnerComponent ownerComponent = new CatOwnerComponent(catData.ownerUuid(), catData.ownerName());
+        CatOwnerComponent ownerComponent =
+            new CatOwnerComponent(catData.ownerUuid(), catData.ownerName());
         store.putComponent(catRef, CatOwnerComponent.getComponentType(), ownerComponent);
       }
 
