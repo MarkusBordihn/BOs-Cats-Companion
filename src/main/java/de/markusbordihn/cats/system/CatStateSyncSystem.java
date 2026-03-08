@@ -31,8 +31,12 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
+import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.MoodData;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
@@ -70,45 +74,41 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
     try {
       StateSupport stateSupport = npcEntity.getRole().getStateSupport();
       CatState state = stateComponent.getState();
-      switch (state) {
-        case SITTING:
-          stateSupport.setState(entityRef, "Pet", "Sitting", store);
-          LOGGER.at(Level.FINE).log("Synced cat to SITTING substate");
-          break;
-        case SLEEPING:
-          stateSupport.setState(entityRef, "Pet", "Sleeping", store);
-          LOGGER.at(Level.FINE).log("Synced cat to SLEEPING substate");
-          break;
-        case PLAYING:
-          stateSupport.setState(entityRef, "Pet", "Playing", store);
-          LOGGER.at(Level.FINE).log("Synced cat to PLAYING substate");
-          break;
-        case SEARCHING:
-          stateSupport.setState(entityRef, "Pet", "Searching", store);
-          LOGGER.at(Level.FINE).log("Synced cat to SEARCHING substate");
-          break;
-        case WAITING:
-          stateSupport.setState(entityRef, "Pet", "Waiting", store);
-          LOGGER.at(Level.FINE).log("Synced cat to WAITING substate");
-          break;
-        case WANDERING:
-          stateSupport.setState(entityRef, "Pet", "Wandering", store);
-          LOGGER.at(Level.FINE).log("Synced cat to WANDERING substate");
-          break;
-        case FOLLOWING:
-          stateSupport.setState(entityRef, "Pet", "Default", store);
-          LOGGER.at(Level.FINE).log("Synced cat to FOLLOWING (Default) substate");
-          break;
-        case ATTACKING:
-          stateSupport.setState(entityRef, "Pet", "Attacking", store);
-          LOGGER.at(Level.FINE).log("Synced cat to ATTACKING substate");
-          break;
-        default:
-          LOGGER.at(Level.WARNING).log("Unknown cat state: " + state);
-          break;
+      String substate =
+          switch (state) {
+            case SITTING -> "Sitting";
+            case SLEEPING -> "Sleeping";
+            case PLAYING -> "Playing";
+            case SEARCHING -> "Searching";
+            case WAITING -> "Waiting";
+            case WANDERING -> "Wandering";
+            case FOLLOWING -> "Default";
+            case ATTACKING -> "Attacking";
+            default -> null;
+          };
+
+      if (substate != null) {
+        stateSupport.setState(entityRef, "Pet", substate, store);
+        LOGGER.at(Level.FINE).log("Synced cat to %s substate", substate);
+      } else {
+        LOGGER.at(Level.WARNING).log("Unknown cat state: %s", state);
       }
     } catch (Exception e) {
       LOGGER.at(Level.WARNING).log("Failed to sync cat state: " + e.getMessage());
+    }
+
+    CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager != null) {
+      CatDataEntry catData = catsManager.getCatData(entityRef, store);
+      if (catData != null && catData.hasOwner()) {
+        commandBuffer.putComponent(
+            entityRef,
+            CatMoodComponent.getComponentType(),
+            new CatMoodComponent(new MoodData(catData.happiness(), catData.lastMoodUpdate())));
+        if (catData.personalityType() == null) {
+          catsManager.assignPersonality(entityRef, store);
+        }
+      }
     }
   }
 
@@ -117,7 +117,5 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> entityRef,
       @Nonnull RemoveReason removeReason,
       @Nonnull Store<EntityStore> store,
-      @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    // No cleanup needed when entity is removed
-  }
+      @Nonnull CommandBuffer<EntityStore> commandBuffer) {}
 }

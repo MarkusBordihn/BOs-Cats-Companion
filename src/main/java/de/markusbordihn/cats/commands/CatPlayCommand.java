@@ -62,7 +62,7 @@ final class CatPlayCommand extends CatCommand {
         context.sendMessage(
             Message.translation("cats.commands.play.success")
                 .param("name", getCatDisplayName(entityRef, store))
-                .color("#FF69B4"));
+                .color(Constants.COLOR_PINK));
       } else {
         context.sendMessage(
             Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));

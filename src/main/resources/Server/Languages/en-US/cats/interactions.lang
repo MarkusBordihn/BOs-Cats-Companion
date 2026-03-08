@@ -27,12 +27,19 @@ carrier.release_failed=Failed to release the cat from the carrier.
 carrier.error=An error occurred with the cat carrier.
 carrier.empty=The carrier is empty. Use it on your tamed cat to pick it up.
 
+# Play Interactions
+play.cooldown=Your cat is tired from playing and needs a break.
+
 # Owner Interactions
 owner.petting.cooldown=Your cat doesn't want to be petted right now.
+owner.gift={name} brought you a little gift: {gift}!
 
 # Feeding
 feeding.healed=Your cat has been healed! (+{amount} HP, now {health}/{maxHealth})
 feeding.full_health=Your cat is already at full health!
+feeding.treat.healed=Your cat happily munches the treat! (+{amount} HP, now {health}/{maxHealth})
+feeding.treat.full_health=Your cat is already full but the treat smells irresistible, purr!
+feeding.treat.cooldown=Your cat is still full from the last treat, try again in a moment.
 
 # Hints
 hint.tame=Press [{key}] to tame

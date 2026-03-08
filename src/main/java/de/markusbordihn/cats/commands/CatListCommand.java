@@ -60,7 +60,8 @@ final class CatListCommand extends CatCommand {
     String limitText = limit == -1 ? "unlimited" : String.valueOf(limit);
 
     if (playerCats.isEmpty()) {
-      context.sendMessage(Message.raw("=== Your Cats (0/" + limitText + ") ===").color("#FFD700"));
+      context.sendMessage(
+          Message.raw("=== Your Cats (0/" + limitText + ") ===").color(Constants.COLOR_GOLD));
       context.sendMessage(Message.raw("You don't have any cats yet.").color(Constants.COLOR_GRAY));
       context.sendMessage(
           Message.raw("Tip: Tame a wild cat by giving it raw fish!").color(Constants.COLOR_INFO));
@@ -68,7 +69,8 @@ final class CatListCommand extends CatCommand {
     }
 
     context.sendMessage(
-        Message.raw("=== Your Cats (" + currentCount + "/" + limitText + ") ===").color("#FFD700"));
+        Message.raw("=== Your Cats (" + currentCount + "/" + limitText + ") ===")
+            .color(Constants.COLOR_GOLD));
 
     int index = 1;
     for (CatDataEntry catData : playerCats) {
@@ -87,7 +89,7 @@ final class CatListCommand extends CatCommand {
               : "(no position)";
       context.sendMessage(
           Message.raw(index + ". " + catName + " " + statusIndicator + " " + positionStr)
-              .color("#00FFFF"));
+              .color(Constants.COLOR_CYAN));
       context.sendMessage(
           Message.raw("   Type: " + catData.catType() + " | State: " + catData.state())
               .color(Constants.COLOR_GRAY));

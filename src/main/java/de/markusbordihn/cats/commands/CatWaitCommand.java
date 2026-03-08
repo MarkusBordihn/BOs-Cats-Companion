@@ -62,7 +62,7 @@ final class CatWaitCommand extends CatCommand {
         context.sendMessage(
             Message.translation("cats.commands.wait.success")
                 .param("name", getCatDisplayName(entityRef, store))
-                .color("#87CEEB"));
+                .color(Constants.COLOR_SKY_BLUE));
       } else {
         context.sendMessage(
             Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));

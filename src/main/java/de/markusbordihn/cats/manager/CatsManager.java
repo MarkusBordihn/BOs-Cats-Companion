@@ -38,12 +38,18 @@ import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.CatStatus;
 import de.markusbordihn.cats.data.CatType;
+import de.markusbordihn.cats.data.GiftType;
+import de.markusbordihn.cats.data.HappinessLevel;
+import de.markusbordihn.cats.data.HappinessSource;
+import de.markusbordihn.cats.data.MoodData;
+import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,11 +58,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CatsManager extends RefSystem<EntityStore> {
+
+  public static final long MOOD_DECAY_INTERVAL_MS = 10 * 60 * 1000L;
+  public static final int MOOD_DECAY_AMOUNT = 1;
+  public static final long GIFT_COOLDOWN_MS = 30 * 60 * 1000L;
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static CatsManager instance;
@@ -264,7 +275,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       return;
     }
 
-    // Read current cat data from components
     CatOwnerComponent ownerComponent =
         store.getComponent(catRef, CatOwnerComponent.getComponentType());
     UUID ownerUuid = ownerComponent != null ? ownerComponent.getOwnerUUID() : null;
@@ -283,7 +293,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       catType = CatType.fromRoleName(npcEntity.getRole().getRoleName());
     }
 
-    // Create or update entry in CatsDataResource
     CatDataEntry existingEntry = resource.getCat(catUuid);
     if (existingEntry != null) {
       resource.updateCat(
@@ -340,8 +349,8 @@ public class CatsManager extends RefSystem<EntityStore> {
       }
     }
 
-    // Register/update cat in CatsDataResource with current state
     registerCat(catRef, store);
+    assignPersonality(catRef, store);
   }
 
   public void updateCatName(
@@ -478,5 +487,196 @@ public class CatsManager extends RefSystem<EntityStore> {
 
     EntityStatValue healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
     return healthStat != null && healthStat.get() > 0;
+  }
+
+  public void assignPersonality(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return;
+    }
+
+    CatDataEntry catData = resource.getCat(catUuid);
+    if (catData == null || catData.personalityType() != null) {
+      return;
+    }
+
+    PersonalityType primary = PersonalityType.random();
+    PersonalityType secondary;
+    do {
+      secondary = PersonalityType.random();
+    } while (secondary == primary);
+
+    resource.updateCat(
+        catUuid, catData.withPersonalityType(primary).withSecondaryPersonality(secondary));
+    LOGGER.at(Level.INFO).log("Assigned personality %s/%s to cat %s", primary, secondary, catUuid);
+  }
+
+  @Nullable
+  public PersonalityType getPersonality(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    CatDataEntry catData = getCatData(catRef, store);
+    return catData != null ? catData.personalityType() : null;
+  }
+
+  public void adjustHappiness(
+      @Nonnull Ref<EntityStore> catRef, int delta, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return;
+    }
+
+    CatDataEntry catData = resource.getCat(catUuid);
+    if (catData == null) {
+      return;
+    }
+
+    int newHappiness =
+        Math.clamp(catData.happiness() + delta, MoodData.MIN_HAPPINESS, MoodData.MAX_HAPPINESS);
+    long now = System.currentTimeMillis();
+    resource.updateCat(catUuid, catData.withHappiness(newHappiness).withLastMoodUpdate(now));
+
+    CatMoodComponent moodComponent =
+        store.getComponent(catRef, CatMoodComponent.getComponentType());
+    if (moodComponent != null) {
+      moodComponent.setData(new MoodData(newHappiness, now));
+    } else {
+      store.putComponent(
+          catRef, CatMoodComponent.getComponentType(), new CatMoodComponent(newHappiness));
+    }
+  }
+
+  public int boostHappiness(
+      @Nonnull Ref<EntityStore> catRef,
+      @Nonnull HappinessSource source,
+      @Nonnull Store<EntityStore> store) {
+    CatDataEntry catData = getCatData(catRef, store);
+    PersonalityType personality = catData != null ? catData.personalityType() : null;
+    int delta = source.calculateDelta(personality);
+    adjustHappiness(catRef, delta, store);
+    return delta;
+  }
+
+  public int getHappiness(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return MoodData.DEFAULT_HAPPINESS;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return MoodData.DEFAULT_HAPPINESS;
+    }
+
+    CatDataEntry catData = resource.getCat(catUuid);
+    if (catData == null) {
+      return MoodData.DEFAULT_HAPPINESS;
+    }
+
+    // Sleeping cats don't lose happiness
+    CatState currentState = catData.state();
+    if (currentState == CatState.SLEEPING || currentState == CatState.GOING_TO_BED) {
+      return catData.happiness();
+    }
+
+    // Don't apply decay while the owner is offline
+    if (catData.ownerUuid() != null) {
+      Ref<EntityStore> ownerRef = store.getExternalData().getRefFromUUID(catData.ownerUuid());
+      if (ownerRef == null || !ownerRef.isValid()) {
+        return catData.happiness();
+      }
+    }
+
+    // Apply lazy time-based decay
+    long now = System.currentTimeMillis();
+    long lastUpdate = catData.lastMoodUpdate();
+    if (lastUpdate > 0 && now > lastUpdate) {
+      long elapsed = now - lastUpdate;
+      int decayTicks = (int) (elapsed / MOOD_DECAY_INTERVAL_MS);
+      if (decayTicks > 0) {
+        int decayed =
+            Math.max(
+                MoodData.MIN_HAPPINESS, catData.happiness() - (decayTicks * MOOD_DECAY_AMOUNT));
+        resource.updateCat(catUuid, catData.withHappiness(decayed).withLastMoodUpdate(now));
+        return decayed;
+      }
+    }
+
+    return catData.happiness();
+  }
+
+  @Nonnull
+  public HappinessLevel getHappinessLevel(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    return HappinessLevel.fromValue(getHappiness(catRef, store));
+  }
+
+  public boolean shouldIgnoreCommand(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    int happiness = getHappiness(catRef, store);
+    HappinessLevel level = HappinessLevel.fromValue(happiness);
+    if (level == HappinessLevel.MISERABLE) {
+      return ThreadLocalRandom.current().nextFloat() < 0.3f;
+    }
+    if (level == HappinessLevel.SAD) {
+      return ThreadLocalRandom.current().nextFloat() < 0.1f;
+    }
+    return false;
+  }
+
+  @Nullable
+  public GiftType tryGiveGift(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return null;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return null;
+    }
+
+    CatDataEntry catData = resource.getCat(catUuid);
+    if (catData == null || !catData.hasOwner()) {
+      return null;
+    }
+
+    long now = System.currentTimeMillis();
+    if (catData.lastGiftTime() > 0 && (now - catData.lastGiftTime()) < GIFT_COOLDOWN_MS) {
+      return null;
+    }
+
+    HappinessLevel level = HappinessLevel.fromValue(catData.happiness());
+    float giftChance =
+        switch (level) {
+          case ECSTATIC -> 0.25f;
+          case HAPPY -> 0.20f;
+          case NEUTRAL -> 0.15f;
+          case SAD -> 0.05f;
+          case MISERABLE -> 0.0f;
+        };
+
+    if (ThreadLocalRandom.current().nextFloat() >= giftChance) {
+      return null;
+    }
+
+    GiftType gift = GiftType.randomForPersonality(catData.personalityType());
+    resource.updateCat(
+        catUuid, catData.withLastGiftTime(now).withTotalGifts(catData.totalGifts() + 1));
+
+    LOGGER.at(Level.FINE).log(
+        "Cat %s brought gift %s (total: %d)", catUuid, gift, catData.totalGifts() + 1);
+
+    return gift;
   }
 }

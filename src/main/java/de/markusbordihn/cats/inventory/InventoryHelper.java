@@ -46,4 +46,26 @@ public class InventoryHelper {
     LOGGER.at(Level.FINE).log(
         "Consumed 1x %s from player inventory at slot %d", itemName, activeSlot);
   }
+
+  public static boolean giveItem(Player player, String itemId) {
+    if (player == null || itemId == null || itemId.isEmpty()) {
+      return false;
+    }
+
+    Inventory inventory = player.getInventory();
+    if (inventory == null) {
+      LOGGER.at(Level.WARNING).log("Cannot give item: player inventory is null");
+      return false;
+    }
+
+    ItemStack giftStack = new ItemStack(itemId);
+    if (!giftStack.isValid()) {
+      LOGGER.at(Level.WARNING).log("Cannot give item: invalid item ID %s", itemId);
+      return false;
+    }
+
+    inventory.getHotbar().addItemStack(giftStack);
+    LOGGER.at(Level.FINE).log("Gave 1x %s to player", itemId);
+    return true;
+  }
 }

@@ -17,31 +17,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.commands;
+package de.markusbordihn.cats.data;
 
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 
-public final class CatCommands extends AbstractCommandCollection {
-  public CatCommands() {
-    super("cat", "Cat management commands");
-    this.addAliases("cats");
+public enum HappinessLevel {
+  MISERABLE(0, 19),
+  SAD(20, 39),
+  NEUTRAL(40, 59),
+  HAPPY(60, 79),
+  ECSTATIC(80, 100);
 
-    this.addSubCommand(new CatPounceCommand());
-    this.addSubCommand(new CatBedCommand());
-    this.addSubCommand(new CatDespawnCommand());
-    this.addSubCommand(new CatFollowCommand());
-    this.addSubCommand(new CatInfoCommand());
-    this.addSubCommand(new CatListCommand());
-    this.addSubCommand(new CatNameCommand());
-    this.addSubCommand(new CatOwnerCommand());
-    this.addSubCommand(new CatPlayCommand());
-    this.addSubCommand(new CatReloadCommand());
-    this.addSubCommand(new CatReleaseCommand());
-    this.addSubCommand(new CatSearchCommand());
-    this.addSubCommand(new CatSitCommand());
-    this.addSubCommand(new CatSleepCommand());
-    this.addSubCommand(new CatSpawnCommand());
-    this.addSubCommand(new CatWaitCommand());
-    this.addSubCommand(new CatWanderCommand());
+  public static final EnumCodec<HappinessLevel> CODEC = new EnumCodec<>(HappinessLevel.class);
+  private static final HappinessLevel[] LEVELS = values();
+  private final int minValue;
+  private final int maxValue;
+
+  HappinessLevel(int minValue, int maxValue) {
+    this.minValue = minValue;
+    this.maxValue = maxValue;
+  }
+
+  public static HappinessLevel fromValue(int happiness) {
+    if (happiness < 0) {
+      return MISERABLE;
+    }
+    int index = Math.min(happiness / 20, LEVELS.length - 1);
+    return LEVELS[index];
+  }
+
+  public int getMinValue() {
+    return minValue;
+  }
+
+  public int getMaxValue() {
+    return maxValue;
   }
 }

@@ -62,7 +62,7 @@ final class CatSearchCommand extends CatCommand {
         context.sendMessage(
             Message.translation("cats.commands.search.success")
                 .param("name", getCatDisplayName(entityRef, store))
-                .color("#FFA500"));
+                .color(Constants.COLOR_ORANGE));
       } else {
         context.sendMessage(
             Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));

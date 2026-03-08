@@ -7,6 +7,24 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.4.0
+
+- Fixed black lines in water caused by incorrect `Transparent` opacity on Cat Bed and Cat Yarn
+  Ball block definitions.
+- Removed `/cat attack` command (replaced by `/cat pounce`).
+- Added personality system: each tamed cat receives a primary and secondary personality type
+  (`LAZY`, `PLAYFUL`, `SHY`, `BRAVE`, `CURIOUS`, `CUDDLY`, `INDEPENDENT`, `MISCHIEVOUS`)
+  that influences happiness gain from petting, playing, and feeding.
+- Added happiness/mood system: cats have a persistent happiness value (0–100) across five levels
+  (`MISERABLE` → `ECSTATIC`) with slow decay while the owner is online and active.
+- Added Cat Treats item (1× Raw Fish + 1× Fibre at Farming Bench) for a bigger happiness boost.
+- Added gift system: happy cats may bring the owner a personality-fitting gift when petted
+  (30-minute cooldown).
+- Added `/cat pounce [target]` command to send a nearby cat to pounce at a target (15-block range).
+- Improved `/cat info` to display happiness level, personality types, and total gifts given.
+- Extended `CatDataEntry` with new persistent fields for personality, happiness, mood timestamps,
+  and gift tracking.
+
 ### 2.3.1
 
 - Fixed missing pixels in cat textures.

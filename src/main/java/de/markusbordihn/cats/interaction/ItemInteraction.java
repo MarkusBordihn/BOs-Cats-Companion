@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
+import de.markusbordihn.cats.Constants;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -80,7 +81,8 @@ public class ItemInteraction {
     role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
 
     if (player != null) {
-      player.sendMessage(Message.translation("cats.interactions.wild.reject").color("#FF6666"));
+      player.sendMessage(
+          Message.translation("cats.interactions.wild.reject").color(Constants.COLOR_RED_SOFT));
     }
   }
 }

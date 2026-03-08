@@ -28,6 +28,12 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.util.Alarm;
+import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.data.GiftType;
+import de.markusbordihn.cats.data.HappinessLevel;
+import de.markusbordihn.cats.data.HappinessSource;
+import de.markusbordihn.cats.inventory.InventoryHelper;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.time.Duration;
 
 public class InteractionOwner {
@@ -38,33 +44,52 @@ public class InteractionOwner {
   public static boolean handle(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
 
-    // Get the NPC entity to access alarm store
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity == null) {
       return false;
     }
 
-    // Get or create the petting cooldown alarm
     Alarm petAlarm = npcEntity.getAlarmStore().get(npcEntity, PET_COOLDOWN_ALARM);
-
-    // Get current world time for alarm check
     WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
 
-    // Check if petting cooldown is active (alarm is set and has not passed)
     if (petAlarm.isSet() && !petAlarm.hasPassed(worldTimeResource.getGameTime())) {
-      // Send message to player that cat doesn't want petting right now
       player.sendMessage(
-          Message.translation("cats.interactions.owner.petting.cooldown").color("#AAAAAA"));
-      return true; // Interaction handled, prevent further processing
+          Message.translation("cats.interactions.owner.petting.cooldown")
+              .color(Constants.COLOR_LIGHT_GRAY));
+      return true;
     }
 
     InteractionLogger.logInteraction(
         "OWNER: Petting Interaction", entityRef, role, store, player, null);
 
-    // Trigger Petting animation state (purring, happy animation)
-    role.getStateSupport().setState(entityRef, "Petting", "Default", store);
+    CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager != null) {
+      catsManager.boostHappiness(entityRef, HappinessSource.PETTING, store);
 
-    // Set petting cooldown alarm (current time + cooldown duration)
+      GiftType gift = catsManager.tryGiveGift(entityRef, store);
+      if (gift != null) {
+        HappinessLevel happinessLevel = catsManager.getHappinessLevel(entityRef, store);
+        String itemId = gift.getItemId(happinessLevel);
+        String catName = catsManager.getCatDisplayName(entityRef, store);
+
+        if (itemId != null) {
+          InventoryHelper.giveItem(player, itemId);
+        }
+
+        player.sendMessage(
+            Message.translation("cats.interactions.owner.gift")
+                .param("name", catName)
+                .param(
+                    "gift", itemId != null ? itemId : gift.name().toLowerCase().replace('_', ' '))
+                .color(Constants.COLOR_GOLD));
+
+        role.getStateSupport().setState(entityRef, "Pet", "Happy", store);
+        petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);
+        return false;
+      }
+    }
+
+    role.getStateSupport().setState(entityRef, "Petting", "Default", store);
     petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);
 
     return false;

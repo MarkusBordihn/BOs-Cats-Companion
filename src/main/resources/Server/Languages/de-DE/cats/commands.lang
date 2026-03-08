@@ -1,9 +1,9 @@
 # Cat Commands
-attack.success={name} greift nun {target} an!
-attack.no_target=Kein Ziel gefunden. Schaue das Ziel an oder gib eine Entity-ID an
-attack.invalid_target=Ungültiges Ziel
-attack.no_cats_nearby=Du hast keine Katzen in der Nähe des Ziels (max. 15 Blöcke)
-attack.no_available_cats=Keine verfügbaren Katzen zum Angreifen gefunden
+pounce.success={name} stürzt sich verspielt auf {target}!
+pounce.no_target=Kein Ziel gefunden. Schaue das Ziel an oder gib eine Entity-ID an
+pounce.invalid_target=Ungültiges Ziel
+pounce.no_cats_nearby=Du hast keine Katzen in der Nähe des Ziels (max. 15 Blöcke)
+pounce.no_available_cats=Keine verfügbaren Katzen zum Anspringen gefunden
 bed.going_to_bed={name} läuft zu einem gemütlichen Bett {distance} Blöcke entfernt bei ({x}, {y}, {z})
 bed.no_beds_found=Keine Katzenbetten innerhalb von {radius} Blöcken für {name} bei Position ({x}, {y}, {z}) gefunden
 bed.all_beds_occupied=Alle {count} Katzenbett(en) in der Nähe sind belegt! {name} muss auf einen freien Platz warten
@@ -25,6 +25,11 @@ spawn.no_despawned=Du hast keine despawnten Katzen zum Spawnen
 spawn.no_match=Keine despawnten Katzen gefunden die '{filter}' entsprechen
 despawn.success=✓ {name} wurde despawnt!
 despawn.info=Nutze /cat spawn um deine Katze zurückzuholen
+
+# Release Command
+release.success=✓ {name} wurde wieder in die Wildnis entlassen!
+release.info=Die Katze wird nun frei umherwandern und kann von jedem Spieler gezähmt werden
+release.already_wild=Diese Katze ist bereits wild!
 
 # Error Messages
 error.no_cat=Keine Katze in Sicht, schau eine Katze an um diesen Befehl zu nutzen

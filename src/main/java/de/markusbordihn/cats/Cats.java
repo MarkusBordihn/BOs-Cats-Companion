@@ -50,6 +50,7 @@ import de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed;
 import de.markusbordihn.cats.commands.CatCommands;
 import de.markusbordihn.cats.compat.LuckPermsCompat;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
+import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
@@ -88,6 +89,7 @@ public class Cats extends JavaPlugin {
   public ComponentType<EntityStore, CatStateComponent> catStateComponentType;
   public ComponentType<EntityStore, CatBedTargetComponent> catBedTargetComponentType;
   public ComponentType<EntityStore, CatTamingProgressComponent> catTamingProgressComponentType;
+  public ComponentType<EntityStore, CatMoodComponent> catMoodComponentType;
   public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
@@ -138,7 +140,6 @@ public class Cats extends JavaPlugin {
 
     LOGGER.at(Level.INFO).log("Registered %d cat interaction actions", registeredCount);
 
-    // Register additional standalone actions
     try {
       actionFactory.add(
           BuilderActionCatSetSleepingState.BUILDER_ID, BuilderActionCatSetSleepingState::new);
@@ -209,7 +210,6 @@ public class Cats extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Author: %s", getManifest().getAuthors());
     LOGGER.at(Level.INFO).log("Description: %s", getManifest().getDescription());
 
-    // Register components
     LOGGER.at(Level.INFO).log("Registering cat components...");
     catOwnerComponentType =
         getEntityStoreRegistry()
@@ -230,23 +230,22 @@ public class Cats extends JavaPlugin {
     catTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatTargetComponent.class, "CatTarget", CatTargetComponent.CODEC);
+    catMoodComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(CatMoodComponent.class, "CatMood", CatMoodComponent.CODEC);
 
-    // Register resources
     LOGGER.at(Level.INFO).log("Registering cat resources...");
     catsDataResourceType =
         getEntityStoreRegistry()
             .registerResource(CatsDataResource.class, "CatsData", CatsDataResource.CODEC);
 
-    // Register systems
     LOGGER.at(Level.INFO).log("Registering cat systems...");
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
 
-    // Register cats manager (handles ownership tracking and data persistence)
     LOGGER.at(Level.INFO).log("Registering cats manager...");
     getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
 
-    // Register damage filter system for tamed cat protection (deferred until DamageModule is ready)
     LOGGER.at(Level.INFO).log("Registering cat damage filter system...");
     DamageModule damageModule = DamageModule.get();
     if (damageModule != null && damageModule.getFilterDamageGroup() != null) {
@@ -282,7 +281,6 @@ public class Cats extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Initializing cat names manager...");
     CatsNamesManager.initialize();
 
-    // Try to register custom actions and sensors early (for client and server worlds)
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin ...");
       registerCatInteractionActions(npcPlugin);
@@ -303,11 +301,9 @@ public class Cats extends JavaPlugin {
           "Event registry is not available, cannot register NPC Plugin setup listener");
     }
 
-    // Register commands
     LOGGER.at(Level.INFO).log("Registering commands...");
     this.getCommandRegistry().registerCommand(new CatCommands());
 
-    // Register spawn config event listener
     LOGGER.at(Level.INFO).log("Registering spawn config system...");
     if (getEventRegistry() != null) {
       getEventRegistry()
@@ -320,7 +316,6 @@ public class Cats extends JavaPlugin {
           "Event registry not available, spawn config modifications will not be applied");
     }
 
-    // Register carrier release event listener
     LOGGER.at(Level.INFO).log("Registering cat carrier interaction listener...");
     if (getEventRegistry() != null) {
       getEventRegistry()
@@ -354,7 +349,6 @@ public class Cats extends JavaPlugin {
     Player player = event.getPlayer();
     com.hypixel.hytale.component.Store<EntityStore> store = event.getPlayerRef().getStore();
 
-    // Use target block coordinates for spawn position if available
     Vector3d targetPos = null;
     Vector3i targetBlock = event.getTargetBlock();
     if (targetBlock != null) {

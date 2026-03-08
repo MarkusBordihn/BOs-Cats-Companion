@@ -8,7 +8,6 @@
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Model",
-    "Opacity": "Transparent",
     "CustomModel": "Blocks/Cats/Cat_Yarn_Ball.blockymodel",
     "CustomModelTexture": [
       {

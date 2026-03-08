@@ -23,6 +23,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
@@ -73,10 +74,7 @@ public class InteractionLogger {
     if (ownerComponent != null && ownerComponent.hasOwner()) {
       LOGGER.at(Level.FINE).log("Owner: %s", ownerComponent.getOwnerName());
 
-      com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
-          store.getComponent(
-              entityRef,
-              com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
+      Nameplate nameplate = store.getComponent(entityRef, Nameplate.getComponentType());
       String catName = nameplate != null ? nameplate.getText() : null;
       LOGGER.at(Level.FINE).log("Cat Name: %s", catName);
     } else {

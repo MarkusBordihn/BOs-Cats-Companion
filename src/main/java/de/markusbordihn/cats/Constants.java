@@ -29,11 +29,22 @@ public final class Constants {
   public static final String COLOR_WARNING = "#FFAA00";
   public static final String COLOR_INFO = "#FFFF00";
   public static final String COLOR_GRAY = "#808080";
+  public static final String COLOR_LIGHT_GRAY = "#AAAAAA";
+  public static final String COLOR_GOLD = "#FFD700";
+  public static final String COLOR_ORANGE = "#FFA500";
+  public static final String COLOR_PINK = "#FF69B4";
+  public static final String COLOR_PURPLE = "#9370DB";
+  public static final String COLOR_LAVENDER = "#E091FF";
+  public static final String COLOR_SKY_BLUE = "#87CEEB";
+  public static final String COLOR_SOFT_ORANGE = "#FFAA66";
+  public static final String COLOR_RED_SOFT = "#FF6666";
+  public static final String COLOR_CYAN = "#00FFFF";
 
   public static final int DEFAULT_CAT_LIMIT = 16;
 
   public static final String CAT_CARRIER_ITEM = "Cat_Carrier";
   public static final String CAT_YARN_BALL_ITEM = "Cat_Yarn_Ball";
+  public static final String CAT_TREATS_ITEM = "Cat_Treats";
 
   private Constants() {}
 }

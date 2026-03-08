@@ -21,13 +21,13 @@ package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -35,7 +35,6 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 
 final class CatReleaseCommand extends CatCommand {
-  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private final EntityWrappedArg entityArg;
 
   public CatReleaseCommand() {
@@ -48,7 +47,8 @@ final class CatReleaseCommand extends CatCommand {
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
     Optional<Ref<EntityStore>> entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityRefOpt.isEmpty()) {
-      context.sendMessage(Message.translation("cats.commands.error.no_cat").color("#FF0000"));
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -63,7 +63,8 @@ final class CatReleaseCommand extends CatCommand {
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
-      context.sendMessage(Message.raw("This cat is already wild!").color("#FFAA00"));
+      context.sendMessage(
+          Message.translation("cats.commands.release.already_wild").color(Constants.COLOR_WARNING));
       return;
     }
 
@@ -77,9 +78,10 @@ final class CatReleaseCommand extends CatCommand {
     }
 
     context.sendMessage(
-        Message.raw("✓ " + catName + " has been released back to the wild!").color("#00FF00"));
+        Message.translation("cats.commands.release.success")
+            .param("name", catName)
+            .color(Constants.COLOR_SUCCESS));
     context.sendMessage(
-        Message.raw("The cat will now wander freely and can be tamed by any player.")
-            .color("#FFFF00"));
+        Message.translation("cats.commands.release.info").color(Constants.COLOR_INFO));
   }
 }

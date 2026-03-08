@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,7 +77,7 @@ final class CatInfoCommand extends CatCommand {
     boolean isOwner = playerUuid != null && playerUuid.equals(catData.ownerUuid());
 
     if (catData.name() != null && !catData.name().isEmpty()) {
-      context.sendMessage(Message.raw("Name: " + catData.name()).color("#FFD700"));
+      context.sendMessage(Message.raw("Name: " + catData.name()).color(Constants.COLOR_GOLD));
     } else {
       context.sendMessage(Message.raw("Name: (unnamed)").color(Constants.COLOR_GRAY));
     }
@@ -95,17 +96,44 @@ final class CatInfoCommand extends CatCommand {
     if (isOwner) {
       String stateColor =
           switch (catData.state()) {
-            case SITTING -> "#FFA500";
-            case SLEEPING -> "#9370DB";
+            case SITTING -> Constants.COLOR_ORANGE;
+            case SLEEPING -> Constants.COLOR_PURPLE;
             case FOLLOWING -> Constants.COLOR_SUCCESS;
-            case PLAYING -> "#FF69B4";
-            case SEARCHING -> "#FFD700";
-            case WAITING -> "#87CEEB";
+            case PLAYING -> Constants.COLOR_PINK;
+            case SEARCHING -> Constants.COLOR_GOLD;
+            case WAITING -> Constants.COLOR_SKY_BLUE;
             default -> Constants.COLOR_INFO;
           };
       context.sendMessage(Message.raw("State: " + catData.state()).color(stateColor));
       context.sendMessage(
           Message.raw("Spawn Status: " + catData.status()).color(Constants.COLOR_GRAY));
+
+      if (catData.personalityType() != null) {
+        String personalityText = catData.personalityType().name();
+        if (catData.secondaryPersonality() != null) {
+          personalityText += " / " + catData.secondaryPersonality().name();
+        }
+        context.sendMessage(
+            Message.raw("Personality: " + personalityText).color(Constants.COLOR_LAVENDER));
+      }
+
+      HappinessLevel happinessLevel = HappinessLevel.fromValue(catData.happiness());
+      String moodColor =
+          switch (happinessLevel) {
+            case ECSTATIC -> Constants.COLOR_GOLD;
+            case HAPPY -> Constants.COLOR_SUCCESS;
+            case NEUTRAL -> Constants.COLOR_INFO;
+            case SAD -> Constants.COLOR_ORANGE;
+            case MISERABLE -> Constants.COLOR_ERROR;
+          };
+      context.sendMessage(
+          Message.raw("Mood: " + happinessLevel.name() + " (" + catData.happiness() + "/100)")
+              .color(moodColor));
+
+      if (catData.totalGifts() > 0) {
+        context.sendMessage(
+            Message.raw("Gifts Given: " + catData.totalGifts()).color(Constants.COLOR_GOLD));
+      }
 
       if (catData.position() != null) {
         String position =

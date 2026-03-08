@@ -1,7 +1,7 @@
 {
     "Group": "MarkusBordihn",
     "Name": "Cats",
-    "Version": "2.3.1",
+    "Version": "2.4.0",
     "Description": "Adds new cat breeds to bringing more variety, personality, and cuteness to your worlds.",
     "Authors": [
         {
@@ -12,7 +12,7 @@
     "Main": "de.markusbordihn.cats.Cats",
     "ServerVersion": "2026.02.19-1a311a592",
     "Dependencies": {
-        
+        "Hytale:NPC": "*"
     },
     "OptionalDependencies": {
         

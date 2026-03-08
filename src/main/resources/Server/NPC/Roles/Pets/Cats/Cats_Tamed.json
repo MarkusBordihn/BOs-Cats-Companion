@@ -38,14 +38,14 @@
     "Melee_Damage": {
       "Interactions": [
         {
-          "$Comment": "Cat melee attack damage configuration",
+          "$Comment": "Pounce deals no damage - playful animation only",
           "Parent": "NPC_Attack_Melee_Damage",
           "DamageCalculator": {
             "Type": "Absolute",
             "BaseDamage": {
-              "Physical": 5
+              "Physical": 0
             },
-            "RandomPercentageModifier": 0.1
+            "RandomPercentageModifier": 0
           }
         }
       ]
@@ -818,6 +818,56 @@
               }
             },
             {
+              "$Comment": "Happy behavior - cat received a gift, plays excited animation",
+              "Sensor": {
+                "Type": "State",
+                "State": ".Happy"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Alerted",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "PlaySound",
+                  "SoundEventId": "SFX_Fox_Run"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.8, 0],
+                  "ParticleSystem": "Hearts_Subtle"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.6, 0],
+                  "ParticleSystem": "Hearts_Subtle"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [3, 3],
+                  "Action": {
+                    "Type": "Sequence",
+                    "Actions": [
+                      {
+                        "Type": "PlayAnimation",
+                        "Animation": "Idle",
+                        "Slot": "Action"
+                      },
+                      {
+                        "Type": "State",
+                        "State": ".Default"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
               "$Comment": "State setter declarations for validation - never executed",
               "Sensor": {
                 "Type": "Flag",
@@ -838,6 +888,7 @@
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
                 {"Type": "State", "State": ".Dying"},
+                {"Type": "State", "State": ".Happy"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "Petting"},
                 {"Type": "State", "State": "PlayingWithYarnBall"},
@@ -1108,7 +1159,8 @@
         "Fish_Trout_Rainbow_Item",
         "Fish_Pike_Item",
         "Fish_Bluegill_Item",
-        "Fish_Minnow_Item"
+        "Fish_Minnow_Item",
+        "Cat_Treats"
       ],
       "Description": "Items that attract cats and make them follow players"
     },

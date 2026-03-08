@@ -22,10 +22,20 @@ package de.markusbordihn.cats.interaction;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.util.Alarm;
+import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.HappinessSource;
+import de.markusbordihn.cats.manager.CatsManager;
+import java.time.Duration;
 
 public class InteractionPlayingWithYarnBall {
+
+  private static final String PLAY_BOOST_ALARM = "PlayBoostCooldown";
+  private static final long BASE_COOLDOWN_MINUTES = 3;
 
   public static boolean handle(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
@@ -33,6 +43,34 @@ public class InteractionPlayingWithYarnBall {
         "PLAYING WITH YARN BALL", entityRef, role, store, player, "Cat_Yarn_Ball");
 
     role.getStateSupport().setState(entityRef, "PlayingWithYarnBall", "Default", store);
+
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+    if (npcEntity == null) {
+      return false;
+    }
+
+    Alarm boostAlarm = npcEntity.getAlarmStore().get(npcEntity, PLAY_BOOST_ALARM);
+    WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
+
+    if (boostAlarm.isSet() && !boostAlarm.hasPassed(worldTimeResource.getGameTime())) {
+      return false;
+    }
+
+    CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager != null) {
+      CatDataEntry catData = catsManager.getCatData(entityRef, store);
+      long cooldownMinutes = BASE_COOLDOWN_MINUTES;
+      if (catData != null && catData.personalityType() != null) {
+        cooldownMinutes =
+            Math.max(
+                1, (long) (BASE_COOLDOWN_MINUTES / catData.personalityType().getPlayModifier()));
+      }
+      catsManager.boostHappiness(entityRef, HappinessSource.PLAYING, store);
+      boostAlarm.set(
+          entityRef,
+          worldTimeResource.getGameTime().plus(Duration.ofMinutes(cooldownMinutes)),
+          store);
+    }
 
     return false;
   }

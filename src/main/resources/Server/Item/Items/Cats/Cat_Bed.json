@@ -40,7 +40,6 @@
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Model",
-    "Opacity": "Transparent",
     "CustomModel": "Blocks/Cats/Cat_Bed.blockymodel",
     "CustomModelTexture": [
       {

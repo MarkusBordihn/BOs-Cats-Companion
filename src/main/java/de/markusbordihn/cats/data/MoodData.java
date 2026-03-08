@@ -17,31 +17,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.commands;
+package de.markusbordihn.cats.data;
 
-import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+import javax.annotation.Nonnull;
 
-public final class CatCommands extends AbstractCommandCollection {
-  public CatCommands() {
-    super("cat", "Cat management commands");
-    this.addAliases("cats");
+public record MoodData(int happiness, long lastMoodUpdate) {
 
-    this.addSubCommand(new CatPounceCommand());
-    this.addSubCommand(new CatBedCommand());
-    this.addSubCommand(new CatDespawnCommand());
-    this.addSubCommand(new CatFollowCommand());
-    this.addSubCommand(new CatInfoCommand());
-    this.addSubCommand(new CatListCommand());
-    this.addSubCommand(new CatNameCommand());
-    this.addSubCommand(new CatOwnerCommand());
-    this.addSubCommand(new CatPlayCommand());
-    this.addSubCommand(new CatReloadCommand());
-    this.addSubCommand(new CatReleaseCommand());
-    this.addSubCommand(new CatSearchCommand());
-    this.addSubCommand(new CatSitCommand());
-    this.addSubCommand(new CatSleepCommand());
-    this.addSubCommand(new CatSpawnCommand());
-    this.addSubCommand(new CatWaitCommand());
-    this.addSubCommand(new CatWanderCommand());
+  public static final int DEFAULT_HAPPINESS = 50;
+  public static final int MIN_HAPPINESS = 0;
+  public static final int MAX_HAPPINESS = 100;
+
+  @Nonnull
+  public static MoodData defaultMood() {
+    return new MoodData(DEFAULT_HAPPINESS, System.currentTimeMillis());
+  }
+
+  @Nonnull
+  public HappinessLevel getLevel() {
+    return HappinessLevel.fromValue(happiness);
+  }
+
+  @Nonnull
+  public MoodData withHappiness(int newHappiness) {
+    return new MoodData(Math.clamp(newHappiness, MIN_HAPPINESS, MAX_HAPPINESS), lastMoodUpdate);
+  }
+
+  @Nonnull
+  public MoodData withLastMoodUpdate(long newLastMoodUpdate) {
+    return new MoodData(happiness, newLastMoodUpdate);
+  }
+
+  @Nonnull
+  public MoodData adjustHappiness(int delta) {
+    return new MoodData(
+        Math.clamp(happiness + delta, MIN_HAPPINESS, MAX_HAPPINESS), System.currentTimeMillis());
   }
 }

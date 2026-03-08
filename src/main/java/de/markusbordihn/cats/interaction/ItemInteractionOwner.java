@@ -45,7 +45,8 @@ public class ItemInteractionOwner {
           "Fish_Trout_Rainbow_Item",
           "Fish_Pike_Item",
           "Fish_Bluegill_Item",
-          "Fish_Minnow_Item");
+          "Fish_Minnow_Item",
+          Constants.CAT_TREATS_ITEM);
 
   public static boolean handle(
       Ref<EntityStore> entityRef,
@@ -79,9 +80,11 @@ public class ItemInteractionOwner {
         player.sendMessage(
             Message.translation("cats.interactions.item.unknown.named")
                 .param("catName", catName)
-                .color("#FFAA66"));
+                .color(Constants.COLOR_SOFT_ORANGE));
       } else {
-        player.sendMessage(Message.translation("cats.interactions.item.unknown").color("#FFAA66"));
+        player.sendMessage(
+            Message.translation("cats.interactions.item.unknown")
+                .color(Constants.COLOR_SOFT_ORANGE));
       }
     }
 

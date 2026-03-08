@@ -1,9 +1,9 @@
 # Cat Commands
-attack.success={name} is now attacking {target}!
-attack.no_target=No target found. Look at the target or provide an entity ID
-attack.invalid_target=Invalid target
-attack.no_cats_nearby=You have no cats nearby the target (max 15 blocks)
-attack.no_available_cats=No available cats found to attack
+pounce.success={name} playfully pounces at {target}!
+pounce.no_target=No target found. Look at the target or provide an entity ID
+pounce.invalid_target=Invalid target
+pounce.no_cats_nearby=You have no cats nearby the target (max 15 blocks)
+pounce.no_available_cats=No available cats found to pounce
 bed.going_to_bed={name} is heading to a cozy bed {distance} blocks away at ({x}, {y}, {z})
 bed.no_beds_found=No cat beds found within {radius} blocks for {name} at position ({x}, {y}, {z})
 bed.all_beds_occupied=All {count} cat bed(s) nearby are occupied! {name} will have to wait for a spot
@@ -25,6 +25,11 @@ spawn.no_despawned=You have no despawned cats to spawn
 spawn.no_match=No despawned cats found matching '{filter}'
 despawn.success=✓ {name} has been despawned!
 despawn.info=Use /cat spawn to bring your cat back
+
+# Release Command
+release.success=✓ {name} has been released back to the wild!
+release.info=The cat will now wander freely and can be tamed by any player
+release.already_wild=This cat is already wild!
 
 # Error Messages
 error.no_cat=No cat in view, look at a cat to use this command

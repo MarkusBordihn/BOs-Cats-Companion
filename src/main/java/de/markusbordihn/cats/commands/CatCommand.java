@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractWorldCommand;
 import com.hypixel.hytale.server.core.command.system.exceptions.NoPermissionException;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
@@ -130,11 +131,7 @@ public abstract class CatCommand extends AbstractWorldCommand {
   @Nonnull
   protected String getCatDisplayName(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    com.hypixel.hytale.server.core.entity.nameplate.Nameplate nameplate =
-        store.getComponent(
-            entityRef,
-            com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType());
-
+    Nameplate nameplate = store.getComponent(entityRef, Nameplate.getComponentType());
     if (nameplate != null) {
       String catName = nameplate.getText();
       if (catName != null && !catName.isEmpty()) {

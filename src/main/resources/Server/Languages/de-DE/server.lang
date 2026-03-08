@@ -47,5 +47,8 @@ items.cats.cat_bed.description=Ein gemütliches Bett für deine Katzen. Weise ei
 items.cats.cat_yarn_ball.name=Katzen-Garnknäuel
 items.cats.cat_yarn_ball.description=Ein verspieltes Garnknäuel-Spielzeug für deine Katzen. Verwende es, um deine gezähmten Katzen anzulocken oder mit ihnen zu spielen. Katzen lieben es, mit Garnknäueln zu spielen!
 
+items.cats.cat_treats.name=Katzen-Leckerlis
+items.cats.cat_treats.description=Leckere Leckerlis aus Fisch und Fasern. Füttere sie deiner Katze, um sie glücklich zu machen!
+
 memories.categories.Cats.title = Katzen
 memories.categories.Kitten.title = Kätzchen

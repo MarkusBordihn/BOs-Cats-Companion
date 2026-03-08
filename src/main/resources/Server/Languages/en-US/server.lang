@@ -50,5 +50,8 @@ items.cats.cat_yarn_ball.description=A playful yarn ball toy for your cats. Use 
 items.cats.cat_carrier.name=Cat Carrier
 items.cats.cat_carrier.description=A portable carrier for your tamed cats. Use it on a tamed cat to pick it up, and use it again to release the cat.
 
+items.cats.cat_treats.name=Cat Treats
+items.cats.cat_treats.description=Tasty treats made from fish and fibre. Feed them to your cat to make it happy!
+
 memories.categories.Cats.title = Cats
 memories.categories.Kitten.title = Kittens
