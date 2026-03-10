@@ -1,7 +1,9 @@
 # License
 
-**The license applies only to the code in this repository. Images, models and other assets are
-explicitly excluded.**
+**The MIT License applies only to the source code in this repository.
+Images, models, textures, designs, and all other non-code assets are explicitly
+excluded from the MIT License unless stated otherwise.
+All rights to those assets are reserved by the author.**
 
 ## MIT License
 

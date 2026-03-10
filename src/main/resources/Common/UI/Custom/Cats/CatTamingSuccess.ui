@@ -1,0 +1,119 @@
+$Common = "../Common.ui";
+
+$Common.@PageOverlay {
+  LayoutMode: Middle;
+  $Common.@DecoratedContainer #CatTamingSuccessRoot {
+    Anchor: (Width: 520, Height: 450);
+    #Title {
+      $Common.@Title #CatTamingSuccessTitle {
+        @Text = "Cat Tamed!";
+      }
+    }
+    #Content {
+      LayoutMode: Top;
+      Label #CatTamingSuccessCongrats {
+        Anchor: (Height: 26, Bottom: 8);
+        Text: "Congratulations!";
+        Style: (
+          FontSize: 15,
+          RenderBold: true,
+          TextColor: #f5d76e,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessBreed {
+        Anchor: (Height: 26, Bottom: 4);
+        Text: "";
+        Style: (
+          FontSize: 18,
+          RenderBold: true,
+          TextColor: #ffffff,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessPersonality {
+        Anchor: (Height: 22, Bottom: 4);
+        Text: "";
+        Style: (
+          FontSize: 13,
+          TextColor: #f5c0c0,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessMood {
+        Anchor: (Height: 22, Bottom: 12);
+        Text: "";
+        Style: (
+          FontSize: 13,
+          TextColor: #c0f5c8,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessNameLabel {
+        Anchor: (Height: 22, Bottom: 4);
+        Text: "Give your cat a name:";
+        Style: (
+          FontSize: 14,
+          TextColor: #dbe4e7,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      TextField #CatTamingSuccessNameField {
+        Style: $Common.@DefaultInputFieldStyle;
+        PlaceholderStyle: $Common.@DefaultInputFieldPlaceholderStyle;
+        Background: $Common.@InputBoxBackground;
+        Anchor: (Height: 44, Bottom: 12);
+        Padding: (Horizontal: 10);
+        PlaceholderText: "Cat name";
+        MaxLength: 32;
+      }
+      Group {
+        Anchor: (Height: 24);
+      }
+      Label #CatTamingSuccessTip1 {
+        Anchor: (Height: 20, Bottom: 2);
+        Text: "Press F with an empty hand to open the interaction menu";
+        Style: (
+          FontSize: 13,
+          TextColor: #888888,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessTip2 {
+        Anchor: (Height: 20, Bottom: 2);
+        Text: "Press F while holding food to feed and heal your cat";
+        Style: (
+          FontSize: 13,
+          TextColor: #888888,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Label #CatTamingSuccessTip3 {
+        Anchor: (Height: 20, Bottom: 12);
+        Text: "Use /cat for commands like sit, follow, sleep and more";
+        Style: (
+          FontSize: 13,
+          TextColor: #888888,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      Group {
+        LayoutMode: Right;
+        $Common.@SmallTertiaryTextButton #CatTamingSuccessConfirmButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Confirm";
+          @Anchor = (Right: 10, MinWidth: 140);
+        }
+      }
+    }
+  }
+}
+$Common.@BackButton {}

@@ -24,6 +24,8 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
@@ -34,6 +36,7 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.ui.CatActionWheelPage;
 import java.time.Duration;
 
 public class InteractionOwner {
@@ -42,6 +45,33 @@ public class InteractionOwner {
   private static final Duration PET_COOLDOWN_DURATION = Duration.ofMinutes(5);
 
   public static boolean handle(
+      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+
+    Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+    if (playerEntityRef == null || !playerEntityRef.isValid()) {
+      return false;
+    }
+
+    PlayerRef playerRef = store.getComponent(playerEntityRef, PlayerRef.getComponentType());
+    if (playerRef == null) {
+      return false;
+    }
+
+    World world = null;
+    if (store.getExternalData() instanceof EntityStore entityStoreData) {
+      world = entityStoreData.getWorld();
+    }
+    if (world == null) {
+      return false;
+    }
+
+    CatActionWheelPage wheel =
+        CatActionWheelPage.create(playerRef, entityRef, player, playerEntityRef, store, world);
+    player.getPageManager().openCustomPage(playerEntityRef, store, wheel);
+    return true;
+  }
+
+  public static boolean pet(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
 
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());

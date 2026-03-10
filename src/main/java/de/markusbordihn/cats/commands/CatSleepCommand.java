@@ -27,10 +27,8 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.Constants;
-import de.markusbordihn.cats.data.CatState;
-import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.ui.CatActionHelper;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 
@@ -53,12 +51,7 @@ final class CatSleepCommand extends CatCommand {
         return;
       }
 
-      // Update state (component + persistent data)
-      CatsManager.getInstance().updateCatState(entityRef, CatState.SLEEPING, store);
-
-      NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-      if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+      if (CatActionHelper.sleep(entityRef, store)) {
         context.sendMessage(
             Message.translation("cats.commands.sleep.success")
                 .param("name", getCatDisplayName(entityRef, store))

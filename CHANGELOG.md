@@ -7,6 +7,16 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.5.0
+
+- Added Action Wheel UI (press F on tamed cat) with follow, stop, pet, play, sleep, wander, bed,
+  and rename. Slot labels adapt to the current cat state.
+- Added Name Input UI for renaming cats directly from the action wheel.
+- Added Taming Success screen showing breed, personality, mood, name input, and interaction tips.
+- Added UI localization for English (en-US) and German (de-DE).
+- Extended CatsManager with display name, happiness level, UUID lookup, and name update methods.
+- Improved block models, textures and generated item icons.
+
 ### 2.4.0
 
 - Fixed black lines in water caused by incorrect `Transparent` opacity on Cat Bed and Cat Yarn

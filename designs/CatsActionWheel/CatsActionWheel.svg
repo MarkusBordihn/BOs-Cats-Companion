@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="760" viewBox="0 0 920 760">
+  <title>Cats Action Wheel by Markus Bordihn</title>
+  <desc>Custom 8-segment radial menu using rotation-based geometry for high precision assets.</desc>
+  <defs>
+    <style>
+      .segment-base {
+        fill: #092238;
+        fill-opacity: 0.82;
+        stroke: #4c6c8a;
+        stroke-width: 2;
+        opacity: 0.92;
+      }
+
+      .segment-highlight {
+        fill: #4a76b8;
+        fill-opacity: 0.82;
+        stroke: #bbd6ff;
+        stroke-width: 3;
+       }
+
+      .segment-active {
+        fill: #be8219;
+        fill-opacity: 0.82;
+        stroke: #ffde92; stroke-width: 3;
+       }
+    </style>
+
+    <path id="segment-shape" d="M345.2 142.8a300 300 0 0 1 229.6 0l-57.4 138.6a150 150 0 0 0-114.8 0z" />
+    <circle id="segment-center" cx="460" cy="420" r="140" stroke-width="4"/>
+  </defs>
+
+  <g id="idle-state">
+    <use href="#segment-center" class="segment-base"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(0, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(45, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(90, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(135, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(180, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(225, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(270, 460, 420)"/>
+    <use href="#segment-shape" class="segment-base" transform="rotate(315, 460, 420)"/>
+  </g>
+
+  <g id="hover-state" display="none">
+    <use href="#segment-center" class="segment-highlight"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(0, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(45, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(90, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(135, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(180, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(225, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(270, 460, 420)"/>
+    <use href="#segment-shape" class="segment-highlight" transform="rotate(315, 460, 420)"/>
+  </g>
+
+  <g id="press-state" display="none">
+    <use href="#segment-center" class="segment-active"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(0, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(45, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(90, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(135, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(180, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(225, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(270, 460, 420)"/>
+    <use href="#segment-shape" class="segment-active" transform="rotate(315, 460, 420)"/>
+  </g>
+
+</svg>

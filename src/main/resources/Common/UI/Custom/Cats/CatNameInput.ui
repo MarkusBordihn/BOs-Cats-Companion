@@ -1,0 +1,52 @@
+$Common = "../Common.ui";
+
+$Common.@PageOverlay {
+  LayoutMode: Middle;
+  $Common.@DecoratedContainer #CatNameInputRoot {
+    Anchor: (Width: 470, Height: 220);
+    #Title {
+      $Common.@Title #CatNameInputTitle {
+        @Text = "Rename Cat";
+      }
+    }
+    #Content {
+      LayoutMode: Top;
+      Label #CatNameInputSubtitle {
+        Anchor: (Height: 26, Bottom: 16);
+        Text: "Choose a new name for your cat.";
+        Style: (
+          FontSize: 16,
+          TextColor: #f5c0c0,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+      TextField #CatNameInputField {
+        Style: $Common.@DefaultInputFieldStyle;
+        PlaceholderStyle: $Common.@DefaultInputFieldPlaceholderStyle;
+        Background: $Common.@InputBoxBackground;
+        Anchor: (Height: 44, Bottom: 20);
+        Padding: (Horizontal: 10);
+        PlaceholderText: "Cat name";
+        MaxLength: 32;
+      }
+      Group {
+        LayoutMode: Right;
+        $Common.@SmallSecondaryTextButton #CatNameCancelButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Cancel";
+          @Anchor = (MinWidth: 128);
+        }
+        Group #CatNameButtonSpacer {
+          Anchor: (Width: 12);
+        }
+        $Common.@SmallTertiaryTextButton #CatNameApplyButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Apply";
+          @Anchor = (Right: 10, MinWidth: 140);
+        }
+      }
+    }
+  }
+}
+$Common.@BackButton {}

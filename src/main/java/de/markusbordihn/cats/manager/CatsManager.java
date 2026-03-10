@@ -362,6 +362,8 @@ public class CatsManager extends RefSystem<EntityStore> {
       return;
     }
 
+    store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catName);
+
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
       CatDataEntry catDataEntry = resource.getCat(catUuid);

@@ -1,0 +1,52 @@
+# Action Wheel
+wheel.status_header=Status:
+wheel.stop=STOP
+
+# Action Wheel Slot Labels
+wheel.slot.follow=Folgen
+wheel.slot.stop=Stopp
+wheel.slot.pet=Streicheln
+wheel.slot.play=Spielen
+wheel.slot.sleep=Schlafen
+wheel.slot.wakeup=Aufwecken
+wheel.slot.wander=Erkunden
+wheel.slot.return=Zurückkehren
+wheel.slot.bed=Zum Bett
+wheel.slot.bed_unavailable=Kein Bett verfügbar
+wheel.slot.leave_bed=Bett verlassen
+wheel.slot.rename=Umbenennen
+
+# Cat States
+state.following=Folgt
+state.sitting=Sitzt
+state.sleeping=Schläft
+state.playing=Spielt
+state.wandering=Erkundet
+state.going_to_bed=Geht zum Bett
+state.waiting=Wartet
+state.pouncing=Springt an
+state.searching=Sucht
+
+# Happiness / Mood
+mood.miserable=Elend
+mood.sad=Traurig
+mood.neutral=Neutral
+mood.happy=Glücklich
+mood.ecstatic=Begeistert
+
+# Name Input
+name_input.title=Katze umbenennen
+name_input.subtitle=Namen eingeben und Übernehmen klicken.
+name_input.placeholder=Katzennamen eingeben
+name_input.apply=Übernehmen
+name_input.cancel=Abbrechen
+
+# Taming Success
+taming_success.congratulations=Glückwunsch!
+taming_success.title=Du hast eine Katze gezähmt!
+taming_success.name_label=Gib deiner Katze einen Namen:
+taming_success.placeholder=Katzenname
+taming_success.confirm=Bestätigen
+taming_success.tip1=Drücke F mit leerer Hand, um das Interaktionsmenü zu öffnen
+taming_success.tip2=Drücke F mit Futter in der Hand, um deine Katze zu heilen
+taming_success.tip3=Nutze /cat für Befehle wie sitzen, folgen, schlafen und mehr

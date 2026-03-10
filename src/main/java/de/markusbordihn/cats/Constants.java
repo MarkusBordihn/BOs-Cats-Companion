@@ -46,5 +46,10 @@ public final class Constants {
   public static final String CAT_YARN_BALL_ITEM = "Cat_Yarn_Ball";
   public static final String CAT_TREATS_ITEM = "Cat_Treats";
 
+  public static final String UI_PATH = "Cats/";
+  public static final String UI_ACTION_WHEEL = UI_PATH + "CatsActionWheel.ui";
+  public static final String UI_NAME_INPUT = UI_PATH + "CatNameInput.ui";
+  public static final String UI_TAMING_SUCCESS = UI_PATH + "CatTamingSuccess.ui";
+
   private Constants() {}
 }

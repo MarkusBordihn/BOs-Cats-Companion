@@ -1,0 +1,162 @@
+$Common = "../Common.ui";
+
+@SliceLabelStyle = LabelStyle(
+  FontSize: 15,
+  RenderBold: true,
+  TextColor: #f5d6d6,
+  HorizontalAlignment: Center,
+  VerticalAlignment: Center,
+  OutlineColor: #000000(0.7),
+  Wrap: true,
+  ShrinkTextToFit: true,
+  MinShrinkTextToFitFontSize: 11
+);
+
+@SliceButtonLabelStyle = LabelStyle(
+  FontSize: 14,
+  RenderBold: true,
+  TextColor: #00000000,
+  HorizontalAlignment: Center,
+  VerticalAlignment: Center
+);
+
+@SliceButtonBaseStyle = TextButtonStyle(
+  Default:  (Background: (Color: #00000000), LabelStyle: @SliceButtonLabelStyle),
+  Disabled: (Background: (Color: #00000000), LabelStyle: @SliceButtonLabelStyle),
+  Sounds: $Common.@ButtonSounds
+);
+
+@Slice0ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton0_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton0_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice1ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton1_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton1_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice2ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton2_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton2_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice3ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton3_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton3_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice4ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton4_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton4_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice5ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton5_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton5_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice6ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton6_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton6_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+@Slice7ButtonStyle = TextButtonStyle( ...@SliceButtonBaseStyle,
+  Hovered: (Background: (TexturePath: "CatsActionWheelButton7_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+  Pressed: (Background: (TexturePath: "CatsActionWheelButton7_press.png"), LabelStyle: @SliceButtonLabelStyle)
+);
+
+$Common.@PageOverlay {
+  LayoutMode: Middle;
+
+  Group #CatsActionMenuWheel {
+    Anchor: (Width: 920, Height: 760);
+    Visible: false;
+    Background: (TexturePath: "CatsActionWheelBackground.png");
+
+    Label #CatsActionMenuTitle {
+      Anchor: (Top: 18, Width: 620, Height: 42, Left: 150);
+      Text: "";
+      Style: (
+        FontSize: 38,
+        RenderBold: true,
+        TextColor: #ffffff,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center
+      );
+    }
+
+    Label #CatsActionMenuSubtitle {
+      Anchor: (Top: 62, Width: 620, Height: 26, Left: 150);
+      Text: "";
+      Style: (
+        FontSize: 16,
+        TextColor: #c9d4e1,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center
+      );
+    }
+
+    TextButton #CatsActionWheelCenterButton {
+      Anchor: (Top: 271, Left: 311, Width: 298, Height: 298);
+      Style: TextButtonStyle(
+        Default:  (Background: (Color: #00000000), LabelStyle: @SliceButtonLabelStyle),
+        Hovered:  (Background: (TexturePath: "CatsActionWheelCenter_hover.png"), LabelStyle: @SliceButtonLabelStyle),
+        Pressed:  (Background: (TexturePath: "CatsActionWheelCenter_press.png"), LabelStyle: @SliceButtonLabelStyle),
+        Disabled: (Background: (Color: #00000000), LabelStyle: @SliceButtonLabelStyle),
+        Sounds: $Common.@ButtonSounds
+      );
+      Text: "";
+    }
+
+    Label #CatsActionWheelStopLabel {
+      Anchor: (Top: 400, Width: 220, Height: 44, Left: 350);
+      Text: "";
+      Style: (
+        FontSize: 32,
+        RenderBold: true,
+        TextColor: #ff4b4b,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center,
+        OutlineColor: #000000(0.8)
+      );
+    }
+
+    Label #CatsActionWheelStatusHeader {
+      Anchor: (Top: 456, Width: 180, Height: 18, Left: 370);
+      Text: "";
+      Style: (
+        FontSize: 11,
+        TextColor: #aaaaaa,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center
+      );
+    }
+
+    Label #CatsActionMenuCenterText {
+      Anchor: (Top: 476, Width: 200, Height: 30, Left: 360);
+      Text: "";
+      Style: (
+        FontSize: 14,
+        RenderBold: true,
+        TextColor: #ffffff,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center,
+        Wrap: true,
+        OutlineColor: #000000(0.7)
+      );
+    }
+
+    TextButton #CatsActionWheelButton0 { Anchor: (Top: 112, Left: 340, Width: 242, Height: 175); Style: @Slice0ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton1 { Anchor: (Top: 134, Left: 513, Width: 233, Height: 233); Style: @Slice1ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton2 { Anchor: (Top: 300, Left: 592, Width: 175, Height: 242); Style: @Slice2ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton3 { Anchor: (Top: 473, Left: 513, Width: 233, Height: 233); Style: @Slice3ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton4 { Anchor: (Top: 552, Left: 340, Width: 242, Height: 175); Style: @Slice4ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton5 { Anchor: (Top: 473, Left: 174, Width: 233, Height: 233); Style: @Slice5ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton6 { Anchor: (Top: 300, Left: 152, Width: 175, Height: 242); Style: @Slice6ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton7 { Anchor: (Top: 134, Left: 174, Width: 233, Height: 233); Style: @Slice7ButtonStyle; Text: ""; Visible: false; }
+
+    Label #CatsActionWheelLabel0 { Anchor: (Top: 164, Left: 376, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel1 { Anchor: (Top: 233, Left: 541, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel2 { Anchor: (Top: 398, Left: 610, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel3 { Anchor: (Top: 563, Left: 541, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel4 { Anchor: (Top: 632, Left: 376, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel5 { Anchor: (Top: 563, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel6 { Anchor: (Top: 398, Left: 142, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel7 { Anchor: (Top: 233, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+  }
+}
+$Common.@BackButton {}

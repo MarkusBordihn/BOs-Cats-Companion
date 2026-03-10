@@ -35,11 +35,13 @@ import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.systems.RoleChangeSystem;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
 import de.markusbordihn.cats.permission.PermissionManager;
+import de.markusbordihn.cats.ui.CatTamingSuccessPage;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -253,6 +255,22 @@ public class InteractionTaming {
       }
     }
 
+    // Open taming popup
+    CatDataEntry catData = catsManager.getCatData(entityRef, store);
+    CatTamingSuccessPage successPage =
+        new CatTamingSuccessPage(
+            playerRef,
+            catUuid,
+            npcEntity != null && npcEntity.getRole() != null
+                ? npcEntity.getRole().getRoleName()
+                : null,
+            catName,
+            catData != null ? catData.personalityType() : null,
+            catData != null ? catData.secondaryPersonality() : null,
+            catData != null ? catData.happiness() : 40);
+    player.getPageManager().openCustomPage(playerEntityRef, store, successPage);
+
+    // Send chat messages (as backup)
     player.sendMessage(
         Message.translation("cats.interactions.taming.success")
             .param("item", itemName)

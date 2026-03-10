@@ -1,0 +1,52 @@
+# Action Wheel
+wheel.status_header=Status:
+wheel.stop=STOP
+
+# Action Wheel Slot Labels
+wheel.slot.follow=Follow
+wheel.slot.stop=Stop
+wheel.slot.pet=Pet
+wheel.slot.play=Play
+wheel.slot.sleep=Sleep
+wheel.slot.wakeup=Wake Up
+wheel.slot.wander=Wander
+wheel.slot.return=Return
+wheel.slot.bed=Go to Bed
+wheel.slot.bed_unavailable=No Bed Available
+wheel.slot.leave_bed=Leave Bed
+wheel.slot.rename=Rename
+
+# Cat States
+state.following=Following
+state.sitting=Sitting
+state.sleeping=Sleeping
+state.playing=Playing
+state.wandering=Wandering
+state.going_to_bed=Going to Bed
+state.waiting=Waiting
+state.pouncing=Pouncing
+state.searching=Searching
+
+# Happiness / Mood
+mood.miserable=Miserable
+mood.sad=Sad
+mood.neutral=Neutral
+mood.happy=Happy
+mood.ecstatic=Ecstatic
+
+# Name Input
+name_input.title=Rename Cat
+name_input.subtitle=Enter a name and click Apply.
+name_input.placeholder=Enter cat name
+name_input.apply=Apply
+name_input.cancel=Cancel
+
+# Taming Success
+taming_success.congratulations=Congratulations!
+taming_success.title=You tamed a cat!
+taming_success.name_label=Give your cat a name:
+taming_success.placeholder=Cat name
+taming_success.confirm=Confirm
+taming_success.tip1=Press F with an empty hand to open the interaction menu
+taming_success.tip2=Press F while holding food to feed and heal your cat
+taming_success.tip3=Use /cat for commands like sit, follow, sleep and more

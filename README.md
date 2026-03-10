@@ -33,26 +33,23 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Eight cat breeds: Black Cat, Calico, Gray Tabby, Longhaired Russian Blue, Orange Tabby, Siamese,
   Tuxedo, Kitten (experimental)
 * Natural spawning across all zones (Zone 1-4) with environment-specific distributions
-* Taming system using fish
-* Automatic cat naming with unique names for each cat
-* Full command-based interaction via `/cat`
-* Custom cat names with `/cat name`
-* Cat ownership limits configurable via permissions
-* Cat Carrier item for transporting tamed cats (pick up with F, release on ground)
-* Server-side config files for cat limit, spawn settings, and damage protection (`config/cats/`)
-* `/cat reload` command to reload config without server restart
-* Configurable damage protection for tamed cats (protected from players by default, vulnerable to
-  mobs)
+* Trust-based taming system: feed a wild cat multiple times to slowly gain its trust
+* Each cat can only be owned by one player (single owner)
+* Automatic unique cat names on taming
+* Personality system: each cat has a unique personality that influences happiness gain
+* Happiness/mood system: five mood levels (Miserable to Ecstatic) with slow decay
+* Gift system: happy cats occasionally bring the owner a gift when petted (30-min cooldown)
 * Multiple behavior states: sitting, following, waiting, wandering, sleeping, playing, searching
-* Matching animations for each behavior
-* Cat sounds
+* Matching animations and sounds for each behavior
+* Action Wheel UI: press F with empty hand to open a radial command menu
+* Cat Carrier item for transporting tamed cats
 * Cat Bed item for assigned sleeping spots
 * Cat Yarn Ball toy for playing with cats
-* Item consumption for taming and feeding (items are consumed from the player's inventory)
-* Persistent component data for owner + state (component CODECs)
-* Full memory system support for NPC tracking and persistence
-* Persistent cat data storage with owner names, positions, and states
-  (saved in `worlds/default/resources/CatsData.json`)
+* Cat Treats item for an extra happiness boost
+* Despawn and respawn system: save your cat and respawn it later with `/cat despawn` / `/cat spawn`
+* Cat ownership limits configurable via permissions
+* Server-side config for cat limit, spawn settings, and damage protection (`config/cats/`)
+* Persistent cat data storage (`worlds/default/resources/CatsData.json`)
 
 ### How to Get a Cat
 
@@ -69,15 +66,15 @@ based on climate. Simply explore and you'll find them!
 
 1. Get fish (Raw Fish, Grilled Fish, Salmon, Catfish, Trout, Pike, Bluegill, or Minnow)
 2. Hold fish and approach a wild cat
-3. Press F (interact) on the cat - it will eat the fish and become tamed
-4. Your cat gets an automatic unique name (e.g., "Whiskers", "Luna", "Shadow")
+3. Feed it multiple times to gain its trust (wrong items will cause it to reject you)
+4. Once tamed, your cat gets an automatic unique name and belongs to you alone
 
 **Tips:**
 
 * Enable "Allow NPC Detection" in Creative Mode Quick Settings (TAB) to interact in Creative
-* Tamed cats can be fed fish to keep them happy
+* Tamed cats can be fed fish to heal and boost happiness
 * Use empty hand to pet your cat (press F)
-* Wrong items may upset wild cats (*hiss!*)
+* Higher quality fish increases taming chance per feeding
 
 ### Cat Furniture
 
@@ -120,32 +117,48 @@ A playful toy for your cats! Craft a Cat Yarn Ball to interact and play with you
 Interact with your tamed cat while holding the Cat Yarn Ball to trigger a playful animation.
 Your cat will show affection with heart particles and happy sounds.
 
+#### Cat Treats
+
+A special treat that gives a bigger happiness boost than regular fish.
+
+**Crafting Recipe (at Farming Bench):**
+
+* 1x Raw Fish
+* 1x Fibre
+
+### How to Interact with your Cat
+
+Press **F** with an empty hand on your tamed cat to open the **Action Wheel**. From there you can
+follow, pet, play, sleep, wander, send to bed, or rename your cat. The available options adapt to
+the cat's current state.
+
 ### Available Commands
 
-* `/cat reload` – Reload all config files without server restart
+* `/cat reload` - Reload all config files without server restart
 
 #### General Commands
 
-* `/cat info` – Show detailed cat information (works on any cat)
-* `/cat list` – List all cats owned by a player
-* `/cat owner` – Admin command to change ownership
-* `/cat spawn` – Spawn a previously despawned cat
-* `/cat despawn` – Despawn a cat (saves state, can be respawned later)
+* `/cat info` - Show detailed cat information (works on any cat)
+* `/cat list` - List all cats owned by a player
+* `/cat owner` - Admin command to change ownership
+* `/cat spawn` - Spawn a previously despawned cat
+* `/cat despawn` - Despawn a cat (saves state, can be respawned later)
 
 #### Tamed Cat Commands
 
 Commands work by looking at your tamed cat or by providing its entity ID:
 
-* `/cat bed` – Send the cat to the nearest available cat bed
-* `/cat follow` – Make the cat follow you
-* `/cat name <name>` – Set a custom name
-* `/cat play` – Enable playful behavior
-* `/cat release` – Release your cat back to the wild
-* `/cat search` – Send the cat roaming and hunting
-* `/cat sit` – Make the cat sit and stay
-* `/cat sleep` – Put the cat to sleep
-* `/cat wait` – Stop following and wait in place
-* `/cat wander` – Allow free roaming
+* `/cat bed` - Send the cat to the nearest available cat bed
+* `/cat follow` - Make the cat follow you
+* `/cat name <name>` - Set a custom name
+* `/cat play` - Enable playful behavior
+* `/cat pounce [target]` - Send a nearby cat to pounce at a target (15-block range)
+* `/cat release` - Release your cat back to the wild
+* `/cat search` - Send the cat roaming and hunting
+* `/cat sit` - Make the cat sit and stay
+* `/cat sleep` - Put the cat to sleep
+* `/cat wait` - Stop following and wait in place
+* `/cat wander` - Allow free roaming
 
 **Tip:** For best results, look directly at your cat when using commands.
 
@@ -154,12 +167,12 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 Config files are created in `config/cats/` on first startup and can be edited while the server is
 running:
 
-* `general.cfg` – Default cat limit per player (default: 16)
-* `protection.cfg` – Damage filters: protect tamed cats from owner hits, other players, mobs (
-  defaults: players protected, mobs deal damage)
-* `spawn.cfg` – Enable/disable natural spawning and adjust spawn weight multiplier
+* `general.cfg` - Default cat limit per player (default: 16)
+* `protection.cfg` - damage filters: owner, other players (friendly fire), mobs, environment,
+  projectiles (defaults: players protected, mobs/environment/projectiles deal damage)
+* `spawn.cfg` - Enable/disable natural spawning and adjust spawn weight multiplier
 
-Apply changes with `/cat reload` — no restart required.
+Apply changes with `/cat reload` - no restart required.
 
 ## 🔐 Permissions
 
@@ -170,28 +183,13 @@ The plugin supports both Hytale's permission system and LuckPerms.
 
 For detailed permission configuration, see the [Permissions Documentation](PERMISSIONS.md).
 
-## ⚠️ Known Limitations
-
-### Important Notes
-
-* **No UI menu**
-  The interactive menu is temporarily disabled and will return in a later version.
-
-* **Attack command (experimental)**
-  The `/cat attack` command is available but currently does not deal damage. This is work in
-  progress.
-
 ## 🚧 Planned Features
 
-Planned improvements and additions:
-
-* Interactive UI menu
 * Cat breeding and kittens
 * Accessories such as collars and bells
 * More toys and interactive items
 * Additional cat breeds
 * Cat progression and special abilities
-* Combat integration (making attack command deal damage)
 
 ## 🗃️ Data Storage
 
