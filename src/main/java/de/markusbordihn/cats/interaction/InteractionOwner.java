@@ -89,9 +89,6 @@ public class InteractionOwner {
       return true;
     }
 
-    InteractionLogger.logInteraction(
-        "OWNER: Petting Interaction", entityRef, role, store, player, null);
-
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager != null) {
       catsManager.boostHappiness(entityRef, HappinessSource.PETTING, store);

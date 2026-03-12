@@ -29,8 +29,6 @@ public class InteractionStranger {
 
   public static boolean handle(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
-    InteractionLogger.logInteraction(
-        "STRANGER: Interaction Blocked", entityRef, role, store, player, null);
     return false;
   }
 }

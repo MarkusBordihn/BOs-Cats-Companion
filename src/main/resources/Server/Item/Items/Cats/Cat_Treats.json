@@ -23,7 +23,7 @@
     "TimeSeconds": 1,
     "Input": [
       {
-        "ItemId": "Ingredient_Fish_Raw",
+        "ResourceTypeId": "Fish",
         "Quantity": 1
       },
       {

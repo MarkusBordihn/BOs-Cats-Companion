@@ -94,7 +94,7 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
         LOGGER.at(Level.WARNING).log("Unknown cat state: %s", state);
       }
     } catch (Exception e) {
-      LOGGER.at(Level.WARNING).log("Failed to sync cat state: " + e.getMessage());
+      LOGGER.at(Level.WARNING).withCause(e).log("Failed to sync cat state");
     }
 
     CatsManager catsManager = CatsManager.getInstance();

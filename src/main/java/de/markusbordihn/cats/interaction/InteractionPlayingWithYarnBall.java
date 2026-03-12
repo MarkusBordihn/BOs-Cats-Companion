@@ -39,8 +39,6 @@ public class InteractionPlayingWithYarnBall {
 
   public static boolean handle(
       Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
-    InteractionLogger.logInteraction(
-        "PLAYING WITH YARN BALL", entityRef, role, store, player, "Cat_Yarn_Ball");
 
     role.getStateSupport().setState(entityRef, "PlayingWithYarnBall", "Default", store);
 

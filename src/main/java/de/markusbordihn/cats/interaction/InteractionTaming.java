@@ -55,9 +55,6 @@ public class InteractionTaming {
       Store<EntityStore> store,
       Player player,
       ItemStack heldItem) {
-    String itemName = heldItem != null ? heldItem.getItemId() : null;
-    InteractionLogger.logInteraction(
-        "WILD CAT: Taming Attempt", entityRef, role, store, player, itemName);
 
     CatTamingProgressComponent progressComponent =
         store.getComponent(entityRef, CatTamingProgressComponent.getComponentType());
@@ -94,6 +91,7 @@ public class InteractionTaming {
         progressComponent.getCurrentProgress(), progressComponent.getRequiredProgress());
 
     if (progressComponent.isReadyToTame()) {
+      InventoryHelper.consumeActiveHotbarItem(player, heldItem);
       handleSuccessfulTaming(entityRef, role, store, player, heldItem);
       store.removeComponent(entityRef, CatTamingProgressComponent.getComponentType());
     } else {
@@ -290,8 +288,6 @@ public class InteractionTaming {
               .param("limit", String.valueOf(catLimit))
               .color(Constants.COLOR_GRAY));
     }
-
-    InventoryHelper.consumeActiveHotbarItem(player, heldItem);
 
     LOGGER.at(Level.INFO).log(
         "Cat successfully tamed by player %s with item %s (cats: %d/%d)",

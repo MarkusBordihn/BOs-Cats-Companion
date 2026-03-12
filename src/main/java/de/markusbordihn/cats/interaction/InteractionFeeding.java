@@ -59,12 +59,10 @@ public class InteractionFeeding {
       boolean isOwner) {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     boolean isTreat = Constants.CAT_TREATS_ITEM.equals(itemName);
-    String interactionType = isOwner ? "FEEDING: By Owner" : "FEEDING: By Stranger";
-    InteractionLogger.logInteraction(interactionType, entityRef, role, store, player, itemName);
 
     NPCEntity npcEntity = null;
     WorldTimeResource worldTime = null;
-    if (isOwner && isTreat) {
+    if (isTreat) {
       npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
       worldTime = npcEntity != null ? store.getResource(WorldTimeResource.getResourceType()) : null;
     }
@@ -81,6 +79,9 @@ public class InteractionFeeding {
       }
     }
 
+    if (role == null) {
+      return false;
+    }
     role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
 
     if (isOwner) {

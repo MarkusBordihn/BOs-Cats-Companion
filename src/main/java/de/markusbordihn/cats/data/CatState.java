@@ -33,4 +33,8 @@ public enum CatState {
   ATTACKING;
 
   public static final EnumCodec<CatState> CODEC = new EnumCodec<>(CatState.class);
+
+  public boolean isSleepingState() {
+    return this == SLEEPING || this == GOING_TO_BED;
+  }
 }

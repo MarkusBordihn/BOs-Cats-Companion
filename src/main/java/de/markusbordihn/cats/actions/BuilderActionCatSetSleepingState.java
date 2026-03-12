@@ -31,6 +31,7 @@ import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
@@ -97,6 +98,7 @@ public class BuilderActionCatSetSleepingState extends BuilderActionBase {
       CatsManager catsManager = CatsManager.getInstance();
       if (catsManager != null) {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
+        catsManager.boostHappiness(entityRef, HappinessSource.SLEEPING_IN_BED, store);
       }
 
       return true;

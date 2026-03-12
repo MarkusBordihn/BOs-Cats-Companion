@@ -7,6 +7,13 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.6.0
+
+- Fixed broken Cat Treats recipe by using resource type `Fish` instead of specific fish item.
+- Fixed decay of happiness while cats are sleeping by pausing decay during sleep state.
+- Added happiness boost from sleeping in cat beds (10 happiness per sleep cycle) to encourage use of cat beds and improve mood.
+- Removed debug interaction logging to reduce fine console spam and improve performance.
+
 ### 2.5.0
 
 - Added Action Wheel UI (press F on tamed cat) with follow, stop, pet, play, sleep, wander, bed,

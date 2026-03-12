@@ -71,9 +71,6 @@ public class CatCarrierInteraction {
       @Nonnull Player player,
       @Nonnull ItemStack heldItem) {
 
-    InteractionLogger.logInteraction(
-        "CAT CARRIER CAPTURE", entityRef, role, store, player, Constants.CAT_CARRIER_ITEM);
-
     UUID storedCatUuid = heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC);
     if (storedCatUuid != null) {
       String storedName = heldItem.getFromMetadataOrNull(META_CAT_NAME, STRING_CODEC);
