@@ -30,7 +30,11 @@ feeding.full_health=Deine Katze hat bereits volle Gesundheit!
 feeding.treat.healed=Deine Katze knabbert genüsslich den Leckerli! (+{amount} HP, jetzt {health}/{maxHealth})
 feeding.treat.full_health=Deine Katze ist eigentlich satt, aber der Leckerli riecht einfach zu verlockend, schnurr!
 feeding.treat.cooldown=Deine Katze ist noch satt vom letzten Leckerli, warte noch einen Moment.
+
 # Hints
 hint.tame=Drücke [{key}] um zu zähmen
-hint.owner=Drücke [{key}] um mit deiner Katze zu interagieren
+hint.owner_wheel=Drücke [{key}] um das Aktionsrad zu öffnen
+hint.owner_feed=Drücke [{key}] um deine Katze zu füttern
+hint.owner_play=Drücke [{key}] um mit deiner Katze zu spielen
+hint.carrier=Drücke [{key}] um in Träger zu stecken
 hint.stranger=Diese Katze gehört jemand anderem

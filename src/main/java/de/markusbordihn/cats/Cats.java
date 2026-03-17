@@ -65,6 +65,9 @@ import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
 import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingCarrier;
+import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingEmptyHand;
+import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingFood;
+import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingYarnBall;
 import de.markusbordihn.cats.sensors.BuilderSensorIsOwner;
 import de.markusbordihn.cats.spawn.CatSpawnConfigSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
@@ -195,6 +198,32 @@ public class Cats extends JavaPlugin {
     } catch (Exception e) {
       LOGGER.at(Level.SEVERE).log(
           "Failed to register sensor: %s", BuilderSensorIsHoldingCarrier.SENSOR_ID, e);
+    }
+
+    try {
+      sensorFactory.add(BuilderSensorIsHoldingFood.SENSOR_ID, BuilderSensorIsHoldingFood::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingFood.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsHoldingFood.SENSOR_ID, e);
+    }
+
+    try {
+      sensorFactory.add(
+          BuilderSensorIsHoldingEmptyHand.SENSOR_ID, BuilderSensorIsHoldingEmptyHand::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingEmptyHand.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsHoldingEmptyHand.SENSOR_ID, e);
+    }
+
+    try {
+      sensorFactory.add(
+          BuilderSensorIsHoldingYarnBall.SENSOR_ID, BuilderSensorIsHoldingYarnBall::new);
+      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingYarnBall.SENSOR_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register sensor: %s", BuilderSensorIsHoldingYarnBall.SENSOR_ID, e);
     }
 
     sensorsRegistered = true;

@@ -28,25 +28,8 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
-import java.util.Set;
 
 public class ItemInteractionOwner {
-
-  private static final Set<String> FOOD_ITEMS =
-      Set.of(
-          "Food_Fish_Raw",
-          "Food_Fish_Raw_Uncommon",
-          "Food_Fish_Raw_Rare",
-          "Food_Fish_Raw_Epic",
-          "Food_Fish_Raw_Legendary",
-          "Food_Fish_Grilled",
-          "Fish_Salmon_Item",
-          "Fish_Catfish_Item",
-          "Fish_Trout_Rainbow_Item",
-          "Fish_Pike_Item",
-          "Fish_Bluegill_Item",
-          "Fish_Minnow_Item",
-          Constants.CAT_TREATS_ITEM);
 
   public static boolean handle(
       Ref<EntityStore> entityRef,
@@ -57,7 +40,7 @@ public class ItemInteractionOwner {
 
     String itemName = heldItem != null ? heldItem.getItemId() : null;
 
-    if (itemName != null && FOOD_ITEMS.contains(itemName)) {
+    if (itemName != null && Constants.CAT_FOOD_ITEMS.contains(itemName)) {
       return InteractionFeeding.handle(entityRef, role, store, player, heldItem, true);
     }
 

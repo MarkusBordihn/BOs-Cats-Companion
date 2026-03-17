@@ -37,7 +37,7 @@ import java.util.logging.Level;
 public class CatsNamesManager {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static final String RESOURCE_PATH = "/Server/cat_names.txt";
-  private static final Path CONFIG_FILE_PATH = Paths.get("config", "cats", "cat_names.txt");
+  private static final Path CONFIG_FILE_PATH = Paths.get("mods", "Cats", "cat_names.txt");
   private static final Random RANDOM = new Random();
   private static final String VALID_NAME_PATTERN = "^[a-zA-Z0-9 '\\-.]+$";
   private static final int MAX_NAME_LENGTH = 32;

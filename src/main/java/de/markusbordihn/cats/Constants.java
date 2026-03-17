@@ -19,6 +19,8 @@
 
 package de.markusbordihn.cats;
 
+import java.util.Set;
+
 public final class Constants {
 
   public static final String MOD_ID = "cats";
@@ -45,6 +47,22 @@ public final class Constants {
   public static final String CAT_CARRIER_ITEM = "Cat_Carrier";
   public static final String CAT_YARN_BALL_ITEM = "Cat_Yarn_Ball";
   public static final String CAT_TREATS_ITEM = "Cat_Treats";
+
+  public static final Set<String> CAT_FOOD_ITEMS =
+      Set.of(
+          "Food_Fish_Raw",
+          "Food_Fish_Raw_Uncommon",
+          "Food_Fish_Raw_Rare",
+          "Food_Fish_Raw_Epic",
+          "Food_Fish_Raw_Legendary",
+          "Food_Fish_Grilled",
+          "Fish_Salmon_Item",
+          "Fish_Catfish_Item",
+          "Fish_Trout_Rainbow_Item",
+          "Fish_Pike_Item",
+          "Fish_Bluegill_Item",
+          "Fish_Minnow_Item",
+          CAT_TREATS_ITEM);
 
   public static final String UI_PATH = "Cats/";
   public static final String UI_ACTION_WHEEL = UI_PATH + "CatsActionWheel.ui";

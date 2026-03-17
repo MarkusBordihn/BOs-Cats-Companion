@@ -113,7 +113,7 @@
                 "Type": "And",
                 "Sensors": [
                   {
-                    "Type": "CatOwner"
+                    "Type": "CatsOwner"
                   },
                   {
                     "Type": "Alarm",
@@ -587,7 +587,7 @@
                 {
                   "$Comment": "Watch owner during greeting, then return to default",
                   "Sensor": {
-                    "Type": "CatOwner"
+                    "Type": "CatsOwner"
                   },
                   "Actions": [
                     {
@@ -1061,8 +1061,8 @@
         "Sensor": {
           "Type": "And",
           "Sensors": [
-            {"Type": "CatOwner"},
-            {"Type": "IsHoldingCarrier"}
+            {"Type": "CatsOwner"},
+            {"Type": "IsHoldingCatsCarrier"}
           ]
         },
         "Actions": [
@@ -1075,20 +1075,58 @@
         ]
       },
       {
-        "$Comment": "Tamed cat + Owner (no carrier) - show owner interaction hint",
+        "$Comment": "Tamed cat + Owner holding food - show feed hint",
         "Continue": true,
         "Sensor": {
           "Type": "And",
           "Sensors": [
-            {"Type": "CatOwner"},
-            {"Type": "Not", "Sensor": {"Type": "IsHoldingCarrier"}}
+            {"Type": "CatsOwner"},
+            {"Type": "IsHoldingCatsFood"}
           ]
         },
         "Actions": [
           {
             "Type": "SetInteractable",
             "Interactable": true,
-            "Hint": "cats.interactions.hint.owner",
+            "Hint": "cats.interactions.hint.owner_feed",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Tamed cat + Owner holding yarn ball - show play hint",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {"Type": "CatsOwner"},
+            {"Type": "IsHoldingCatsYarnBall"}
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.owner_play",
+            "ShowPrompt": true
+          }
+        ]
+      },
+      {
+        "$Comment": "Tamed cat + Owner with empty hand - show action wheel hint",
+        "Continue": true,
+        "Sensor": {
+          "Type": "And",
+          "Sensors": [
+            {"Type": "CatsOwner"},
+            {"Type": "IsHoldingCatsEmptyHand"}
+          ]
+        },
+        "Actions": [
+          {
+            "Type": "SetInteractable",
+            "Interactable": true,
+            "Hint": "cats.interactions.hint.owner_wheel",
             "ShowPrompt": true
           }
         ]
@@ -1099,7 +1137,7 @@
         "Sensor": {
           "Type": "Not",
           "Sensor": {
-            "Type": "CatOwner"
+            "Type": "CatsOwner"
           }
         },
         "Actions": [

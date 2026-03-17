@@ -157,6 +157,22 @@ $Common.@PageOverlay {
     Label #CatsActionWheelLabel5 { Anchor: (Top: 563, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
     Label #CatsActionWheelLabel6 { Anchor: (Top: 398, Left: 142, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
     Label #CatsActionWheelLabel7 { Anchor: (Top: 233, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+
+    Group { Anchor: (Top: 325, Right: 0, Width: 155, Height: 200); Background: (Color: #00000088); }
+
+    Label #CatInfoPanelPersonalityHeader { Anchor: (Top: 335, Right: 0, Width: 155, Height: 18); Text: "Personality:"; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelPersonality       { Anchor: (Top: 355, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelSecondaryHeader   { Anchor: (Top: 387, Right: 0, Width: 155, Height: 18); Text: "Secondary:"; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelSecondary         { Anchor: (Top: 407, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelGiftsHeader       { Anchor: (Top: 445, Right: 0, Width: 155, Height: 18); Text: "Gifts:"; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelGifts             { Anchor: (Top: 465, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
+
+    $Common.@SmallTertiaryTextButton #CatInfoPanelRenameButton {
+      @Text = "Rename Cat";
+      @Sounds = $Common.@ButtonSounds;
+      @Anchor = (Top: 730, Left: 360, Width: 200);
+      Visible: true;
+    }
   }
 }
 $Common.@BackButton {}

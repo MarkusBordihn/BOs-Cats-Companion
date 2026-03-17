@@ -24,6 +24,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
@@ -38,27 +39,49 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.HappinessLevel;
+import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.interaction.InteractionOwner;
 import de.markusbordihn.cats.manager.CatsManager;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class CatActionWheelPage
     extends InteractiveCustomUIPage<CatActionWheelPage.WheelEventData> {
 
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+  private static final long PAGE_CONFLICT_THRESHOLD_MS = 100;
+
   private static final String[] SLOT_IDS = {
-    "follow_stop", "pet", "play", "sleep_wakeup", "wander_return", "bed_leave", "rename", ""
+    "follow_stop", "pet", "play", "sleep_wakeup", "wander_return", "bed_leave", "", ""
   };
   private static final String KEY_CMD = "CommandId";
-
+  private static final String UI_WHEEL = "#CatsActionMenuWheel";
+  private static final String UI_TITLE = "#CatsActionMenuTitle";
+  private static final String UI_SUBTITLE = "#CatsActionMenuSubtitle";
+  private static final String UI_STOP_LABEL = "#CatsActionWheelStopLabel";
+  private static final String UI_STATUS_HEADER = "#CatsActionWheelStatusHeader";
+  private static final String UI_CENTER_TEXT = "#CatsActionMenuCenterText";
+  private static final String UI_CENTER_BUTTON = "#CatsActionWheelCenterButton";
+  private static final String UI_BUTTON_PREFIX = "#CatsActionWheelButton";
+  private static final String UI_LABEL_PREFIX = "#CatsActionWheelLabel";
+  private static final String UI_PANEL_PERSONALITY_HEADER = "#CatInfoPanelPersonalityHeader";
+  private static final String UI_PANEL_PERSONALITY = "#CatInfoPanelPersonality";
+  private static final String UI_PANEL_SECONDARY_HEADER = "#CatInfoPanelSecondaryHeader";
+  private static final String UI_PANEL_SECONDARY = "#CatInfoPanelSecondary";
+  private static final String UI_PANEL_GIFTS_HEADER = "#CatInfoPanelGiftsHeader";
+  private static final String UI_PANEL_GIFTS = "#CatInfoPanelGifts";
+  private static final String UI_PANEL_RENAME_BUTTON = "#CatInfoPanelRenameButton";
   private final Ref<EntityStore> catRef;
   private final Player player;
   private final Ref<EntityStore> playerEntityRef;
   private final World world;
   private final boolean hasBed;
   private final CatState currentState;
+  private long openedAt;
 
   public CatActionWheelPage(
       @Nonnull PlayerRef playerRef,
@@ -102,19 +125,21 @@ public final class CatActionWheelPage
       @Nonnull UICommandBuilder commandBuilder,
       @Nonnull UIEventBuilder eventBuilder,
       @Nonnull Store<EntityStore> store) {
+    this.openedAt = System.currentTimeMillis();
     commandBuilder.append(Constants.UI_ACTION_WHEEL);
-    commandBuilder.set("#CatsActionMenuWheel.Visible", true);
-    commandBuilder.set("#CatsActionMenuTitle.Text", getCatDisplayName(store));
-    commandBuilder.set("#CatsActionMenuSubtitle.Text", resolveMoodText(store));
-    commandBuilder.set("#CatsActionWheelStopLabel.Text", Message.translation("cats.ui.wheel.stop"));
+    commandBuilder.set(UI_WHEEL + ".Visible", true);
+    commandBuilder.set(UI_TITLE + ".Text", getCatDisplayName(store));
+    commandBuilder.set(UI_SUBTITLE + ".Text", resolveMoodText(store));
+    commandBuilder.set(UI_STOP_LABEL + ".Text", Message.translation("cats.ui.wheel.stop"));
     commandBuilder.set(
-        "#CatsActionWheelStatusHeader.Text", Message.translation("cats.ui.wheel.status_header"));
-    commandBuilder.set("#CatsActionMenuCenterText.Text", resolveStateText());
+        UI_STATUS_HEADER + ".Text", Message.translation("cats.ui.wheel.status_header"));
+    commandBuilder.set(UI_CENTER_TEXT + ".Text", resolveStateText());
 
     buildCommandButtons(commandBuilder, eventBuilder);
+    buildInfoPanel(commandBuilder, eventBuilder, store);
     eventBuilder.addEventBinding(
         CustomUIEventBindingType.Activating,
-        "#CatsActionWheelCenterButton",
+        UI_CENTER_BUTTON,
         EventData.of(KEY_CMD, "stop"),
         false);
   }
@@ -187,14 +212,24 @@ public final class CatActionWheelPage
     }
   }
 
+  @Override
+  public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+    if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
+      LOGGER.at(Level.WARNING).log(
+          "[Cats] Action wheel for %s was dismissed within %dms of opening — "
+              + "likely replaced by another mod (PageManager conflict).",
+          playerRef, PAGE_CONFLICT_THRESHOLD_MS);
+    }
+  }
+
   private void buildCommandButtons(
       @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
     for (int i = 0; i < 8; i++) {
-      String buttonId = "#CatsActionWheelButton" + i;
-      String labelId = "#CatsActionWheelLabel" + i;
+      String buttonId = UI_BUTTON_PREFIX + i;
+      String labelId = UI_LABEL_PREFIX + i;
 
-      // Slot 7 always hidden (unused)
-      if (i == 7) {
+      // Slots 6 and 7 always hidden
+      if (i == 6 || i == 7) {
         commandBuilder.set(buttonId + ".Visible", false);
         commandBuilder.set(labelId + ".Visible", false);
         continue;
@@ -240,7 +275,6 @@ public final class CatActionWheelPage
           (this.currentState == CatState.GOING_TO_BED || this.currentState == CatState.SLEEPING)
               ? Message.translation("cats.ui.wheel.slot.leave_bed")
               : Message.translation("cats.ui.wheel.slot.bed");
-      case 6 -> Message.translation("cats.ui.wheel.slot.rename");
       default -> Message.raw("");
     };
   }
@@ -279,11 +313,55 @@ public final class CatActionWheelPage
     };
   }
 
+  private void buildInfoPanel(
+      @Nonnull UICommandBuilder commandBuilder,
+      @Nonnull UIEventBuilder eventBuilder,
+      @Nonnull Store<EntityStore> store) {
+    CatsManager catsManager = CatsManager.getInstance();
+    CatDataEntry catData = catsManager != null ? catsManager.getCatData(this.catRef, store) : null;
+
+    PersonalityType primary = catData != null ? catData.personalityType() : null;
+    PersonalityType secondary = catData != null ? catData.secondaryPersonality() : null;
+    int gifts = catData != null ? catData.totalGifts() : 0;
+
+    commandBuilder.set(UI_PANEL_PERSONALITY_HEADER + ".Visible", true);
+    commandBuilder.set(UI_PANEL_PERSONALITY + ".Visible", true);
+    commandBuilder.set(UI_PANEL_SECONDARY_HEADER + ".Visible", true);
+    commandBuilder.set(UI_PANEL_SECONDARY + ".Visible", true);
+    commandBuilder.set(UI_PANEL_GIFTS_HEADER + ".Visible", true);
+    commandBuilder.set(UI_PANEL_GIFTS + ".Visible", true);
+    commandBuilder.set(
+        UI_PANEL_PERSONALITY_HEADER + ".Text", Message.translation("cats.ui.panel.personality"));
+    commandBuilder.set(UI_PANEL_PERSONALITY + ".Text", formatPersonality(primary));
+    commandBuilder.set(
+        UI_PANEL_SECONDARY_HEADER + ".Text", Message.translation("cats.ui.panel.secondary"));
+    commandBuilder.set(UI_PANEL_SECONDARY + ".Text", formatPersonality(secondary));
+    commandBuilder.set(UI_PANEL_GIFTS_HEADER + ".Text", Message.translation("cats.ui.panel.gifts"));
+    commandBuilder.set(UI_PANEL_GIFTS + ".Text", String.valueOf(gifts));
+    commandBuilder.set(
+        UI_PANEL_RENAME_BUTTON + ".Text", Message.translation("cats.ui.panel.rename"));
+
+    eventBuilder.addEventBinding(
+        CustomUIEventBindingType.Activating,
+        UI_PANEL_RENAME_BUTTON,
+        EventData.of(KEY_CMD, "rename"),
+        false);
+  }
+
+  @Nonnull
+  private String formatPersonality(@Nullable PersonalityType type) {
+    if (type == null) {
+      return "-";
+    }
+    String raw = type.name().toLowerCase().replace('_', ' ');
+    return Character.toUpperCase(raw.charAt(0)) + raw.substring(1);
+  }
+
   @Nonnull
   private String getCatDisplayName(@Nonnull Store<EntityStore> store) {
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      return "Cat";
+      return "";
     }
     String name = catsManager.getCatDisplayName(this.catRef, store);
     return name != null ? name : "Cat";

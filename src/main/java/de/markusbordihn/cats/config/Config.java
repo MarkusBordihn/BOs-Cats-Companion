@@ -34,7 +34,7 @@ import java.util.logging.Level;
 public abstract class Config {
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-  private static final Path CONFIG_DIR = Paths.get("config", "cats");
+  private static final Path CONFIG_DIR = Paths.get("mods", "Cats");
 
   private final String fileName;
   private final Properties properties = new Properties();

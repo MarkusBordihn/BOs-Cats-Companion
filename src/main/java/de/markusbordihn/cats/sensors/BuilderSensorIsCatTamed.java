@@ -34,7 +34,7 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import javax.annotation.Nonnull;
 
 public class BuilderSensorIsCatTamed extends BuilderSensorBase {
-  public static final String SENSOR_ID = "CatTamed";
+  public static final String SENSOR_ID = "CatsTamed";
 
   @Nonnull
   @Override

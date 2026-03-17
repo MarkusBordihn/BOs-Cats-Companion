@@ -24,6 +24,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
@@ -38,14 +39,18 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class CatTamingSuccessPage
     extends InteractiveCustomUIPage<CatTamingSuccessPage.TamingSuccessEventData> {
 
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+  private static final long PAGE_CONFLICT_THRESHOLD_MS = 100;
   private static final String KEY_NAME_INPUT = "@CatTamingNameInput";
 
+  private long openedAt;
   private final UUID catUuid;
   private final String catType;
   private final String initialName;
@@ -93,6 +98,7 @@ public final class CatTamingSuccessPage
       @Nonnull UICommandBuilder commandBuilder,
       @Nonnull UIEventBuilder eventBuilder,
       @Nonnull Store<EntityStore> store) {
+    this.openedAt = System.currentTimeMillis();
     commandBuilder.append(Constants.UI_TAMING_SUCCESS);
     commandBuilder.set(
         "#CatTamingSuccessCongrats.Text",
@@ -141,7 +147,14 @@ public final class CatTamingSuccessPage
   }
 
   @Override
-  public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {}
+  public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+    if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
+      LOGGER.at(Level.WARNING).log(
+          "[Cats] Taming success screen for %s was dismissed within %dms of opening — "
+              + "likely replaced by another mod (PageManager conflict).",
+          playerRef, PAGE_CONFLICT_THRESHOLD_MS);
+    }
+  }
 
   private String resolvePersonalityText() {
     if (this.primaryPersonality == null) {

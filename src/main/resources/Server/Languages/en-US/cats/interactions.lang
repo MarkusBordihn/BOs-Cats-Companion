@@ -43,6 +43,8 @@ feeding.treat.cooldown=Your cat is still full from the last treat, try again in 
 
 # Hints
 hint.tame=Press [{key}] to tame
-hint.owner=Press [{key}] to interact with your cat
+hint.owner_wheel=Press [{key}] to open the action wheel
+hint.owner_feed=Press [{key}] to feed your cat
+hint.owner_play=Press [{key}] to play with your cat
 hint.carrier=Press [{key}] to capture into carrier
 hint.stranger=This cat belongs to someone else

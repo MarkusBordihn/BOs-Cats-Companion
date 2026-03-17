@@ -23,7 +23,8 @@ import com.google.gson.JsonElement;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
@@ -32,34 +33,33 @@ import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
-import de.markusbordihn.cats.component.CatOwnerComponent;
-import java.util.UUID;
+import de.markusbordihn.cats.Constants;
 import javax.annotation.Nonnull;
 
-public class BuilderSensorIsOwner extends BuilderSensorBase {
-  public static final String SENSOR_ID = "CatsOwner";
+public class BuilderSensorIsHoldingFood extends BuilderSensorBase {
+  public static final String SENSOR_ID = "IsHoldingCatsFood";
 
   @Nonnull
   @Override
   public Sensor build(BuilderSupport support) {
-    return new SensorIsOwner(this, support);
+    return new SensorIsHoldingFood(this, support);
   }
 
   @Nonnull
   @Override
   public String getShortDescription() {
-    return "Checks if the interacting player is the cat's owner";
+    return "Checks if the interacting player is holding cat food";
   }
 
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Returns true if the currently iterating player in InteractionInstruction matches the cat's owner UUID";
+    return "Returns true if the player holds a fish or cat treat item in their active hotbar slot";
   }
 
   @Nonnull
   @Override
-  public BuilderSensorIsOwner readConfig(@Nonnull JsonElement data) {
+  public BuilderSensorIsHoldingFood readConfig(@Nonnull JsonElement data) {
     return this;
   }
 
@@ -69,8 +69,8 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
     return BuilderDescriptorState.Stable;
   }
 
-  public static class SensorIsOwner extends SensorBase {
-    public SensorIsOwner(BuilderSensorBase builder, BuilderSupport support) {
+  public static class SensorIsHoldingFood extends SensorBase {
+    public SensorIsHoldingFood(BuilderSensorBase builder, BuilderSupport support) {
       super(builder);
     }
 
@@ -84,7 +84,6 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
         return false;
       }
 
-      // Get the currently iterated player from the InteractionInstruction
       Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
       if (playerRef == null) {
         return false;
@@ -95,19 +94,17 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
         return false;
       }
 
-      CatOwnerComponent ownerComponent =
-          store.getComponent(entityRef, CatOwnerComponent.getComponentType());
-      if (ownerComponent == null || !ownerComponent.hasOwner()) {
+      Inventory inventory = player.getInventory();
+      if (inventory == null) {
         return false;
       }
 
-      PlayerRef playerRefComponent = store.getComponent(playerRef, PlayerRef.getComponentType());
-      if (playerRefComponent == null) {
+      ItemStack activeItem = inventory.getActiveHotbarItem();
+      if (activeItem == null || activeItem.isEmpty()) {
         return false;
       }
 
-      UUID playerUUID = playerRefComponent.getUuid();
-      return ownerComponent.getOwnerUUID().equals(playerUUID);
+      return Constants.CAT_FOOD_ITEMS.contains(activeItem.getItemId());
     }
 
     @Override

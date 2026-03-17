@@ -48,7 +48,7 @@ Each cat supports multiple behavior states and animations, making them feel aliv
 * Cat Treats item for an extra happiness boost
 * Despawn and respawn system: save your cat and respawn it later with `/cat despawn` / `/cat spawn`
 * Cat ownership limits configurable via permissions
-* Server-side config for cat limit, spawn settings, and damage protection (`config/cats/`)
+* Server-side config for cat limit, spawn settings, and damage protection (`mods/Cats/`)
 * Persistent cat data storage (`worlds/default/resources/CatsData.json`)
 
 ### How to Get a Cat
@@ -164,7 +164,7 @@ Commands work by looking at your tamed cat or by providing its entity ID:
 
 ## ⚙️ Configuration
 
-Config files are created in `config/cats/` on first startup and can be edited while the server is
+Config files are created in `mods/Cats/` on first startup and can be edited while the server is
 running:
 
 * `general.cfg` - Default cat limit per player (default: 16)

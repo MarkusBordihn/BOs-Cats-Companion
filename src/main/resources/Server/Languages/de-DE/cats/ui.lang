@@ -47,6 +47,13 @@ taming_success.title=Du hast eine Katze gezähmt!
 taming_success.name_label=Gib deiner Katze einen Namen:
 taming_success.placeholder=Katzenname
 taming_success.confirm=Bestätigen
-taming_success.tip1=Drücke F mit leerer Hand, um das Interaktionsmenü zu öffnen
+taming_success.tip1=Drücke F mit leerer Hand, um das Aktionsrad zu öffnen
 taming_success.tip2=Drücke F mit Futter in der Hand, um deine Katze zu heilen
 taming_success.tip3=Nutze /cat für Befehle wie sitzen, folgen, schlafen und mehr
+
+# Info Panel
+panel.personality=Persönlichkeit:
+panel.secondary=Sekundär:
+panel.gifts=Geschenke:
+panel.rename=Umbenennen
+panel.personality.none=Unbekannt

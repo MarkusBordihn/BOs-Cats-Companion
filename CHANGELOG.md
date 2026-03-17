@@ -7,11 +7,23 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.7.0
+
+- Moved config files from `config/cats/` to `mods/Cats/` to match the official Hytale mod path
+  convention.
+- Added diagnostic warning when the action wheel is dismissed without player interaction, helping
+  server admins identify PageManager conflicts with other mods.
+- Added context-aware interaction hints: empty hand shows "open the action wheel", holding fish or
+  cat treats shows "feed your cat".
+- Moved Rename out of the action wheel into a side info panel that also displays personality type,
+  secondary personality, and total gifts given.
+
 ### 2.6.0
 
 - Fixed broken Cat Treats recipe by using resource type `Fish` instead of specific fish item.
 - Fixed decay of happiness while cats are sleeping by pausing decay during sleep state.
-- Added happiness boost from sleeping in cat beds (10 happiness per sleep cycle) to encourage use of cat beds and improve mood.
+- Added happiness boost from sleeping in cat beds (10 happiness per sleep cycle) to encourage use of
+  cat beds and improve mood.
 - Removed debug interaction logging to reduce fine console spam and improve performance.
 
 ### 2.5.0
@@ -77,7 +89,7 @@ Note: Please always back up your world before updating to a new version!
 - Fixed alerted timeout too short for food attraction to trigger (5–8 s → 15–25 s).
 - Added basic Cat Carrier item to pick up and transport tamed cats (recipe: 2x Wood Planks + 1x
   Leather + 1x White Wool + 1x Red Wool at Farming Workbench).
-- Added server-side config files (`config/cats/`): `general.cfg` (cat limit), `protection.cfg` (
+- Added server-side config files (`mods/Cats/`): `general.cfg` (cat limit), `protection.cfg` (
   damage filters), `spawn.cfg` (spawn enable/weight).
 - Added `/cat reload` command to reload config files without a server restart.
 - Added damage filter system for tamed cats: configurable protection from owner, other players, and
@@ -160,7 +172,7 @@ Use `/cat list` to see all your cats and their status.
 ### 1.5.0
 
 - Added automatic cat naming when taming with over 90 unique names.
-- Added configurable cat names list (editable in `config/cats/cat_names.txt`).
+- Added configurable cat names list (editable in `mods/Cats/cat_names.txt`).
 - Added security validation for custom cat names to prevent exploits.
 - Added `/cat release` command to release (remove) owned cats.
 - Added cat limit permission support with built-in Hytale permissions and LuckPerms.

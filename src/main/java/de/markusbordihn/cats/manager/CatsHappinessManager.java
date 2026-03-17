@@ -114,7 +114,8 @@ public class CatsHappinessManager {
             Math.max(
                 MoodData.MIN_HAPPINESS, catData.happiness() - (decayTicks * MOOD_DECAY_AMOUNT));
         resource.updateCat(catUuid, catData.withHappiness(decayed).withLastMoodUpdate(now));
-        LOGGER.at(Level.FINE).log("Cat %s happiness decayed by %d", catUuid, decayTicks * MOOD_DECAY_AMOUNT);
+        LOGGER.at(Level.FINE).log(
+            "Cat %s happiness decayed by %d", catUuid, decayTicks * MOOD_DECAY_AMOUNT);
         return decayed;
       }
     }
@@ -127,7 +128,6 @@ public class CatsHappinessManager {
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     return HappinessLevel.fromValue(getHappiness(catRef, store));
   }
-
 
   @Nullable
   private CatDataEntry getCatDataEntry(

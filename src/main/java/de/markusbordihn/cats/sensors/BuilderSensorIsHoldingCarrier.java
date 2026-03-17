@@ -37,7 +37,7 @@ import de.markusbordihn.cats.Constants;
 import javax.annotation.Nonnull;
 
 public class BuilderSensorIsHoldingCarrier extends BuilderSensorBase {
-  public static final String SENSOR_ID = "IsHoldingCarrier";
+  public static final String SENSOR_ID = "IsHoldingCatsCarrier";
 
   @Nonnull
   @Override

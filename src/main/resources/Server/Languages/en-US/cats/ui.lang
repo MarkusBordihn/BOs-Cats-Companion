@@ -47,6 +47,13 @@ taming_success.title=You tamed a cat!
 taming_success.name_label=Give your cat a name:
 taming_success.placeholder=Cat name
 taming_success.confirm=Confirm
-taming_success.tip1=Press F with an empty hand to open the interaction menu
+taming_success.tip1=Press F with an empty hand to open the action wheel
 taming_success.tip2=Press F while holding food to feed and heal your cat
 taming_success.tip3=Use /cat for commands like sit, follow, sleep and more
+
+# Info Panel
+panel.personality=Personality:
+panel.secondary=Secondary:
+panel.gifts=Gifts:
+panel.rename=Rename
+panel.personality.none=Unknown

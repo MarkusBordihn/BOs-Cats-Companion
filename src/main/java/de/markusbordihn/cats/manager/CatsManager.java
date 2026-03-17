@@ -347,7 +347,8 @@ public class CatsManager extends RefSystem<EntityStore> {
         CatDataEntry updatedEntry = catDataEntry.withState(state);
         if (catDataEntry.state().isSleepingState() && !state.isSleepingState()) {
           updatedEntry = updatedEntry.withLastMoodUpdate(System.currentTimeMillis());
-          LOGGER.at(Level.FINE).log("Cat %s woke up – mood timer reset to prevent sleep decay", catUuid);
+          LOGGER.at(Level.FINE).log(
+              "Cat %s woke up – mood timer reset to prevent sleep decay", catUuid);
         }
 
         resource.updateCat(catUuid, updatedEntry);
@@ -501,7 +502,6 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     return happinessManager.getHappinessLevel(catRef, store);
   }
-
 
   @Nullable
   public GiftType tryGiveGift(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
