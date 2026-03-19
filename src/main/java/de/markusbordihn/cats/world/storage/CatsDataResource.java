@@ -41,6 +41,8 @@ import javax.annotation.Nullable;
 
 public class CatsDataResource implements Resource<EntityStore> {
 
+  public static final String ID = "CatsData";
+
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
   public static final BuilderCodec<CatsDataResource> CODEC =

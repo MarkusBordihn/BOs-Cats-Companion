@@ -7,6 +7,14 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.8.0
+
+- Fixed kitten calico spawn egg not working due to wrong NPC role.
+- Fixed and improved translation keys and messages for better clarity and consistency.
+- Added automatic permission node registration for all commands to simplifying permission
+  management.
+- General code optimizations and refactoring for better maintainability and performance.
+
 ### 2.7.0
 
 - Moved config files from `config/cats/` to `mods/Cats/` to match the official Hytale mod path

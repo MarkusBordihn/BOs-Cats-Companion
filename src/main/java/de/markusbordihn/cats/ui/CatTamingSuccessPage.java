@@ -49,14 +49,13 @@ public final class CatTamingSuccessPage
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static final long PAGE_CONFLICT_THRESHOLD_MS = 100;
   private static final String KEY_NAME_INPUT = "@CatTamingNameInput";
-
-  private long openedAt;
   private final UUID catUuid;
   private final String catType;
   private final String initialName;
   private final PersonalityType primaryPersonality;
   private final PersonalityType secondaryPersonality;
   private final int happiness;
+  private long openedAt;
 
   public CatTamingSuccessPage(
       @Nonnull PlayerRef playerRef,

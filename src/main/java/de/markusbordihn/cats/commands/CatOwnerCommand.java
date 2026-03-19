@@ -46,6 +46,11 @@ final class CatOwnerCommand extends CatCommand {
   }
 
   @Override
+  protected boolean requiresOp() {
+    return true;
+  }
+
+  @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
 
@@ -54,9 +59,10 @@ final class CatOwnerCommand extends CatCommand {
     String ownerName = this.ownerArg.get(context);
     Optional<Ref<EntityStore>> entityOpt = getEntityFromArgument(this.entityArg, store, context);
     if (entityOpt.isEmpty()) {
-      context.sendMessage(Message.raw("No entity in view.").color(Constants.COLOR_ERROR));
       context.sendMessage(
-          Message.raw("Look at a cat and use: /cat owner <player>").color(Constants.COLOR_GRAY));
+          Message.translation("cats.commands.owner.no_entity").color(Constants.COLOR_ERROR));
+      context.sendMessage(
+          Message.translation("cats.commands.owner.usage").color(Constants.COLOR_GRAY));
       return;
     }
 
@@ -70,7 +76,9 @@ final class CatOwnerCommand extends CatCommand {
 
     if (newOwnerId == null) {
       context.sendMessage(
-          Message.raw("Player '" + ownerName + "' not found online!").color(Constants.COLOR_ERROR));
+          Message.translation("cats.commands.owner.player_not_found")
+              .param("name", ownerName)
+              .color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -79,6 +87,9 @@ final class CatOwnerCommand extends CatCommand {
       catsManager.assignOwner(entityOpt.get(), newOwnerId, ownerName, null, "Pet", store);
     }
 
-    context.sendMessage(Message.raw("Owner set to: " + ownerName).color(Constants.COLOR_SUCCESS));
+    context.sendMessage(
+        Message.translation("cats.commands.owner.success")
+            .param("name", ownerName)
+            .color(Constants.COLOR_SUCCESS));
   }
 }

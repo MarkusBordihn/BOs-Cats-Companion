@@ -26,10 +26,13 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
+import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
 import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
@@ -344,6 +347,43 @@ public class CatCarrierInteraction {
           "replaceItemStackInSlot failed, falling back to remove+add");
       inventory.getHotbar().removeItemStackFromSlot(activeSlot, 1);
       inventory.getHotbar().addItemStackToSlot(activeSlot, newItem);
+    }
+  }
+
+  public static void onPlayerInteract(PlayerInteractEvent event) {
+    if (event.isCancelled()) {
+      return;
+    }
+
+    ItemStack heldItem = event.getItemInHand();
+    if (heldItem == null || !Constants.CAT_CARRIER_ITEM.equals(heldItem.getItemId())) {
+      return;
+    }
+
+    if (!hasStoredCat(heldItem)) {
+      return;
+    }
+
+    if (event.getTargetEntity() != null) {
+      return;
+    }
+
+    InteractionType actionType = event.getActionType();
+    LOGGER.at(Level.INFO).log(
+        "Carrier release event: actionType=%s, targetBlock=%s", actionType, event.getTargetBlock());
+
+    Player player = event.getPlayer();
+    Store<EntityStore> store = event.getPlayerRef().getStore();
+
+    Vector3d targetPos = null;
+    Vector3i targetBlock = event.getTargetBlock();
+    if (targetBlock != null) {
+      targetPos = new Vector3d(targetBlock.getX(), targetBlock.getY(), targetBlock.getZ());
+    }
+
+    boolean consumed = handleRelease(store, player, heldItem, targetPos);
+    if (consumed) {
+      event.setCancelled(true);
     }
   }
 }

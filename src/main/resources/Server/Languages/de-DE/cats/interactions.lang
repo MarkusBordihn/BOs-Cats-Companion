@@ -1,6 +1,6 @@
 # Item Interactions
-item.unknown=Die Katze schnuppert neugierig, weiß aber nicht was sie damit anfangen soll.
-item.unknown.named={catName} schnuppert neugierig, weiß aber nicht was sie damit anfangen soll.
+item.unknown=Die Katze schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
+item.unknown.named={catName} schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
 wild.reject=*fauchen* Die wilde Katze traut dir damit nicht!
 
 # Taming
@@ -17,6 +17,16 @@ taming.likes_food=Die Katze fängt an dich zu mögen!
 taming.almost_there=Die Katze ist fast bereit dir zu vertrauen!
 taming.too_soon=Die Katze ist noch satt! Warte noch {seconds} Sekunden bevor du wieder fütterst.
 
+# Cat Carrier
+carrier.captured={catName} (UUID: {catUuid}) ist in der Transportbox.
+carrier.released={catName} wurde freigelassen.
+carrier.already_occupied=Transportbox belegt: {catName} (UUID: {catUuid}). Rechtsklick auf den Boden zum Freilassen.
+carrier.not_tamed=Nur gezähmte Katzen können in die Transportbox.
+carrier.not_owner=Du kannst nur deine eigenen Katzen einpacken.
+carrier.release_failed=Freilassen aus der Transportbox fehlgeschlagen.
+carrier.error=Fehler mit der Katzentransportbox.
+carrier.empty=Transportbox leer. Bei gezähmter Katze benutzen.
+
 # Play Interactions
 play.cooldown=Deine Katze ist müde vom Spielen und braucht eine Pause.
 
@@ -27,14 +37,14 @@ owner.gift={name} hat dir ein kleines Geschenk gebracht: {gift}!
 # Feeding
 feeding.healed=Deine Katze wurde geheilt! (+{amount} HP, jetzt {health}/{maxHealth})
 feeding.full_health=Deine Katze hat bereits volle Gesundheit!
-feeding.treat.healed=Deine Katze knabbert genüsslich den Leckerli! (+{amount} HP, jetzt {health}/{maxHealth})
-feeding.treat.full_health=Deine Katze ist eigentlich satt, aber der Leckerli riecht einfach zu verlockend, schnurr!
+feeding.treat.healed=Deine Katze knabbert genüsslich das Leckerli! (+{amount} HP, jetzt {health}/{maxHealth})
+feeding.treat.full_health=Deine Katze ist eigentlich satt, aber das Leckerli riecht einfach zu verlockend, schnurr!
 feeding.treat.cooldown=Deine Katze ist noch satt vom letzten Leckerli, warte noch einen Moment.
 
 # Hints
-hint.tame=Drücke [{key}] um zu zähmen
-hint.owner_wheel=Drücke [{key}] um das Aktionsrad zu öffnen
-hint.owner_feed=Drücke [{key}] um deine Katze zu füttern
-hint.owner_play=Drücke [{key}] um mit deiner Katze zu spielen
-hint.carrier=Drücke [{key}] um in Träger zu stecken
+hint.tame=Drücke [{key}], um zu zähmen
+hint.owner_wheel=Drücke [{key}], um das Aktionsrad zu öffnen
+hint.owner_feed=Drücke [{key}], um deine Katze zu füttern
+hint.owner_play=Drücke [{key}], um mit deiner Katze zu spielen
+hint.carrier=Drücke [{key}], um die Katze einzupacken
 hint.stranger=Diese Katze gehört jemand anderem

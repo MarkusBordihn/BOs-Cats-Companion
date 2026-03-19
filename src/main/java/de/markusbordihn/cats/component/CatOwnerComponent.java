@@ -35,6 +35,8 @@ import javax.annotation.Nullable;
 
 public class CatOwnerComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatOwner";
+
   public static final String OWNER_ID_TAG = "OwnerId";
   public static final String OWNER_NAME_TAG = "OwnerName";
   public static final String TAMED_TIMESTAMP_TAG = "TamedTimestamp";

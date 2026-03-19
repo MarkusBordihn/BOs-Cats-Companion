@@ -42,6 +42,11 @@ final class CatReloadCommand extends CatCommand {
   }
 
   @Override
+  protected boolean requiresOp() {
+    return true;
+  }
+
+  @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
 

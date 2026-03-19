@@ -18,8 +18,8 @@ taming.almost_there=The cat is almost ready to trust you!
 taming.too_soon=The cat is still full! Wait {seconds} more seconds before feeding again.
 
 # Cat Carrier
-carrier.captured=✓ {catName} (UUID: {catUuid}) has been safely placed into the carrier!
-carrier.released=✓ {catName} has been released from the carrier!
+carrier.captured={catName} (UUID: {catUuid}) has been safely placed into the carrier!
+carrier.released={catName} has been released from the carrier!
 carrier.already_occupied=The carrier contains {catName} (UUID: {catUuid}). Right-click on the ground to release.
 carrier.not_tamed=You can only carry tamed cats.
 carrier.not_owner=You can only carry your own cats.

@@ -32,6 +32,8 @@ import javax.annotation.Nullable;
 
 public class CatTargetComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatTarget";
+
   public static final String TARGET_ENTITY_UUID_TAG = "TargetEntityUUID";
 
   @Nonnull

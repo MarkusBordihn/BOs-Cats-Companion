@@ -33,6 +33,8 @@ import javax.annotation.Nullable;
 
 public class CatBedTargetComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatBedTarget";
+
   private static final String X_TAG = "X";
   private static final String Y_TAG = "Y";
   private static final String Z_TAG = "Z";

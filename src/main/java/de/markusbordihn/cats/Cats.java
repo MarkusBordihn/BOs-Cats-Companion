@@ -23,12 +23,7 @@ import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3i;
-import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -63,6 +58,7 @@ import de.markusbordihn.cats.interaction.CatCarrierInteraction;
 import de.markusbordihn.cats.interaction.UseCatCarrierInteraction;
 import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.manager.CatsNamesManager;
+import de.markusbordihn.cats.permission.PermissionManager;
 import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingCarrier;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingEmptyHand;
@@ -73,6 +69,7 @@ import de.markusbordihn.cats.spawn.CatSpawnConfigSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 @SuppressWarnings("unused")
@@ -86,6 +83,26 @@ public class Cats extends JavaPlugin {
         BuilderActionCatInteractionOwner.class,
         BuilderActionCatInteractionStranger.class
       };
+
+  private static final String[] SENSOR_IDS = {
+    BuilderSensorIsCatTamed.SENSOR_ID,
+    BuilderSensorIsOwner.SENSOR_ID,
+    BuilderSensorIsHoldingCarrier.SENSOR_ID,
+    BuilderSensorIsHoldingFood.SENSOR_ID,
+    BuilderSensorIsHoldingEmptyHand.SENSOR_ID,
+    BuilderSensorIsHoldingYarnBall.SENSOR_ID,
+  };
+
+  @SuppressWarnings("rawtypes")
+  private static final Supplier[] SENSOR_SUPPLIERS = {
+    BuilderSensorIsCatTamed::new,
+    BuilderSensorIsOwner::new,
+    BuilderSensorIsHoldingCarrier::new,
+    BuilderSensorIsHoldingFood::new,
+    BuilderSensorIsHoldingEmptyHand::new,
+    BuilderSensorIsHoldingYarnBall::new,
+  };
+
   public static ComponentType<EntityStore, CatTargetComponent> catTargetComponentType;
   private static Cats instance;
   public ComponentType<EntityStore, CatOwnerComponent> catOwnerComponentType;
@@ -97,6 +114,7 @@ public class Cats extends JavaPlugin {
   private boolean actionsRegistered = false;
   private boolean sensorsRegistered = false;
   private boolean damageFilterRegistered = false;
+  private CatCommands catCommands;
 
   public Cats(JavaPluginInit init) {
     super(init);
@@ -165,6 +183,7 @@ public class Cats extends JavaPlugin {
     actionsRegistered = true;
   }
 
+  @SuppressWarnings("unchecked")
   private void registerCatSensors(NPCPlugin npcPlugin) {
     if (sensorsRegistered) {
       LOGGER.at(Level.INFO).log("Custom sensors already registered - skipping");
@@ -175,104 +194,65 @@ public class Cats extends JavaPlugin {
 
     BuilderFactory<Sensor> sensorFactory = npcPlugin.getBuilderManager().getFactory(Sensor.class);
 
-    try {
-      sensorFactory.add(BuilderSensorIsCatTamed.SENSOR_ID, BuilderSensorIsCatTamed::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsCatTamed.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsCatTamed.SENSOR_ID, e);
-    }
-
-    try {
-      sensorFactory.add(BuilderSensorIsOwner.SENSOR_ID, BuilderSensorIsOwner::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsOwner.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsOwner.SENSOR_ID, e);
-    }
-
-    try {
-      sensorFactory.add(
-          BuilderSensorIsHoldingCarrier.SENSOR_ID, BuilderSensorIsHoldingCarrier::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingCarrier.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsHoldingCarrier.SENSOR_ID, e);
-    }
-
-    try {
-      sensorFactory.add(BuilderSensorIsHoldingFood.SENSOR_ID, BuilderSensorIsHoldingFood::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingFood.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsHoldingFood.SENSOR_ID, e);
-    }
-
-    try {
-      sensorFactory.add(
-          BuilderSensorIsHoldingEmptyHand.SENSOR_ID, BuilderSensorIsHoldingEmptyHand::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingEmptyHand.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsHoldingEmptyHand.SENSOR_ID, e);
-    }
-
-    try {
-      sensorFactory.add(
-          BuilderSensorIsHoldingYarnBall.SENSOR_ID, BuilderSensorIsHoldingYarnBall::new);
-      LOGGER.at(Level.INFO).log("Registered sensor: %s", BuilderSensorIsHoldingYarnBall.SENSOR_ID);
-    } catch (Exception e) {
-      LOGGER.at(Level.SEVERE).log(
-          "Failed to register sensor: %s", BuilderSensorIsHoldingYarnBall.SENSOR_ID, e);
+    int registeredCount = 0;
+    for (int i = 0; i < SENSOR_IDS.length; i++) {
+      String sensorId = SENSOR_IDS[i];
+      try {
+        sensorFactory.add(sensorId, SENSOR_SUPPLIERS[i]);
+        registeredCount++;
+        LOGGER.at(Level.INFO).log("Registered sensor: %s", sensorId);
+      } catch (Exception e) {
+        LOGGER.at(Level.SEVERE).log("Failed to register sensor: %s", sensorId, e);
+      }
     }
 
     sensorsRegistered = true;
-    LOGGER.at(Level.INFO).log("Finished registering custom cat sensors");
+    LOGGER.at(Level.INFO).log("Registered %d cat sensors", registeredCount);
   }
 
   @Override
   protected void setup() {
     super.setup();
-    LOGGER.at(Level.INFO).log("Setting up %s Plugin...", Constants.MOD_NAME);
-    LOGGER.at(Level.INFO).log("Plugin: %s", getManifest().getName());
-    LOGGER.at(Level.INFO).log("Version: %s", getManifest().getVersion());
-    LOGGER.at(Level.INFO).log("Author: %s", getManifest().getAuthors());
-    LOGGER.at(Level.INFO).log("Description: %s", getManifest().getDescription());
+    LOGGER.at(Level.INFO).log(
+        "Setting up %s (v%s by %s): %s",
+        getManifest().getName(),
+        getManifest().getVersion(),
+        getManifest().getAuthors(),
+        getManifest().getDescription());
 
-    LOGGER.at(Level.INFO).log("Registering cat components...");
+    LOGGER.at(Level.INFO).log("Registering components and resources...");
     catOwnerComponentType =
         getEntityStoreRegistry()
-            .registerComponent(CatOwnerComponent.class, "CatOwner", CatOwnerComponent.CODEC);
+            .registerComponent(
+                CatOwnerComponent.class, CatOwnerComponent.ID, CatOwnerComponent.CODEC);
     catStateComponentType =
         getEntityStoreRegistry()
-            .registerComponent(CatStateComponent.class, "CatState", CatStateComponent.CODEC);
+            .registerComponent(
+                CatStateComponent.class, CatStateComponent.ID, CatStateComponent.CODEC);
     catBedTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(
-                CatBedTargetComponent.class, "CatBedTarget", CatBedTargetComponent.CODEC);
+                CatBedTargetComponent.class, CatBedTargetComponent.ID, CatBedTargetComponent.CODEC);
     catTamingProgressComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatTamingProgressComponent.class,
-                "CatTamingProgress",
+                CatTamingProgressComponent.ID,
                 CatTamingProgressComponent.CODEC);
     catTargetComponentType =
         getEntityStoreRegistry()
-            .registerComponent(CatTargetComponent.class, "CatTarget", CatTargetComponent.CODEC);
+            .registerComponent(
+                CatTargetComponent.class, CatTargetComponent.ID, CatTargetComponent.CODEC);
     catMoodComponentType =
         getEntityStoreRegistry()
-            .registerComponent(CatMoodComponent.class, "CatMood", CatMoodComponent.CODEC);
-
-    LOGGER.at(Level.INFO).log("Registering cat resources...");
+            .registerComponent(CatMoodComponent.class, CatMoodComponent.ID, CatMoodComponent.CODEC);
     catsDataResourceType =
         getEntityStoreRegistry()
-            .registerResource(CatsDataResource.class, "CatsData", CatsDataResource.CODEC);
+            .registerResource(CatsDataResource.class, CatsDataResource.ID, CatsDataResource.CODEC);
 
-    LOGGER.at(Level.INFO).log("Registering cat systems...");
+    LOGGER.at(Level.INFO).log("Registering systems...");
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
-
-    LOGGER.at(Level.INFO).log("Registering cats manager...");
     getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
 
     LOGGER.at(Level.INFO).log("Registering cat damage filter system...");
@@ -298,7 +278,6 @@ public class Cats extends JavaPlugin {
           "Cannot register damage filter system: event registry not available");
     }
 
-    LOGGER.at(Level.INFO).log("Registering custom item interaction types...");
     this.getCodecRegistry(Interaction.CODEC)
         .register("UseCatCarrier", UseCatCarrierInteraction.class, UseCatCarrierInteraction.CODEC);
 
@@ -306,8 +285,6 @@ public class Cats extends JavaPlugin {
     GeneralConfig.initialize();
     SpawnConfig.initialize();
     ProtectionConfig.initialize();
-
-    LOGGER.at(Level.INFO).log("Initializing cat names manager...");
     CatsNamesManager.initialize();
 
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
@@ -331,7 +308,8 @@ public class Cats extends JavaPlugin {
     }
 
     LOGGER.at(Level.INFO).log("Registering commands...");
-    this.getCommandRegistry().registerCommand(new CatCommands());
+    catCommands = new CatCommands();
+    this.getCommandRegistry().registerCommand(catCommands);
 
     LOGGER.at(Level.INFO).log("Registering spawn config system...");
     if (getEventRegistry() != null) {
@@ -345,48 +323,9 @@ public class Cats extends JavaPlugin {
           "Event registry not available, spawn config modifications will not be applied");
     }
 
-    LOGGER.at(Level.INFO).log("Registering cat carrier interaction listener...");
     if (getEventRegistry() != null) {
       getEventRegistry()
-          .registerGlobal(PlayerInteractEvent.class, this::onPlayerInteractCarrierRelease);
-    }
-  }
-
-  private void onPlayerInteractCarrierRelease(PlayerInteractEvent event) {
-    if (event.isCancelled()) {
-      return;
-    }
-
-    ItemStack heldItem = event.getItemInHand();
-    if (heldItem == null || !Constants.CAT_CARRIER_ITEM.equals(heldItem.getItemId())) {
-      return;
-    }
-
-    if (!CatCarrierInteraction.hasStoredCat(heldItem)) {
-      return;
-    }
-
-    // Skip if targeting a cat entity — that's handled by NPC action (ItemInteractionOwner)
-    if (event.getTargetEntity() != null) {
-      return;
-    }
-
-    InteractionType actionType = event.getActionType();
-    LOGGER.at(Level.INFO).log(
-        "Carrier release event: actionType=%s, targetBlock=%s", actionType, event.getTargetBlock());
-
-    Player player = event.getPlayer();
-    com.hypixel.hytale.component.Store<EntityStore> store = event.getPlayerRef().getStore();
-
-    Vector3d targetPos = null;
-    Vector3i targetBlock = event.getTargetBlock();
-    if (targetBlock != null) {
-      targetPos = new Vector3d(targetBlock.getX(), targetBlock.getY(), targetBlock.getZ());
-    }
-
-    boolean consumed = CatCarrierInteraction.handleRelease(store, player, heldItem, targetPos);
-    if (consumed) {
-      event.setCancelled(true);
+          .registerGlobal(PlayerInteractEvent.class, CatCarrierInteraction::onPlayerInteract);
     }
   }
 
@@ -394,6 +333,10 @@ public class Cats extends JavaPlugin {
   protected void start() {
     super.start();
     LOGGER.at(Level.INFO).log("Starting Cats Plugin...");
+
+    if (catCommands != null) {
+      PermissionManager.initializeDefaultPermissions(catCommands.buildPlayerPermissionNodes());
+    }
 
     // Detect LuckPerms after Universe is ready
     Universe.get().getUniverseReady().thenRun(LuckPermsCompat::detect);

@@ -33,6 +33,8 @@ import javax.annotation.Nonnull;
 
 public class CatMoodComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatMood";
+
   public static final String HAPPINESS_TAG = "Happiness";
   public static final String LAST_UPDATE_TAG = "LastMoodUpdate";
 

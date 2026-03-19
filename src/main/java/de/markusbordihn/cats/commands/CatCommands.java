@@ -20,28 +20,50 @@
 package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class CatCommands extends AbstractCommandCollection {
+
+  private final List<CatCommand> catSubCommands = new ArrayList<>();
+
   public CatCommands() {
     super("cat", "Cat management commands");
     this.addAliases("cats");
 
-    this.addSubCommand(new CatPounceCommand());
-    this.addSubCommand(new CatBedCommand());
-    this.addSubCommand(new CatDespawnCommand());
-    this.addSubCommand(new CatFollowCommand());
-    this.addSubCommand(new CatInfoCommand());
-    this.addSubCommand(new CatListCommand());
-    this.addSubCommand(new CatNameCommand());
-    this.addSubCommand(new CatOwnerCommand());
-    this.addSubCommand(new CatPlayCommand());
-    this.addSubCommand(new CatReloadCommand());
-    this.addSubCommand(new CatReleaseCommand());
-    this.addSubCommand(new CatSearchCommand());
-    this.addSubCommand(new CatSitCommand());
-    this.addSubCommand(new CatSleepCommand());
-    this.addSubCommand(new CatSpawnCommand());
-    this.addSubCommand(new CatWaitCommand());
-    this.addSubCommand(new CatWanderCommand());
+    register(new CatPounceCommand());
+    register(new CatBedCommand());
+    register(new CatDespawnCommand());
+    register(new CatFollowCommand());
+    register(new CatInfoCommand());
+    register(new CatListCommand());
+    register(new CatNameCommand());
+    register(new CatOwnerCommand());
+    register(new CatPlayCommand());
+    register(new CatReloadCommand());
+    register(new CatReleaseCommand());
+    register(new CatSearchCommand());
+    register(new CatSitCommand());
+    register(new CatSleepCommand());
+    register(new CatSpawnCommand());
+    register(new CatWaitCommand());
+    register(new CatWanderCommand());
+  }
+
+  private void register(CatCommand cmd) {
+    this.addSubCommand(cmd);
+    this.catSubCommands.add(cmd);
+  }
+
+  public Set<String> buildPlayerPermissionNodes() {
+    Set<String> nodes =
+        catSubCommands.stream()
+            .filter(cmd -> !cmd.requiresOp())
+            .map(CatCommand::getPermission)
+            .collect(Collectors.toCollection(java.util.HashSet::new));
+    nodes.add(this.getPermission());
+    return nodes;
   }
 }

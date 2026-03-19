@@ -46,6 +46,10 @@ public abstract class CatCommand extends AbstractWorldCommand {
     super(name, description);
   }
 
+  protected boolean requiresOp() {
+    return false;
+  }
+
   protected void checkPermissionAlways(@Nonnull CommandContext context, @Nonnull String permission)
       throws NoPermissionException {
     PermissionManager.checkPermissionAlways(context, permission);

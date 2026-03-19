@@ -109,7 +109,8 @@ final class CatSpawnCommand extends CatCommand {
 
                   String catName = cat.name() != null ? cat.name() : "Cat";
                   context.sendMessage(
-                      Message.raw("The cat " + catName + " has been teleported to you!")
+                      Message.translation("cats.commands.spawn.teleported")
+                          .param("name", catName)
                           .color(Constants.COLOR_SUCCESS));
                   return;
                 }

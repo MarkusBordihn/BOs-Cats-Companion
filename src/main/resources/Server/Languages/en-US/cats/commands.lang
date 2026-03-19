@@ -18,8 +18,15 @@ sleep.success={name} curls up for a nap
 wait.success={name} is patiently waiting
 wander.success={name} is freely exploring the area
 
+# Owner Command
+owner.no_entity=No entity in view.
+owner.usage=Look at a cat and use: /cat owner <player>
+owner.player_not_found=Player '{name}' not found online!
+owner.success=Owner set to: {name}
+
 # Spawn/Despawn Commands
-spawn.success=✓ Spawned {count} cat(s)!
+spawn.teleported=The cat {name} has been teleported to you!
+spawn.success=Spawned {count} cat(s)!
 spawn.failed=Failed to spawn cats
 spawn.no_despawned=You have no despawned cats to spawn
 spawn.no_match=No despawned cats found matching '{filter}'
@@ -27,12 +34,13 @@ despawn.success=✓ {name} has been despawned!
 despawn.info=Use /cat spawn to bring your cat back
 
 # Release Command
-release.success=✓ {name} has been released back to the wild!
+release.success={name} has been released back to the wild!
 release.info=The cat will now wander freely and can be tamed by any player
 release.already_wild=This cat is already wild!
 
 # Error Messages
 error.no_cat=No cat in view, look at a cat to use this command
+error.no_permission=You don't have permission to use this command
 error.no_position=Cannot determine cat position
 error.not_owned=This cat is still wild and doesn't have an owner
 error.not_owner={name} belongs to {owner}
@@ -44,5 +52,5 @@ error.player_ref_not_found=Unable to get player reference
 error.player_pos_not_found=Unable to get player position
 
 # Reload Command
-reload.success=✓ Cats configuration reloaded successfully!
+reload.success=Cats configuration reloaded successfully!
 reload.failed=Failed to reload configuration

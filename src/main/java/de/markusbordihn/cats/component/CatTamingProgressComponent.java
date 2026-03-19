@@ -32,6 +32,8 @@ import javax.annotation.Nonnull;
 
 public class CatTamingProgressComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatTamingProgress";
+
   public static final String CURRENT_PROGRESS_TAG = "CurrentProgress";
   public static final String REQUIRED_PROGRESS_TAG = "RequiredProgress";
   public static final String LAST_FED_TIMESTAMP_TAG = "LastFedTimestamp";

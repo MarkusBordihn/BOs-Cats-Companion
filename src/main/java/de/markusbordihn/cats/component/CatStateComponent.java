@@ -32,6 +32,8 @@ import javax.annotation.Nonnull;
 
 public class CatStateComponent implements Component<EntityStore> {
 
+  public static final String ID = "CatState";
+
   public static final String STATE_TAG = "State";
 
   private static final EnumCodec<CatState> STATE_CODEC = new EnumCodec<>(CatState.class);
