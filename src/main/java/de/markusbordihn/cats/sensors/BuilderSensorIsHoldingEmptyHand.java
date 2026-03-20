@@ -20,28 +20,20 @@
 package de.markusbordihn.cats.sensors;
 
 import com.google.gson.JsonElement;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
-import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
-import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import javax.annotation.Nonnull;
 
-public class BuilderSensorIsHoldingEmptyHand extends BuilderSensorBase {
+public class BuilderSensorIsHoldingEmptyHand extends BuilderSensorIsHoldingItemBase {
   public static final String SENSOR_ID = "IsHoldingCatsEmptyHand";
 
   @Nonnull
   @Override
   public Sensor build(BuilderSupport support) {
-    return new SensorIsHoldingEmptyHand(this, support);
+    return new SensorIsHoldingEmptyHand(this);
   }
 
   @Nonnull
@@ -68,43 +60,19 @@ public class BuilderSensorIsHoldingEmptyHand extends BuilderSensorBase {
     return BuilderDescriptorState.Stable;
   }
 
-  public static class SensorIsHoldingEmptyHand extends SensorBase {
-    public SensorIsHoldingEmptyHand(BuilderSensorBase builder, BuilderSupport support) {
+  public static class SensorIsHoldingEmptyHand extends SensorIsHoldingItemBase {
+    public SensorIsHoldingEmptyHand(BuilderSensorBase builder) {
       super(builder);
     }
 
     @Override
-    public boolean matches(
-        @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
-        double dt,
-        @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
-        return false;
-      }
-
-      Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
-      if (playerRef == null) {
-        return false;
-      }
-
-      Player player = store.getComponent(playerRef, Player.getComponentType());
-      if (player == null) {
-        return false;
-      }
-
-      Inventory inventory = player.getInventory();
-      if (inventory == null) {
-        return false;
-      }
-
-      ItemStack activeItem = inventory.getActiveHotbarItem();
-      return activeItem == null || activeItem.isEmpty();
+    protected boolean matchesEmptyHand() {
+      return true;
     }
 
     @Override
-    public InfoProvider getSensorInfo() {
-      return null;
+    protected boolean matchesActiveItem(@Nonnull ItemStack activeItem) {
+      return false;
     }
   }
 }

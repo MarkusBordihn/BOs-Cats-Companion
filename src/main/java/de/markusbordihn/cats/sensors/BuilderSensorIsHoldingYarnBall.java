@@ -20,29 +20,21 @@
 package de.markusbordihn.cats.sensors;
 
 import com.google.gson.JsonElement;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
-import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
-import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.Constants;
 import javax.annotation.Nonnull;
 
-public class BuilderSensorIsHoldingYarnBall extends BuilderSensorBase {
+public class BuilderSensorIsHoldingYarnBall extends BuilderSensorIsHoldingItemBase {
   public static final String SENSOR_ID = "IsHoldingCatsYarnBall";
 
   @Nonnull
   @Override
   public Sensor build(BuilderSupport support) {
-    return new SensorIsHoldingYarnBall(this, support);
+    return new SensorIsHoldingYarnBall(this);
   }
 
   @Nonnull
@@ -69,47 +61,14 @@ public class BuilderSensorIsHoldingYarnBall extends BuilderSensorBase {
     return BuilderDescriptorState.Stable;
   }
 
-  public static class SensorIsHoldingYarnBall extends SensorBase {
-    public SensorIsHoldingYarnBall(BuilderSensorBase builder, BuilderSupport support) {
+  public static class SensorIsHoldingYarnBall extends SensorIsHoldingItemBase {
+    public SensorIsHoldingYarnBall(BuilderSensorBase builder) {
       super(builder);
     }
 
     @Override
-    public boolean matches(
-        @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
-        double dt,
-        @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
-        return false;
-      }
-
-      Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
-      if (playerRef == null) {
-        return false;
-      }
-
-      Player player = store.getComponent(playerRef, Player.getComponentType());
-      if (player == null) {
-        return false;
-      }
-
-      Inventory inventory = player.getInventory();
-      if (inventory == null) {
-        return false;
-      }
-
-      ItemStack activeItem = inventory.getActiveHotbarItem();
-      if (activeItem == null || activeItem.isEmpty()) {
-        return false;
-      }
-
+    protected boolean matchesActiveItem(@Nonnull ItemStack activeItem) {
       return Constants.CAT_YARN_BALL_ITEM.equals(activeItem.getItemId());
-    }
-
-    @Override
-    public InfoProvider getSensorInfo() {
-      return null;
     }
   }
 }

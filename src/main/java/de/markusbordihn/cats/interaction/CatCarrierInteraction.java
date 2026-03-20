@@ -102,6 +102,12 @@ public class CatCarrierInteraction {
     }
 
     CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager == null) {
+      player.sendMessage(
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      return true;
+    }
+
     UUID catUuid = catsManager.getUuid(entityRef, store);
     if (catUuid == null) {
       player.sendMessage(
@@ -194,6 +200,12 @@ public class CatCarrierInteraction {
     }
 
     CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager == null) {
+      player.sendMessage(
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      return true;
+    }
+
     CatDataEntry catData = catsManager.getCatData(storedCatUuid, store);
     if (catData == null) {
       player.sendMessage(
@@ -208,26 +220,11 @@ public class CatCarrierInteraction {
       return true;
     }
 
-    Vector3d spawnPos;
-    if (targetPos != null) {
-      spawnPos =
-          new Vector3d(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
-    } else {
-      Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
-      if (playerRef == null || !playerRef.isValid()) {
-        player.sendMessage(
-            Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
-        return true;
-      }
-      TransformComponent playerTransform =
-          store.getComponent(playerRef, TransformComponent.getComponentType());
-      if (playerTransform == null) {
-        player.sendMessage(
-            Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
-        return true;
-      }
-      Vector3d playerPos = playerTransform.getPosition();
-      spawnPos = playerPos.add(Math.random() * 4 - 2, 0, Math.random() * 4 - 2);
+    Vector3d spawnPos = resolveSpawnPosition(store, player, playerUuid, targetPos);
+    if (spawnPos == null) {
+      player.sendMessage(
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      return true;
     }
 
     if (!spawnCatFromData(catData, spawnPos, store)) {
@@ -257,6 +254,30 @@ public class CatCarrierInteraction {
       return false;
     }
     return heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC) != null;
+  }
+
+  @Nullable
+  private static Vector3d resolveSpawnPosition(
+      @Nonnull Store<EntityStore> store,
+      @Nonnull Player player,
+      @Nonnull UUID playerUuid,
+      @Nullable Vector3d targetPos) {
+    if (targetPos != null) {
+      return new Vector3d(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
+    }
+
+    Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
+    if (playerRef == null || !playerRef.isValid()) {
+      return null;
+    }
+
+    TransformComponent playerTransform =
+        store.getComponent(playerRef, TransformComponent.getComponentType());
+    if (playerTransform == null) {
+      return null;
+    }
+
+    return playerTransform.getPosition().add(Math.random() * 4 - 2, 0, Math.random() * 4 - 2);
   }
 
   private static boolean spawnCatFromData(
@@ -295,6 +316,10 @@ public class CatCarrierInteraction {
 
       Ref<EntityStore> catRef = spawnResult.left();
       CatsManager catsManager = CatsManager.getInstance();
+      if (catsManager == null) {
+        LOGGER.at(Level.WARNING).log("Cannot restore cat data after spawn: CatsManager is null");
+        return true;
+      }
 
       UUID newEntityUuid = catsManager.getUuid(catRef, store);
       if (newEntityUuid != null && !newEntityUuid.equals(catData.uuid())) {

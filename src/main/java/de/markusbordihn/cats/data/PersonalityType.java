@@ -60,4 +60,17 @@ public enum PersonalityType {
   public float getPlayModifier() {
     return playModifier;
   }
+
+  public CatBehaviorProfile getBaseProfile() {
+    return switch (this) {
+      case LAZY -> CatBehaviorProfile.baseLazy();
+      case PLAYFUL -> CatBehaviorProfile.basePlayful();
+      case SHY -> CatBehaviorProfile.baseShy();
+      case BRAVE -> CatBehaviorProfile.baseBrave();
+      case CURIOUS -> CatBehaviorProfile.baseCurious();
+      case CUDDLY -> CatBehaviorProfile.baseCuddly();
+      case INDEPENDENT -> CatBehaviorProfile.baseIndependent();
+      case MISCHIEVOUS -> CatBehaviorProfile.baseMischievous();
+    };
+  }
 }

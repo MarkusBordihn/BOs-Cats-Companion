@@ -20,29 +20,21 @@
 package de.markusbordihn.cats.sensors;
 
 import com.google.gson.JsonElement;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
-import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
-import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.Constants;
 import javax.annotation.Nonnull;
 
-public class BuilderSensorIsHoldingCarrier extends BuilderSensorBase {
+public class BuilderSensorIsHoldingCarrier extends BuilderSensorIsHoldingItemBase {
   public static final String SENSOR_ID = "IsHoldingCatsCarrier";
 
   @Nonnull
   @Override
   public Sensor build(BuilderSupport support) {
-    return new SensorIsHoldingCarrier(this, support);
+    return new SensorIsHoldingCarrier(this);
   }
 
   @Nonnull
@@ -69,47 +61,14 @@ public class BuilderSensorIsHoldingCarrier extends BuilderSensorBase {
     return BuilderDescriptorState.Stable;
   }
 
-  public static class SensorIsHoldingCarrier extends SensorBase {
-    public SensorIsHoldingCarrier(BuilderSensorBase builder, BuilderSupport support) {
+  public static class SensorIsHoldingCarrier extends SensorIsHoldingItemBase {
+    public SensorIsHoldingCarrier(BuilderSensorBase builder) {
       super(builder);
     }
 
     @Override
-    public boolean matches(
-        @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
-        double dt,
-        @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
-        return false;
-      }
-
-      Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
-      if (playerRef == null) {
-        return false;
-      }
-
-      Player player = store.getComponent(playerRef, Player.getComponentType());
-      if (player == null) {
-        return false;
-      }
-
-      Inventory inventory = player.getInventory();
-      if (inventory == null) {
-        return false;
-      }
-
-      ItemStack activeItem = inventory.getActiveHotbarItem();
-      if (activeItem == null || activeItem.isEmpty()) {
-        return false;
-      }
-
+    protected boolean matchesActiveItem(@Nonnull ItemStack activeItem) {
       return Constants.CAT_CARRIER_ITEM.equals(activeItem.getItemId());
-    }
-
-    @Override
-    public InfoProvider getSensorInfo() {
-      return null;
     }
   }
 }

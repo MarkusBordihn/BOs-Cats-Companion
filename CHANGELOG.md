@@ -7,6 +7,11 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.8.1
+
+- Added cat behavior profiles.
+- Improved item holding sensors for better interaction handling.
+
 ### 2.8.0
 
 - Fixed kitten calico spawn egg not working due to wrong NPC role.

@@ -28,6 +28,8 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrapp
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.data.CatBehaviorProfile;
+import de.markusbordihn.cats.data.CatBehaviorProfileResolver;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -115,6 +117,21 @@ final class CatInfoCommand extends CatCommand {
         }
         context.sendMessage(
             Message.raw("Personality: " + personalityText).color(Constants.COLOR_LAVENDER));
+
+        CatBehaviorProfile profile =
+            CatBehaviorProfileResolver.resolve(
+                catData.personalityType(),
+                catData.secondaryPersonality(),
+                HappinessLevel.fromValue(catData.happiness()));
+        context.sendMessage(
+            Message.raw(
+                    String.format(
+                        "Profile: activity=%.2f social=%.2f play=%.2f rest=%.2f",
+                        profile.activityWeight(),
+                        profile.socialWeight(),
+                        profile.playWeight(),
+                        profile.restWeight()))
+                .color(Constants.COLOR_GRAY));
       }
 
       HappinessLevel happinessLevel = HappinessLevel.fromValue(catData.happiness());
