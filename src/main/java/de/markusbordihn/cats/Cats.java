@@ -40,6 +40,7 @@ import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionWild;
+import de.markusbordihn.cats.actions.BuilderActionCatMoodParticles;
 import de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState;
 import de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed;
 import de.markusbordihn.cats.commands.CatCommands;
@@ -178,6 +179,15 @@ public class Cats extends JavaPlugin {
     } catch (Exception e) {
       LOGGER.at(Level.SEVERE).log(
           "Failed to register action: %s", BuilderActionCatTeleportToBed.BUILDER_ID, e);
+    }
+
+    try {
+      actionFactory.add(
+          BuilderActionCatMoodParticles.BUILDER_ID, BuilderActionCatMoodParticles::new);
+      LOGGER.at(Level.INFO).log("Registered action: %s", BuilderActionCatMoodParticles.BUILDER_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register action: %s", BuilderActionCatMoodParticles.BUILDER_ID, e);
     }
 
     actionsRegistered = true;

@@ -1,22 +1,21 @@
 {
-    "Group": "MarkusBordihn",
-    "Name": "Cats",
-    "Version": "2.8.1",
-    "Description": "Adds new cat breeds to bringing more variety, personality, and cuteness to your worlds.",
-    "Authors": [
-        {
-            "Name": "Markus Bordihn"
-        }
-    ],
-    "Website": "https://www.curseforge.com/hytale/mods/cats",
-    "Main": "de.markusbordihn.cats.Cats",
-    "ServerVersion": "2026.02.19-1a311a592",
-    "Dependencies": {
-        "Hytale:NPC": "*"
-    },
-    "OptionalDependencies": {
-        
-    },
-    "DisabledByDefault": false,
-    "IncludesAssetPack": true
+  "Group": "MarkusBordihn",
+  "Name": "Cats",
+  "Version": "2.9.0",
+  "Description": "Adds new cat breeds to bringing more variety, personality, and cuteness to your worlds.",
+  "Authors": [
+    {
+      "Name": "Markus Bordihn"
+    }
+  ],
+  "Website": "https://www.curseforge.com/hytale/mods/cats",
+  "Main": "de.markusbordihn.cats.Cats",
+  "ServerVersion": "2026.02.19-1a311a592",
+  "Dependencies": {
+    "Hytale:NPC": "*"
+  },
+  "OptionalDependencies": {
+  },
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true
 }

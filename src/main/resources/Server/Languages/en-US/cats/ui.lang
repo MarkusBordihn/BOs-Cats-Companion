@@ -34,6 +34,11 @@ mood.neutral=Neutral
 mood.happy=Happy
 mood.ecstatic=Ecstatic
 
+# Mood hints (contextual advice for extreme states)
+mood.hint.miserable=Your cat is miserable - show it some love!
+mood.hint.sad=Your cat seems sad - try petting or a treat.
+mood.hint.ecstatic=Your cat is absolutely thriving!
+
 # Name Input
 name_input.title=Rename Cat
 name_input.subtitle=Enter a name and click Apply.

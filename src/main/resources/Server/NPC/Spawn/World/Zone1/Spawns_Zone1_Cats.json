@@ -1,5 +1,5 @@
 {
-  "$Comment": "Common domestic cats spawn in plains - friendly cats that spawn during the day",
+  "$Comment": "Zone 1 plains - domestic cats, daytime",
   "Environments": [
     "Env_Zone1_Plains"
   ],

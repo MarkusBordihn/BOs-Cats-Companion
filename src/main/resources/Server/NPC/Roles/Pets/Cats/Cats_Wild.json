@@ -267,7 +267,6 @@
       ]
     },
     {
-      "$Comment": "Clear idle anims",
       "States": [
         {
           "To": [],
@@ -433,7 +432,6 @@
               }
             },
             {
-              "$Comment": "Switch to flee state if any flock member engages a target TODO switch to attack if you are very close and can attack? otherwise flee.",
               "Enabled": {"Compute": "!isEmptyStringArray(FlockArray)"},
               "Sensor": {
                 "Type": "Beacon",
@@ -689,7 +687,6 @@
               ]
             },
             {
-              "$Comment": "Sleep time.",
               "Actions": [
                 {
                   "Type": "Timeout",
@@ -1123,7 +1120,6 @@
           },
           "Instructions": [
             {
-              "$Comment": "Switch to flee state if any flock member engages a target TODO switch to attack if you are very close and can attack? otherwise flee.",
               "Enabled": {"Compute": "!isEmptyStringArray(FlockArray)"},
               "Sensor": {
                 "Type": "Beacon",
@@ -1165,7 +1161,6 @@
             },
             {
               "Sensor": {
-                "$Comment": "TODO: make them walk home, expose walking speed?",
                 "Type": "Leash",
                 "Range": {"Compute": "LeashDistance * 0.3"}
               },
@@ -1199,7 +1194,6 @@
           },
           "Instructions": [
             {
-              "$Comment": "TODO: Add a state message",
               "Enabled": {"Compute": "!isEmptyStringArray(FlockArray)"},
               "Continue": true,
               "Sensor": {

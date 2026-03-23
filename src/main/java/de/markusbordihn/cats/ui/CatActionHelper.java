@@ -81,14 +81,27 @@ public final class CatActionHelper {
       return false;
     }
 
-    CatsManager.getInstance().updateCatState(entityRef, CatState.WAITING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Waiting", store);
-    TransformComponent transform =
-        store.getComponent(entityRef, TransformComponent.getComponentType());
-    if (transform != null) {
-      Vector3d pos = transform.getPosition();
+    Vector3d origin = null;
+    @SuppressWarnings("null")
+    CatBedTargetComponent bedTarget =
+        store.getComponent(entityRef, CatBedTargetComponent.getComponentType());
+    if (bedTarget != null && bedTarget.hasTarget()) {
+      origin = bedTarget.getTargetPosition();
+    } else {
+      @SuppressWarnings("null")
+      TransformComponent transform =
+          store.getComponent(entityRef, TransformComponent.getComponentType());
+      if (transform != null) {
+        origin = transform.getPosition();
+      }
+    }
+
+    CatsManager.getInstance().updateCatState(entityRef, CatState.WANDERING, store);
+    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Wandering", store);
+
+    if (origin != null) {
       TransientPath path = new TransientPath();
-      path.addWaypoint(new Vector3d(pos.x + 2.0, pos.y, pos.z), new Vector3f(0, 0, 0));
+      path.addWaypoint(new Vector3d(origin.x + 3.0, origin.y, origin.z), new Vector3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
     return true;

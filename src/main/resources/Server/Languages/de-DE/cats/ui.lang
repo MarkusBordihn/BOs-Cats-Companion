@@ -34,6 +34,11 @@ mood.neutral=Neutral
 mood.happy=Glücklich
 mood.ecstatic=Begeistert
 
+# Mood hints (contextual advice for extreme states)
+mood.hint.miserable=Deine Katze ist elend - zeig ihr etwas Liebe!
+mood.hint.sad=Deine Katze wirkt traurig - streicheln oder Leckerli hilft.
+mood.hint.ecstatic=Deine Katze ist absolut glücklich!
+
 # Name Input
 name_input.title=Katze umbenennen
 name_input.subtitle=Namen eingeben und Übernehmen klicken.

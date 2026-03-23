@@ -1,5 +1,5 @@
 {
-  "$Comment": "Longhaired Russian Blue cats spawn in Zone 3 Tundra and Forests - cold-climate cats",
+  "$Comment": "Zone 3 tundra/forests - Russian Blue cats",
   "Environments": [
     "Env_Zone3_Tundra",
     "Env_Zone3_Forests"

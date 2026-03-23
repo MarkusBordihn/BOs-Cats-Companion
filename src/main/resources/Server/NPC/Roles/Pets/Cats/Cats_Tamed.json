@@ -25,7 +25,7 @@
     "Melee_Start": {
       "Interactions": [
         {
-          "$Comment": "Cat melee attack animation and timing configuration",
+          "$Comment": "Melee attack",
           "Parent": "NPC_Attack_Melee_Simple",
           "Effects": {
             "ItemPlayerAnimationsId": "Fox_Default",
@@ -38,7 +38,7 @@
     "Melee_Damage": {
       "Interactions": [
         {
-          "$Comment": "Pounce deals no damage - playful animation only",
+          "$Comment": "Pounce (no damage)",
           "Parent": "NPC_Attack_Melee_Damage",
           "DamageCalculator": {
             "Type": "Absolute",
@@ -55,14 +55,88 @@
     {
       "Instructions": [
         {
-          "$Comment": "Cat is tamed - use substates for different behaviors",
+          "$Comment": "Tamed cat behavior",
           "Sensor": {
             "Type": "State",
             "State": "Pet"
           },
           "Instructions": [
             {
-              "$Comment": "Day/night cycle - cats sleep at night automatically",
+              "Continue": true,
+              "Sensor": {
+                "Type": "Not",
+                "Sensor": {"Type": "State", "State": ".Dying"}
+              },
+              "Actions": [
+                {"Type": "CatMoodParticles"}
+              ]
+            },
+            {
+              "Continue": true,
+              "Sensor": {"Type": "State", "State": ".Sleeping"},
+              "Actions": [
+                {
+                  "Type": "Timeout",
+                  "Delay": [60, 90],
+                  "Action": {
+                    "Type": "SpawnParticles", "Offset": [0, 0.5, 0], "ParticleSystem": "Sleepy"
+                  }
+                }
+              ]
+            },
+            {
+              "Sensor": {"Type": "State", "State": ".MoodEcstatic"},
+              "ActionsBlocking": true,
+              "Actions": [
+                {"Type": "SpawnParticles", "Offset": [0, 0.9, 0], "ParticleSystem": "Hearts"},
+                {"Type": "SpawnParticles", "Offset": [0, 0.6, 0], "ParticleSystem": "Hearts"},
+                {
+                  "Type": "Timeout", "Delay": [1, 2],
+                  "Action": {"Type": "State", "State": ".Waiting"}
+                }
+              ],
+              "BodyMotion": {"Type": "Nothing"}
+            },
+            {
+              "Sensor": {"Type": "State", "State": ".MoodHappy"},
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "SpawnParticles", "Offset": [0, 0.8, 0], "ParticleSystem": "Hearts_Subtle"
+                },
+                {
+                  "Type": "Timeout", "Delay": [1, 2],
+                  "Action": {"Type": "State", "State": ".Waiting"}
+                }
+              ],
+              "BodyMotion": {"Type": "Nothing"}
+            },
+            {
+              "Sensor": {"Type": "State", "State": ".MoodSad"},
+              "ActionsBlocking": true,
+              "Actions": [
+                {"Type": "SpawnParticles", "Offset": [0, 0.7, 0], "ParticleSystem": "Angry"},
+                {
+                  "Type": "Timeout", "Delay": [1, 2],
+                  "Action": {"Type": "State", "State": ".Waiting"}
+                }
+              ],
+              "BodyMotion": {"Type": "Nothing"}
+            },
+            {
+              "Sensor": {"Type": "State", "State": ".MoodMiserable"},
+              "ActionsBlocking": true,
+              "Actions": [
+                {"Type": "SpawnParticles", "Offset": [0, 0.7, 0], "ParticleSystem": "Angry"},
+                {
+                  "Type": "Timeout", "Delay": [1, 2],
+                  "Action": {"Type": "State", "State": ".Waiting"}
+                }
+              ],
+              "BodyMotion": {"Type": "Nothing"}
+            },
+            {
+              "$Comment": "Night sleep",
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
@@ -108,7 +182,7 @@
               ]
             },
             {
-              "$Comment": "Greet owner when nearby (cooldown via alarm to prevent spam)",
+              "$Comment": "Greet owner",
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
@@ -158,7 +232,7 @@
               ]
             },
             {
-              "$Comment": "Clear greeting alarm when it has passed",
+              "$Comment": "Reset greeting cooldown",
               "Continue": true,
               "Sensor": {
                 "Type": "Alarm",
@@ -173,7 +247,7 @@
               ]
             },
             {
-              "$Comment": "Flee from hostile mobs - cats run away from danger",
+              "$Comment": "Flee hostile mobs",
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
@@ -218,7 +292,6 @@
               ]
             },
             {
-              "$Comment": "Sitting behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
                 "State": ".Sitting"
@@ -244,7 +317,6 @@
               }
             },
             {
-              "$Comment": "Sleeping behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
                 "State": ".Sleeping"
@@ -274,14 +346,13 @@
               }
             },
             {
-              "$Comment": "GoingToBed behavior - walks to bed using TransientPath, teleports after timeout",
+              "$Comment": "Going to bed",
               "Sensor": {
                 "Type": "State",
                 "State": ".GoingToBed"
               },
               "Instructions": [
                 {
-                  "$Comment": "Follow path to bed while path exists, teleport after 4-5 sec timeout",
                   "Sensor": {
                     "Type": "Path",
                     "PathType": "TransientPath"
@@ -306,7 +377,6 @@
                   }
                 },
                 {
-                  "$Comment": "No path - teleport immediately to bed",
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -324,7 +394,6 @@
               ]
             },
             {
-              "$Comment": "Stretching behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
                 "State": ".Stretching"
@@ -335,6 +404,12 @@
                   "Type": "PlayAnimation",
                   "Animation": "Stretch",
                   "Slot": "Action"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.7, 0],
+                  "ParticleSystem": "Hearts_Subtle",
+                  "Once": true
                 },
                 {
                   "Type": "Timeout",
@@ -350,7 +425,6 @@
               }
             },
             {
-              "$Comment": "Licking behavior - auto switches to waiting after timeout",
               "Sensor": {
                 "Type": "State",
                 "State": ".Licking"
@@ -361,6 +435,12 @@
                   "Type": "PlayAnimation",
                   "Animation": "Lick",
                   "Slot": "Action"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.7, 0],
+                  "ParticleSystem": "Hearts_Subtle",
+                  "Once": true
                 },
                 {
                   "Type": "Timeout",
@@ -376,7 +456,6 @@
               }
             },
             {
-              "$Comment": "Playing behavior - auto-returns to default after 3-6 seconds",
               "Sensor": {
                 "Type": "State",
                 "State": ".Playing"
@@ -387,6 +466,12 @@
                   "Type": "PlayAnimation",
                   "Animation": "Swing_Left",
                   "Slot": "Action"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.6, 0],
+                  "ParticleSystem": "Hearts_Subtle",
+                  "Once": true
                 },
                 {
                   "Type": "Timeout",
@@ -402,14 +487,12 @@
               }
             },
             {
-              "$Comment": "Searching behavior with movement",
               "Sensor": {
                 "Type": "State",
                 "State": ".Searching"
               },
               "Instructions": [
                 {
-                  "$Comment": "Reset animation first",
                   "Sensor": {
                     "Type": "Any",
                     "Once": true
@@ -419,6 +502,11 @@
                       "Type": "PlayAnimation",
                       "Animation": "Idle",
                       "Slot": "Action"
+                    },
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.9, 0],
+                      "ParticleSystem": "Question"
                     }
                   ]
                 },
@@ -441,14 +529,25 @@
               ]
             },
             {
-              "$Comment": "Attacking behavior - attacks commanded target",
               "Sensor": {
                 "Type": "State",
                 "State": ".Attacking"
               },
               "Instructions": [
                 {
-                  "$Comment": "Chase and attack target",
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.9, 0],
+                      "ParticleSystem": "Alerted"
+                    }
+                  ]
+                },
+                {
                   "Sensor": {
                     "Type": "Target",
                     "TargetSlot": "LockedTarget",
@@ -469,7 +568,6 @@
                   }
                 },
                 {
-                  "$Comment": "Execute attack when in range",
                   "Sensor": {
                     "Type": "Target",
                     "TargetSlot": "LockedTarget",
@@ -489,7 +587,6 @@
                   ]
                 },
                 {
-                  "$Comment": "No target found - go back to default behavior",
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -503,14 +600,25 @@
               ]
             },
             {
-              "$Comment": "Fleeing behavior - runs away from hostile entities",
               "Sensor": {
                 "Type": "State",
                 "State": ".Fleeing"
               },
               "Instructions": [
                 {
-                  "$Comment": "Flee from nearby hostile entity",
+                  "Sensor": {
+                    "Type": "Any",
+                    "Once": true
+                  },
+                  "Actions": [
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.9, 0],
+                      "ParticleSystem": "Alerted"
+                    }
+                  ]
+                },
+                {
                   "Sensor": {
                     "Type": "Mob",
                     "Range": 12,
@@ -534,7 +642,6 @@
                   }
                 },
                 {
-                  "$Comment": "No more threats nearby - return to waiting",
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -555,14 +662,12 @@
               ]
             },
             {
-              "$Comment": "Greeting behavior - cat greets owner with animation, then cooldown",
               "Sensor": {
                 "Type": "State",
                 "State": ".Greeting"
               },
               "Instructions": [
                 {
-                  "$Comment": "Play greeting animation and set cooldown alarm",
                   "Sensor": {
                     "Type": "Any",
                     "Once": true
@@ -585,7 +690,6 @@
                   ]
                 },
                 {
-                  "$Comment": "Watch owner during greeting, then return to default",
                   "Sensor": {
                     "Type": "CatsOwner"
                   },
@@ -614,7 +718,6 @@
                   }
                 },
                 {
-                  "$Comment": "Owner not nearby anymore - end greeting early",
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -633,7 +736,6 @@
               ]
             },
             {
-              "$Comment": "Waiting behavior",
               "Sensor": {
                 "Type": "State",
                 "State": ".Waiting"
@@ -650,14 +752,12 @@
               }
             },
             {
-              "$Comment": "Wandering behavior",
               "Sensor": {
                 "Type": "State",
                 "State": ".Wandering"
               },
               "Instructions": [
                 {
-                  "$Comment": "Reset animation first",
                   "Sensor": {
                     "Type": "Any",
                     "Once": true
@@ -671,6 +771,11 @@
                     {
                       "Type": "PlaySound",
                       "SoundEventId": "SFX_Chicken_Walk"
+                    },
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.9, 0],
+                      "ParticleSystem": "Question"
                     }
                   ]
                 },
@@ -693,14 +798,12 @@
               ]
             },
             {
-              "$Comment": "Default following behavior with pauses",
               "Sensor": {
                 "Type": "State",
                 "State": ".Default"
               },
               "Instructions": [
                 {
-                  "$Comment": "Reset animation first when entering this state",
                   "Sensor": {
                     "Type": "Any",
                     "Once": true
@@ -714,7 +817,6 @@
                   ]
                 },
                 {
-                  "$Comment": "Random following behavior - sometimes with pauses, sometimes continuous",
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -722,7 +824,6 @@
                   "ExecuteFor": [60, 120],
                   "Instructions": [
                     {
-                      "$Comment": "Active following with short pauses",
                       "Weight": 40,
                       "Sensor": {
                         "Type": "Player",
@@ -761,7 +862,6 @@
                       }
                     },
                     {
-                      "$Comment": "Continuous following without pauses",
                       "Weight": 60,
                       "Sensor": {
                         "Type": "Player",
@@ -785,7 +885,6 @@
                   ]
                 },
                 {
-                  "$Comment": "Teleport to player if too far away (outside seek range)",
                   "Sensor": {
                     "Type": "Target"
                   },
@@ -796,7 +895,6 @@
               ]
             },
             {
-              "$Comment": "Dying behavior - plays death animation",
               "Sensor": {
                 "Type": "State",
                 "State": ".Dying"
@@ -818,7 +916,6 @@
               }
             },
             {
-              "$Comment": "Happy behavior - cat received a gift, plays excited animation",
               "Sensor": {
                 "Type": "State",
                 "State": ".Happy"
@@ -889,6 +986,10 @@
                 {"Type": "State", "State": ".Wandering"},
                 {"Type": "State", "State": ".Dying"},
                 {"Type": "State", "State": ".Happy"},
+                {"Type": "State", "State": ".MoodEcstatic"},
+                {"Type": "State", "State": ".MoodHappy"},
+                {"Type": "State", "State": ".MoodSad"},
+                {"Type": "State", "State": ".MoodMiserable"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "Petting"},
                 {"Type": "State", "State": "PlayingWithYarnBall"},
@@ -1038,7 +1139,6 @@
           }
         },
         {
-          "$Comment": "Cat despawns",
           "Sensor": {
             "Type": "State",
             "State": "Despawn"

@@ -1,5 +1,5 @@
 {
-  "$Comment": "Cats spawn in Zone 2 savanna and oasis - heat-adapted domestic cats",
+  "$Comment": "Zone 2 savanna/oasis - domestic cats",
   "Environments": [
     "Env_Zone2_Savanna",
     "Env_Zone2_Oasis"

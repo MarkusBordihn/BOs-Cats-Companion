@@ -1,5 +1,5 @@
 {
-  "$Comment": "Cats spawn in Azure and mountain regions - adaptable cats for varied terrain",
+  "$Comment": "Zone 1 Azure/mountains - mixed breeds",
   "Environments": [
     "Env_Zone1_Azure",
     "Env_Zone1_Mountains"

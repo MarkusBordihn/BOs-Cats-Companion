@@ -26,6 +26,7 @@ public enum HappinessSource {
   PLAYING(8, PersonalityType.PLAYFUL),
   TREAT(10, PersonalityType.LAZY),
   FEEDING(3, null),
+  SLEEPING(2, PersonalityType.LAZY),
   SLEEPING_IN_BED(10, PersonalityType.LAZY);
 
   private final int baseDelta;
@@ -47,7 +48,7 @@ public enum HappinessSource {
         switch (this) {
           case PETTING -> catPersonality.getPetModifier();
           case PLAYING -> catPersonality.getPlayModifier();
-          case TREAT, FEEDING, SLEEPING_IN_BED -> catPersonality.getActivityModifier();
+          case TREAT, FEEDING, SLEEPING, SLEEPING_IN_BED -> catPersonality.getActivityModifier();
         };
     return Math.max(1, (int) (baseDelta * modifier));
   }

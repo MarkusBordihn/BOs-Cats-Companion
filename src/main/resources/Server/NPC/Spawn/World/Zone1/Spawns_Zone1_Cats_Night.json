@@ -1,5 +1,5 @@
 {
-  "$Comment": "Black cats spawn at night in forests - mysterious nocturnal cats",
+  "$Comment": "Zone 1 forests - black cats, night only",
   "Environments": [
     "Env_Zone1_Forests",
     "Env_Zone1_Swamps"

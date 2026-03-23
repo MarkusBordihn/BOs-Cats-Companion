@@ -98,6 +98,7 @@ public class BuilderActionCatSetSleepingState extends BuilderActionBase {
       CatsManager catsManager = CatsManager.getInstance();
       if (catsManager != null) {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
+        catsManager.boostHappiness(entityRef, HappinessSource.SLEEPING, store);
         catsManager.boostHappiness(entityRef, HappinessSource.SLEEPING_IN_BED, store);
       }
 

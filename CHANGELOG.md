@@ -7,6 +7,15 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.9.0
+
+- Fixed "Leave Bed" not moving the cat away from the bed.
+- Added mood particles for tamed cats: emotion particles shown periodically based on happiness.
+- Added sleep particles (Sleepy/Zzz) while cats are sleeping.
+- Added passive happiness: no decay near owner (≤16 blocks) or warmth sources (≤5 blocks).
+- Added happiness boost for sleeping (+2 per cycle, stacks with cat bed bonus).
+- Slowed happiness decay interval from 10 to 20 minutes.
+
 ### 2.8.1
 
 - Added cat behavior profiles.
