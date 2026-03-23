@@ -43,10 +43,12 @@ repositories {
 dependencies {
   testImplementation platform('org.junit:junit-bom:5.10.0')
   testImplementation 'org.junit.jupiter:junit-jupiter'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   compileOnly("com.hypixel.hytale:Server:$hytale_build")
   if (hasLocalServer) {
     runtimeOnly(files(hytaleServerJarPath))
+    testRuntimeOnly(files(hytaleServerJarPath))
   }
 }
 
@@ -62,21 +64,28 @@ test {
 }
 
 tasks.register('updatePluginManifest') {
-  def manifestFile = file('src/main/resources/manifest.json')
+  def sourceManifestFile = file('src/main/resources/manifest.json')
+  def generatedManifestFile = layout.buildDirectory.file('generated/resources/main/manifest.json')
   doLast {
-    if (!manifestFile.exists()) {
-      throw new GradleException("manifest.json not found at ${manifestFile.path}")
+    if (!sourceManifestFile.exists()) {
+      throw new GradleException("manifest.json not found at ${sourceManifestFile.path}")
     }
-    def manifest = new groovy.json.JsonSlurper().parseText(manifestFile.text)
+    def manifest = new groovy.json.JsonSlurper().parseText(sourceManifestFile.text)
     manifest.Version = project.version
     manifest.ServerVersion = project.hytale_build
-    manifestFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest))
-    logger.lifecycle("Updated manifest.json: Version=${project.version}, ServerVersion=${project.hytale_build}")
+    def generatedManifest = generatedManifestFile.get().asFile
+    generatedManifest.parentFile.mkdirs()
+    generatedManifest.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest))
+    logger.lifecycle("Generated manifest.json: Version=${project.version}, ServerVersion=${project.hytale_build}")
   }
 }
 
 tasks.named('processResources') {
   dependsOn 'updatePluginManifest'
+  exclude 'manifest.json'
+  from(layout.buildDirectory.dir('generated/resources/main')) {
+    include 'manifest.json'
+  }
 }
 
 jar {

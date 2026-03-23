@@ -38,10 +38,10 @@ public enum HappinessSource {
   }
 
   public int calculateDelta(@Nullable PersonalityType catPersonality) {
-    if (catPersonality == null || preferredPersonality == null) {
+    if (catPersonality == null) {
       return baseDelta;
     }
-    if (catPersonality == preferredPersonality) {
+    if (preferredPersonality != null && catPersonality == preferredPersonality) {
       return (int) (baseDelta * 1.5f);
     }
     float modifier =
