@@ -46,6 +46,7 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   compileOnly("com.hypixel.hytale:Server:$hytale_build")
+  testRuntimeOnly("com.hypixel.hytale:Server:$hytale_build")
   if (hasLocalServer) {
     runtimeOnly(files(hytaleServerJarPath))
     testRuntimeOnly(files(hytaleServerJarPath))
