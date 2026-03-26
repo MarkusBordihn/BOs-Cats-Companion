@@ -17,25 +17,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.data;
+package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.codec.codecs.EnumCodec;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 
-public enum CatState {
-  ATTACKING,
-  FETCHING,
-  FOLLOWING,
-  GOING_TO_BED,
-  PLAYING,
-  SEARCHING,
-  SITTING,
-  SLEEPING,
-  WAITING,
-  WANDERING;
+public final class YarnBallThrowRegistry {
 
-  public static final EnumCodec<CatState> CODEC = new EnumCodec<>(CatState.class);
+  private static final ConcurrentHashMap<UUID, Long> pendingThrows = new ConcurrentHashMap<>();
 
-  public boolean isSleepingState() {
-    return this == SLEEPING || this == GOING_TO_BED;
+  private YarnBallThrowRegistry() {}
+
+  public static void register(UUID playerUuid) {
+    pendingThrows.put(playerUuid, System.currentTimeMillis());
+  }
+
+  public static void complete(UUID playerUuid) {
+    pendingThrows.remove(playerUuid);
+  }
+
+  @Nullable
+  public static UUID getRecentThrower(long maxAgeMs) {
+    long now = System.currentTimeMillis();
+    for (var entry : pendingThrows.entrySet()) {
+      if (now - entry.getValue() <= maxAgeMs) {
+        return entry.getKey();
+      }
+    }
+    return null;
   }
 }

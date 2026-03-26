@@ -7,6 +7,15 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.10.0
+
+- Fixed yarn ball from placeable block to throwable item with projectile interaction.
+- Fixed wild cats moving without animation ("statue" movement) after waking from sleep or exiting
+  idle flavor animations (Sit, Lick, Search).
+- Added yarn ball fetch mechanic: tamed cats fetch thrown yarn balls and return them to the owner.
+- Added `FetchingYarnBall` NPC state for tamed cats with path-following and idle animation.
+- Added tamed cat daytime wake-up: sleeping or going-to-bed cats now wake at daytime.
+
 ### 2.9.0
 
 - Fixed "Leave Bed" not moving the cat away from the bed.

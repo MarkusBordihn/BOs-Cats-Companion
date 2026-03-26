@@ -1,0 +1,42 @@
+{
+  "Model": "Cat_Yarn_Ball_Projectile",
+  "SpawnRotationOffset": {
+    "Pitch": 10,
+    "Yaw": 0,
+    "Roll": 15
+  },
+  "Physics": {
+    "Type": "Standard",
+    "Gravity": 18,
+    "TerminalVelocityAir": 40,
+    "TerminalVelocityWater": 12,
+    "RotationMode": "VelocityRoll",
+    "Bounciness": 0.4,
+    "BounceCount": 2,
+    "AllowRolling": true,
+    "RollingFrictionFactor": 1,
+    "SticksVertically": false
+  },
+  "LaunchForce": 20,
+  "SpawnOffset": {
+    "X": 0.2,
+    "Y": 0.1,
+    "Z": 0.0
+  },
+  "Interactions": {
+    "ProjectileMiss": {
+      "Cooldown": {"Cooldown": 0},
+      "Interactions": [
+        {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"},
+        {"Type": "RemoveEntity", "Entity": "User"}
+      ]
+    },
+    "ProjectileHit": {
+      "Cooldown": {"Cooldown": 0},
+      "Interactions": [
+        {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"},
+        {"Type": "RemoveEntity", "Entity": "User"}
+      ]
+    }
+  }
+}

@@ -45,6 +45,7 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.interaction.InteractionOwner;
 import de.markusbordihn.cats.manager.CatsManager;
+import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -175,7 +176,10 @@ public final class CatActionWheelPage
         this.close();
       }
       case "play" -> {
-        CatActionHelper.play(this.catRef, store);
+        UUID ownerUuid = this.player.getUuid();
+        if (ownerUuid == null || !CatActionHelper.fetchGroundBall(this.catRef, ownerUuid, store)) {
+          CatActionHelper.play(this.catRef, store);
+        }
         this.close();
       }
       case "sleep_wakeup" -> {
@@ -228,14 +232,12 @@ public final class CatActionWheelPage
       String buttonId = UI_BUTTON_PREFIX + i;
       String labelId = UI_LABEL_PREFIX + i;
 
-      // Slots 6 and 7 always hidden
       if (i == 6 || i == 7) {
         commandBuilder.set(buttonId + ".Visible", false);
         commandBuilder.set(labelId + ".Visible", false);
         continue;
       }
 
-      // Slot 5 (bed) shown but non-interactive when no bed is nearby
       if (i == 5 && !this.hasBed) {
         commandBuilder.set(buttonId + ".Visible", true);
         commandBuilder.set(buttonId + ".Text", "");
@@ -282,15 +284,16 @@ public final class CatActionWheelPage
   @Nonnull
   private Message resolveStateText() {
     return switch (this.currentState) {
+      case ATTACKING -> Message.translation("cats.ui.state.pouncing");
+      case FETCHING -> Message.translation("cats.ui.state.fetching");
       case FOLLOWING -> Message.translation("cats.ui.state.following");
+      case GOING_TO_BED -> Message.translation("cats.ui.state.going_to_bed");
+      case PLAYING -> Message.translation("cats.ui.state.playing");
+      case SEARCHING -> Message.translation("cats.ui.state.searching");
       case SITTING -> Message.translation("cats.ui.state.sitting");
       case SLEEPING -> Message.translation("cats.ui.state.sleeping");
-      case PLAYING -> Message.translation("cats.ui.state.playing");
-      case WANDERING -> Message.translation("cats.ui.state.wandering");
-      case GOING_TO_BED -> Message.translation("cats.ui.state.going_to_bed");
       case WAITING -> Message.translation("cats.ui.state.waiting");
-      case ATTACKING -> Message.translation("cats.ui.state.pouncing");
-      case SEARCHING -> Message.translation("cats.ui.state.searching");
+      case WANDERING -> Message.translation("cats.ui.state.wandering");
     };
   }
 
@@ -305,11 +308,11 @@ public final class CatActionWheelPage
       return Message.raw("");
     }
     return switch (level) {
-      case MISERABLE -> Message.translation("cats.ui.mood.miserable");
-      case SAD -> Message.translation("cats.ui.mood.sad");
-      case NEUTRAL -> Message.translation("cats.ui.mood.neutral");
-      case HAPPY -> Message.translation("cats.ui.mood.happy");
       case ECSTATIC -> Message.translation("cats.ui.mood.ecstatic");
+      case HAPPY -> Message.translation("cats.ui.mood.happy");
+      case MISERABLE -> Message.translation("cats.ui.mood.miserable");
+      case NEUTRAL -> Message.translation("cats.ui.mood.neutral");
+      case SAD -> Message.translation("cats.ui.mood.sad");
     };
   }
 

@@ -8,10 +8,10 @@
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Model",
-    "CustomModel": "Items/CatTreats/Cat_Treats.blockymodel",
+    "CustomModel": "Items/Cats/CatTreats/Cat_Treats.blockymodel",
     "CustomModelTexture": [
       {
-        "Texture": "Items/CatTreats/CatTreats_Texture.png",
+        "Texture": "Items/Cats/CatTreats/Cat_Treats_Texture.png",
         "Weight": 1
       }
     ],

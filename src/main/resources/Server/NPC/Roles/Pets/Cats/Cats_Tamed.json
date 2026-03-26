@@ -182,6 +182,37 @@
               ]
             },
             {
+              "$Comment": "Daytime wake-up: if sleeping during daytime, wake up",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Time",
+                    "Period": [6.01, 17.99]
+                  },
+                  {
+                    "Type": "Or",
+                    "Sensors": [
+                      {
+                        "Type": "State",
+                        "State": ".Sleeping"
+                      },
+                      {
+                        "Type": "State",
+                        "State": ".GoingToBed"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": ".Waiting"
+                }
+              ]
+            },
+            {
               "$Comment": "Greet owner",
               "Sensor": {
                 "Type": "And",
@@ -971,29 +1002,30 @@
                 "Name": "_VALIDATION_ONLY_NEVER_SET"
               },
               "Actions": [
-                {"Type": "State", "State": ".Default"},
-                {"Type": "State", "State": ".Sitting"},
-                {"Type": "State", "State": ".Sleeping"},
-                {"Type": "State", "State": ".GoingToBed"},
-                {"Type": "State", "State": ".Stretching"},
-                {"Type": "State", "State": ".Licking"},
-                {"Type": "State", "State": ".Playing"},
-                {"Type": "State", "State": ".Searching"},
                 {"Type": "State", "State": ".Attacking"},
-                {"Type": "State", "State": ".Fleeing"},
-                {"Type": "State", "State": ".Greeting"},
-                {"Type": "State", "State": ".Waiting"},
-                {"Type": "State", "State": ".Wandering"},
+                {"Type": "State", "State": ".Default"},
                 {"Type": "State", "State": ".Dying"},
+                {"Type": "State", "State": ".Fleeing"},
+                {"Type": "State", "State": ".GoingToBed"},
+                {"Type": "State", "State": ".Greeting"},
                 {"Type": "State", "State": ".Happy"},
+                {"Type": "State", "State": ".Licking"},
                 {"Type": "State", "State": ".MoodEcstatic"},
                 {"Type": "State", "State": ".MoodHappy"},
-                {"Type": "State", "State": ".MoodSad"},
                 {"Type": "State", "State": ".MoodMiserable"},
+                {"Type": "State", "State": ".MoodSad"},
+                {"Type": "State", "State": ".Playing"},
+                {"Type": "State", "State": ".Searching"},
+                {"Type": "State", "State": ".Sitting"},
+                {"Type": "State", "State": ".Sleeping"},
+                {"Type": "State", "State": ".Stretching"},
+                {"Type": "State", "State": ".Waiting"},
+                {"Type": "State", "State": ".Wandering"},
+                {"Type": "State", "State": "Despawn"},
                 {"Type": "State", "State": "Feeding"},
+                {"Type": "State", "State": "FetchingYarnBall"},
                 {"Type": "State", "State": "Petting"},
-                {"Type": "State", "State": "PlayingWithYarnBall"},
-                {"Type": "State", "State": "Despawn"}
+                {"Type": "State", "State": "PlayingWithYarnBall"}
               ]
             }
           ]
@@ -1137,6 +1169,43 @@
           "BodyMotion": {
             "Type": "Nothing"
           }
+        },
+        {
+          "$Comment": "Fetching Yarn Ball state - cat runs to thrown ball and returns it to owner",
+          "Sensor": {
+            "Type": "State",
+            "State": "FetchingYarnBall"
+          },
+          "Instructions": [
+            {
+              "$Comment": "CatFetchYarnBall runs every tick to manage phase transitions and delivery",
+              "Continue": true,
+              "Sensor": {
+                "Type": "Any"
+              },
+              "Actions": [
+                {"Type": "CatFetchYarnBall"}
+              ]
+            },
+            {
+              "$Comment": "While on transient path - play idle animation and follow path",
+              "Sensor": {
+                "Type": "Path",
+                "PathType": "TransientPath"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Idle",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Path"
+              }
+            }
+          ]
         },
         {
           "Sensor": {
@@ -1286,19 +1355,19 @@
     },
     "AttractiveItems": {
       "Value": [
-        "Food_Fish_Raw",
-        "Food_Fish_Raw_Uncommon",
-        "Food_Fish_Raw_Rare",
+        "Cat_Treats",
+        "Fish_Bluegill_Item",
+        "Fish_Catfish_Item",
+        "Fish_Minnow_Item",
+        "Fish_Pike_Item",
+        "Fish_Salmon_Item",
+        "Fish_Trout_Rainbow_Item",
+        "Food_Fish_Grilled",
         "Food_Fish_Raw_Epic",
         "Food_Fish_Raw_Legendary",
-        "Food_Fish_Grilled",
-        "Fish_Salmon_Item",
-        "Fish_Catfish_Item",
-        "Fish_Trout_Rainbow_Item",
-        "Fish_Pike_Item",
-        "Fish_Bluegill_Item",
-        "Fish_Minnow_Item",
-        "Cat_Treats"
+        "Food_Fish_Raw_Rare",
+        "Food_Fish_Raw_Uncommon",
+        "Food_Fish_Raw"
       ],
       "Description": "Items that attract cats and make them follow players"
     },

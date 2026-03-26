@@ -30,9 +30,11 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
+import de.markusbordihn.cats.component.CatFetchTargetComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBedInfo;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.interaction.YarnBallGroundRegistry;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,6 +142,37 @@ public final class CatActionHelper {
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.PLAYING, store);
     npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Playing", store);
+    return true;
+  }
+
+  public static boolean fetchGroundBall(
+      @Nonnull Ref<EntityStore> catRef,
+      @Nonnull UUID ownerUuid,
+      @Nonnull Store<EntityStore> store) {
+    Vector3d ballPos = YarnBallGroundRegistry.claim(ownerUuid);
+    if (ballPos == null) {
+      return false;
+    }
+
+    var fetchType = CatFetchTargetComponent.getComponentType();
+    var stateType = CatStateComponent.getComponentType();
+    if (fetchType == null || stateType == null) {
+      YarnBallGroundRegistry.register(ownerUuid, ballPos);
+      return false;
+    }
+
+    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
+    if (npcEntity == null || npcEntity.getRole() == null) {
+      YarnBallGroundRegistry.register(ownerUuid, ballPos);
+      return false;
+    }
+
+    store.putComponent(catRef, fetchType, new CatFetchTargetComponent(ballPos, ownerUuid));
+    store.putComponent(catRef, stateType, new CatStateComponent(CatState.FETCHING));
+    npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
+    TransientPath path = new TransientPath();
+    path.addWaypoint(ballPos, new Vector3f(0, 0, 0));
+    npcEntity.getPathManager().setTransientPath(path);
     return true;
   }
 

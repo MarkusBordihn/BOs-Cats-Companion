@@ -42,6 +42,8 @@ import javax.annotation.Nonnull;
 
 public class UseCatCarrierInteraction extends SimpleInteraction {
 
+  public static final String ID = "UseCatCarrier";
+
   @Nonnull
   public static final BuilderCodec<UseCatCarrierInteraction> CODEC =
       BuilderCodec.builder(
@@ -80,7 +82,6 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
       return;
     }
 
-    // Only handle release, if carrier is empty, fail (capture is handled by NPC actions)
     if (!CatCarrierInteraction.hasStoredCat(item)) {
       context.getState().state = InteractionState.Failed;
       super.tick0(firstRun, time, type, context, cooldownHandler);
@@ -116,7 +117,6 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
       return;
     }
 
-    // Determine target position from target block (if clicking on a block)
     final Vector3d targetPos;
     BlockPosition targetBlock = context.getTargetBlock();
     if (targetBlock != null) {
@@ -151,7 +151,5 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
       float time,
       @Nonnull InteractionType type,
       @Nonnull InteractionContext context,
-      @Nonnull CooldownHandler cooldownHandler) {
-    // No client-side simulation needed
-  }
+      @Nonnull CooldownHandler cooldownHandler) {}
 }

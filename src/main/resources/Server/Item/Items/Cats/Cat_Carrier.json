@@ -6,8 +6,8 @@
   "Icon": "Icons/ItemsGenerated/Cat_Carrier.png",
   "Quality": "Uncommon",
   "PlayerAnimationsId": "Item",
-  "Model": "Items/Pets/Cats/Cat_Carrier.blockymodel",
-  "Texture": "Items/Pets/Cats/Cat_Carrier_Texture.png",
+  "Model": "Items/Cats/CatCarrier/Cat_Carrier.blockymodel",
+  "Texture": "Items/Cats/CatCarrier/Cat_Carrier_Texture.png",
   "IconProperties": {
     "Scale": 0.5,
     "Rotation": [

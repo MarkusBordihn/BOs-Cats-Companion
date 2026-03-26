@@ -72,18 +72,22 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
     }
 
     try {
-      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
       CatState state = stateComponent.getState();
+      if (state == CatState.FETCHING) {
+        return;
+      }
+
+      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
       String substate =
           switch (state) {
-            case SITTING -> "Sitting";
-            case SLEEPING -> "Sleeping";
+            case ATTACKING -> "Attacking";
+            case FOLLOWING -> "Default";
             case PLAYING -> "Playing";
             case SEARCHING -> "Searching";
+            case SITTING -> "Sitting";
+            case SLEEPING -> "Sleeping";
             case WAITING -> "Waiting";
             case WANDERING -> "Wandering";
-            case FOLLOWING -> "Default";
-            case ATTACKING -> "Attacking";
             default -> null;
           };
 

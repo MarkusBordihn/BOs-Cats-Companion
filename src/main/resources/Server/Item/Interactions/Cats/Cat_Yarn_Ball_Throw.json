@@ -1,0 +1,26 @@
+{
+  "Type": "Serial",
+  "Interactions": [
+    {
+      "Type": "Cat_Yarn_Ball_Throw_Register"
+    },
+    {
+      "Type": "Simple",
+      "RunTime": 0.25,
+      "Effects": {"ItemAnimationId": "Throw"}
+    },
+    {
+      "Type": "ResetCooldown",
+      "Cooldown": {"Cooldown": 0.5}
+    },
+    {
+      "Type": "Projectile",
+      "Config": "Projectile_Config_Cat_Yarn_Ball",
+      "Next": {"Type": "Simple", "RunTime": 0.2}
+    },
+    {
+      "Type": "ModifyInventory",
+      "ItemToRemove": {"Id": "Cat_Yarn_Ball", "Quantity": 1}
+    }
+  ]
+}

@@ -30,6 +30,11 @@ carrier.empty=The carrier is empty. Use it on your tamed cat to pick it up.
 # Play Interactions
 play.cooldown=Your cat is tired from playing and needs a break.
 
+# Yarn Ball Throw
+yarn_ball.thrown={catName} noticed the yarn ball and is going to fetch it!
+yarn_ball.returned={catName} proudly brings back the yarn ball!
+yarn_ball.no_cat_nearby=None of your cats are interested in the yarn ball right now.
+
 # Owner Interactions
 owner.petting.cooldown=Your cat doesn't want to be petted right now.
 owner.gift={name} brought you a little gift: {gift}!

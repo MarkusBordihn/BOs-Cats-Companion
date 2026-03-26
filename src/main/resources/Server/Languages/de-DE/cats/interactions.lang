@@ -30,6 +30,11 @@ carrier.empty=Transportbox leer. Bei gezähmter Katze benutzen.
 # Play Interactions
 play.cooldown=Deine Katze ist müde vom Spielen und braucht eine Pause.
 
+# Yarn Ball Throw
+yarn_ball.thrown={catName} hat den Wollknäuel bemerkt und holt ihn!
+yarn_ball.returned={catName} bringt stolz den Wollknäuel zurück!
+yarn_ball.no_cat_nearby=Keine deiner Katzen interessiert sich gerade für den Wollknäuel.
+
 # Owner Interactions
 owner.petting.cooldown=Deine Katze möchte gerade nicht gestreichelt werden.
 owner.gift={name} hat dir ein kleines Geschenk gebracht: {gift}!

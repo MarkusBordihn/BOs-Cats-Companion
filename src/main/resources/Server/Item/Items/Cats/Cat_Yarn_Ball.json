@@ -5,20 +5,9 @@
   },
   "Icon": "Icons/ItemsGenerated/Cat_Yarn_Ball.png",
   "Quality": "Common",
-  "BlockType": {
-    "Material": "Solid",
-    "DrawType": "Model",
-    "CustomModel": "Blocks/Cats/Cat_Yarn_Ball.blockymodel",
-    "CustomModelTexture": [
-      {
-        "Texture": "Blocks/Cats/Cat_Yarn_Ball_Texture.png",
-        "Weight": 1
-      }
-    ],
-    "VariantRotation": "NESW",
-    "ParticleColor": "#8d7661"
-  },
-  "PlayerAnimationsId": "Block",
+  "Model": "Items/Cats/CatYarnBall/Cat_Yarn_Ball.blockymodel",
+  "Texture": "Items/Cats/CatYarnBall/Cat_Yarn_Ball_Texture.png",
+  "PlayerAnimationsId": "Item",
   "IconProperties": {
     "Scale": 0.4,
     "Rotation": [
@@ -42,6 +31,14 @@
   },
   "Scale": 0.75,
   "MaxStack": 16,
+  "Weapon": {},
+  "Interactions": {
+    "Primary": {
+      "Interactions": [
+        "Cat_Yarn_Ball_Throw"
+      ]
+    }
+  },
   "Recipe": {
     "TimeSeconds": 1,
     "Input": [

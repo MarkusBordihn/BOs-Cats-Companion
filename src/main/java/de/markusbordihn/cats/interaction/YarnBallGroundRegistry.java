@@ -17,25 +17,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package de.markusbordihn.cats.data;
+package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.codec.codecs.EnumCodec;
+import com.hypixel.hytale.math.vector.Vector3d;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 
-public enum CatState {
-  ATTACKING,
-  FETCHING,
-  FOLLOWING,
-  GOING_TO_BED,
-  PLAYING,
-  SEARCHING,
-  SITTING,
-  SLEEPING,
-  WAITING,
-  WANDERING;
+public final class YarnBallGroundRegistry {
 
-  public static final EnumCodec<CatState> CODEC = new EnumCodec<>(CatState.class);
+  private static final long MAX_AGE_MS = 5 * 60 * 1000L;
 
-  public boolean isSleepingState() {
-    return this == SLEEPING || this == GOING_TO_BED;
+  private static final ConcurrentHashMap<UUID, Entry> entries = new ConcurrentHashMap<>();
+
+  private YarnBallGroundRegistry() {}
+
+  public static void register(UUID ownerUuid, Vector3d position) {
+    entries.put(ownerUuid, new Entry(position, System.currentTimeMillis()));
   }
+
+  @Nullable
+  public static Vector3d claim(UUID ownerUuid) {
+    Entry entry = entries.remove(ownerUuid);
+    if (entry == null || System.currentTimeMillis() - entry.timestamp > MAX_AGE_MS) {
+      return null;
+    }
+    return entry.position;
+  }
+
+  public static void clear(UUID ownerUuid) {
+    entries.remove(ownerUuid);
+  }
+
+  private record Entry(Vector3d position, long timestamp) {}
 }
