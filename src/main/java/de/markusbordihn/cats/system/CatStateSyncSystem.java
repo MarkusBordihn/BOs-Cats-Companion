@@ -82,6 +82,7 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
           switch (state) {
             case ATTACKING -> "Attacking";
             case FOLLOWING -> "Default";
+            case GOING_TO_BED -> "GoingToBed";
             case PLAYING -> "Playing";
             case SEARCHING -> "Searching";
             case SITTING -> "Sitting";

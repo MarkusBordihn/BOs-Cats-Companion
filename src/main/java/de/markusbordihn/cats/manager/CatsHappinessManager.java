@@ -40,7 +40,8 @@ import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.data.MoodData;
 import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -214,12 +215,12 @@ public class CatsHappinessManager {
           continue;
         }
 
-        Int2ObjectMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
+        Int2ReferenceMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
         if (entityRefs == null || entityRefs.isEmpty()) {
           continue;
         }
 
-        for (Int2ObjectMap.Entry<Ref<ChunkStore>> entry : entityRefs.int2ObjectEntrySet()) {
+        for (Entry<Ref<ChunkStore>> entry : entityRefs.int2ReferenceEntrySet()) {
           int blockIndex = entry.getIntKey();
           int localX = ChunkUtil.xFromIndex(blockIndex);
           int localY = blockIndex / (ChunkUtil.SIZE * ChunkUtil.SIZE);

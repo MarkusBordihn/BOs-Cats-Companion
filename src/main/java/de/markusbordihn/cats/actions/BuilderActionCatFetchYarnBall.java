@@ -21,7 +21,6 @@ package de.markusbordihn.cats.actions;
 
 import com.google.gson.JsonElement;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -103,8 +102,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       super(builder);
     }
 
-    private static void setTransientPath(
-        @Nonnull NPCEntity npcEntity, @Nonnull Vector3d target) {
+    private static void setTransientPath(@Nonnull NPCEntity npcEntity, @Nonnull Vector3d target) {
       TransientPath path = new TransientPath();
       path.addWaypoint(target, new Vector3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);

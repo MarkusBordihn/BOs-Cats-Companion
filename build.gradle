@@ -48,11 +48,12 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-  compileOnly("com.hypixel.hytale:Server:$hytale_build")
   if (hasLocalServer) {
+    compileOnly(files(hytaleServerJarPath))
     runtimeOnly(files(hytaleServerJarPath))
     testRuntimeOnly(files(hytaleServerJarPath))
   } else {
+    compileOnly("com.hypixel.hytale:Server:$hytale_build")
     testRuntimeOnly("com.hypixel.hytale:Server:$hytale_build")
   }
 }

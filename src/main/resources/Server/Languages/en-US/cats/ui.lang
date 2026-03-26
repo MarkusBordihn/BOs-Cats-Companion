@@ -25,6 +25,7 @@ state.wandering=Wandering
 state.going_to_bed=Going to Bed
 state.waiting=Waiting
 state.pouncing=Pouncing
+state.fetching=Fetching
 state.searching=Searching
 
 # Happiness / Mood

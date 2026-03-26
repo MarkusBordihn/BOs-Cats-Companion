@@ -37,7 +37,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBedInfo;
 import de.markusbordihn.cats.data.CatState;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap.Entry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -88,12 +89,12 @@ public final class CatBed {
           continue;
         }
 
-        Int2ObjectMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
+        Int2ReferenceMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
         if (entityRefs == null || entityRefs.isEmpty()) {
           continue;
         }
 
-        for (Int2ObjectMap.Entry<Ref<ChunkStore>> entry : entityRefs.int2ObjectEntrySet()) {
+        for (Entry<Ref<ChunkStore>> entry : entityRefs.int2ReferenceEntrySet()) {
           int blockIndex = entry.getIntKey();
           int localX = ChunkUtil.xFromIndex(blockIndex);
           int localY = blockIndex / (ChunkUtil.SIZE * ChunkUtil.SIZE);

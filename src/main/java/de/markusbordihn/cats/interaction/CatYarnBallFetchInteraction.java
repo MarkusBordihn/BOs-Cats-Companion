@@ -245,8 +245,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
         playerEntityRef != null
             ? store.getComponent(playerEntityRef, TransformComponent.getComponentType())
             : null;
-    Vector3d playerPos =
-        playerTransform != null ? playerTransform.getPosition() : landingPosition;
+    Vector3d playerPos = playerTransform != null ? playerTransform.getPosition() : landingPosition;
 
     Ref<EntityStore> catRef = findNearestFetchCat(ownerUuid, playerPos, store);
     if (catRef == null) {

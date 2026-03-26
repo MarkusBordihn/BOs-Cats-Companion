@@ -25,6 +25,7 @@ state.wandering=Erkundet
 state.going_to_bed=Geht zum Bett
 state.waiting=Wartet
 state.pouncing=Springt an
+state.fetching=Apportiert
 state.searching=Sucht
 
 # Happiness / Mood

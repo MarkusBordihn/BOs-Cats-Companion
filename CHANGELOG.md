@@ -9,6 +9,8 @@ Note: Please always back up your world before updating to a new version!
 
 ### 2.10.0
 
+- Migrated to Hytale 2026.03.26-89796e57b with updated APIs and systems.
+  (Navigation and Pathfinding is currently broken !!!)
 - Fixed yarn ball from placeable block to throwable item with projectile interaction.
 - Fixed wild cats moving without animation ("statue" movement) after waking from sleep or exiting
   idle flavor animations (Sit, Lick, Search).
