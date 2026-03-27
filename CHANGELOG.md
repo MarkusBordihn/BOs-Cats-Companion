@@ -7,6 +7,13 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.10.1
+
+- Fixed broken navigation and pathfinding for tamed cats after migrating to Hytale
+  2026.03.26-89796e57b.
+- Fixed flaky catch and bring behavior.
+- Improved yarn ball projectile interaction.
+
 ### 2.10.0
 
 - Migrated to Hytale 2026.03.26-89796e57b with updated APIs and systems.

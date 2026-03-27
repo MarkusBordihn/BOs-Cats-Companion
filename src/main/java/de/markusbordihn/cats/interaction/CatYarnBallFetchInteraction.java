@@ -120,6 +120,10 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       return;
     }
 
+    if (YarnBallFetchRegistry.isFetching(ownerUuid)) {
+      return;
+    }
+    YarnBallFetchRegistry.register(ownerUuid, catRef);
     commandBuffer.putComponent(
         catRef, fetchTargetType, new CatFetchTargetComponent(landingPosition, ownerUuid));
     commandBuffer.putComponent(catRef, catStateType, new CatStateComponent(CatState.FETCHING));

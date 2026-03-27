@@ -137,78 +137,67 @@
             },
             {
               "$Comment": "Night sleep",
+              "Continue": true,
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
+                  {"Type": "Time", "Period": [17.99, 6.01]},
                   {
-                    "Type": "Time",
-                    "Period": [17.99, 6.01]
+                    "Type": "Or",
+                    "Sensors": [
+                      {"Type": "State", "State": ".Waiting"},
+                      {"Type": "State", "State": ".Wandering"},
+                      {"Type": "State", "State": ".Searching"}
+                    ]
                   },
-                  {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "State",
-                      "State": ".Sleeping"
-                    }
-                  },
-                  {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "State",
-                      "State": ".GoingToBed"
-                    }
-                  },
-                  {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "State",
-                      "State": ".Attacking"
-                    }
-                  },
-                  {
-                    "Type": "Not",
-                    "Sensor": {
-                      "Type": "State",
-                      "State": ".Dying"
-                    }
-                  }
+                  {"Type": "Alarm", "Name": "Sleep_Pending", "State": "Unset"},
+                  {"Type": "Alarm", "Name": "Sleep_Cooldown", "State": "Unset"}
                 ]
               },
               "Actions": [
                 {
-                  "Type": "State",
-                  "State": ".Sleeping"
+                  "Type": "SetAlarm",
+                  "Name": "Sleep_Pending",
+                  "DurationRange": ["PT15M", "PT45M"]
                 }
               ]
             },
             {
-              "$Comment": "Daytime wake-up: if sleeping during daytime, wake up",
+              "$Comment": "Night sleep - execute: sleep once pending alarm fires",
               "Sensor": {
                 "Type": "And",
                 "Sensors": [
-                  {
-                    "Type": "Time",
-                    "Period": [6.01, 17.99]
-                  },
+                  {"Type": "Time", "Period": [17.99, 6.01]},
                   {
                     "Type": "Or",
                     "Sensors": [
-                      {
-                        "Type": "State",
-                        "State": ".Sleeping"
-                      },
-                      {
-                        "Type": "State",
-                        "State": ".GoingToBed"
-                      }
+                      {"Type": "State", "State": ".Waiting"},
+                      {"Type": "State", "State": ".Wandering"},
+                      {"Type": "State", "State": ".Searching"}
                     ]
-                  }
+                  },
+                  {"Type": "Alarm", "Name": "Sleep_Pending", "State": "Passed", "Clear": true}
                 ]
               },
               "Actions": [
+                {"Type": "State", "State": ".Sleeping"}
+              ]
+            },
+            {
+              "$Comment": "Daytime wake-up: if sleeping during daytime, wake up and set cooldown",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {"Type": "Time", "Period": [6.01, 17.99]},
+                  {"Type": "State", "State": ".Sleeping"}
+                ]
+              },
+              "Actions": [
+                {"Type": "State", "State": ".Waiting"},
                 {
-                  "Type": "State",
-                  "State": ".Waiting"
+                  "Type": "SetAlarm",
+                  "Name": "Sleep_Cooldown",
+                  "DurationRange": ["PT2H", "PT4H"]
                 }
               ]
             },

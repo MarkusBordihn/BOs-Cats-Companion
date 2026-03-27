@@ -11,7 +11,7 @@
     "TerminalVelocityAir": 40,
     "TerminalVelocityWater": 12,
     "RotationMode": "VelocityRoll",
-    "Bounciness": 0.4,
+    "Bounciness": 0.3,
     "BounceCount": 2,
     "AllowRolling": true,
     "RollingFrictionFactor": 1,
