@@ -51,9 +51,11 @@ dependencies {
   if (hasLocalServer) {
     compileOnly(files(hytaleServerJarPath))
     runtimeOnly(files(hytaleServerJarPath))
+    testCompileOnly(files(hytaleServerJarPath))
     testRuntimeOnly(files(hytaleServerJarPath))
   } else {
     compileOnly("com.hypixel.hytale:Server:$hytale_build")
+    testCompileOnly("com.hypixel.hytale:Server:$hytale_build")
     testRuntimeOnly("com.hypixel.hytale:Server:$hytale_build")
   }
 }

@@ -765,6 +765,13 @@
                   "Type": "PlayAnimation",
                   "Animation": "Idle",
                   "Slot": "Action"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [8, 20],
+                  "Action": {
+                    "Type": "CatIdleChoice"
+                  }
                 }
               ],
               "BodyMotion": {
@@ -837,6 +844,53 @@
                   ]
                 },
                 {
+                  "$Comment": "Active personality: high activityWeight cats follow faster with shorter pauses",
+                  "Sensor": {
+                    "Type": "CatPersonalityWeight",
+                    "Weight": "activity",
+                    "Threshold": 0.65
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "Player",
+                        "Range": 18,
+                        "LockOnTarget": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ],
+                      "BodyMotion": {
+                        "Type": "Sequence",
+                        "Looped": true,
+                        "Motions": [
+                          {
+                            "Type": "Timer",
+                            "Time": [2, 4],
+                            "Motion": {
+                              "Type": "Seek",
+                              "SlowDownDistance": 5,
+                              "StopDistance": 2,
+                              "RelativeSpeed": 1.1
+                            }
+                          },
+                          {
+                            "Type": "Timer",
+                            "Time": [0.3, 1.0],
+                            "Motion": {
+                              "Type": "Nothing"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
                   "Sensor": {
                     "Type": "Any"
                   },
@@ -900,6 +954,53 @@
                         "SlowDownDistance": 5,
                         "StopDistance": 3,
                         "RelativeSpeed": 0.8
+                      }
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Lazy personality: high restWeight cats follow slower with longer pauses",
+                  "Sensor": {
+                    "Type": "CatPersonalityWeight",
+                    "Weight": "rest",
+                    "Threshold": 0.65
+                  },
+                  "Instructions": [
+                    {
+                      "Sensor": {
+                        "Type": "Player",
+                        "Range": 18,
+                        "LockOnTarget": true
+                      },
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
+                        }
+                      ],
+                      "BodyMotion": {
+                        "Type": "Sequence",
+                        "Looped": true,
+                        "Motions": [
+                          {
+                            "Type": "Timer",
+                            "Time": [6, 10],
+                            "Motion": {
+                              "Type": "Seek",
+                              "SlowDownDistance": 5,
+                              "StopDistance": 4,
+                              "RelativeSpeed": 0.5
+                            }
+                          },
+                          {
+                            "Type": "Timer",
+                            "Time": [2, 4],
+                            "Motion": {
+                              "Type": "Nothing"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]

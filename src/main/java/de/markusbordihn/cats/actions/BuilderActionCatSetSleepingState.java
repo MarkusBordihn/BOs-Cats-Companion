@@ -36,6 +36,7 @@ import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 public class BuilderActionCatSetSleepingState extends BuilderActionBase {
+
   public static final String BUILDER_ID = "CatSetSleepingState";
 
   public String getBuilderId() {

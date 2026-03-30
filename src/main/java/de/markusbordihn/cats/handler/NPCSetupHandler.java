@@ -26,6 +26,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
 import com.hypixel.hytale.server.npc.instructions.Action;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
 import de.markusbordihn.cats.actions.BuilderActionCatFetchYarnBall;
+import de.markusbordihn.cats.actions.BuilderActionCatIdleChoice;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionOwner;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionStranger;
@@ -33,6 +34,7 @@ import de.markusbordihn.cats.actions.BuilderActionCatInteractionWild;
 import de.markusbordihn.cats.actions.BuilderActionCatMoodParticles;
 import de.markusbordihn.cats.actions.BuilderActionCatSetSleepingState;
 import de.markusbordihn.cats.actions.BuilderActionCatTeleportToBed;
+import de.markusbordihn.cats.sensors.BuilderSensorCatPersonalityWeight;
 import de.markusbordihn.cats.sensors.BuilderSensorIsCatTamed;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingCarrier;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingEmptyHand;
@@ -61,6 +63,7 @@ public class NPCSetupHandler {
     BuilderSensorIsHoldingFood.SENSOR_ID,
     BuilderSensorIsHoldingEmptyHand.SENSOR_ID,
     BuilderSensorIsHoldingYarnBall.SENSOR_ID,
+    BuilderSensorCatPersonalityWeight.SENSOR_ID,
   };
 
   @SuppressWarnings("rawtypes")
@@ -71,6 +74,7 @@ public class NPCSetupHandler {
     BuilderSensorIsHoldingFood::new,
     BuilderSensorIsHoldingEmptyHand::new,
     BuilderSensorIsHoldingYarnBall::new,
+    BuilderSensorCatPersonalityWeight::new,
   };
 
   private boolean actionsRegistered = false;
@@ -158,6 +162,14 @@ public class NPCSetupHandler {
     } catch (Exception e) {
       LOGGER.at(Level.SEVERE).log(
           "Failed to register action: %s", BuilderActionCatFetchYarnBall.BUILDER_ID, e);
+    }
+
+    try {
+      actionFactory.add(BuilderActionCatIdleChoice.BUILDER_ID, BuilderActionCatIdleChoice::new);
+      LOGGER.at(Level.INFO).log("Registered action: %s", BuilderActionCatIdleChoice.BUILDER_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register action: %s", BuilderActionCatIdleChoice.BUILDER_ID, e);
     }
 
     actionsRegistered = true;

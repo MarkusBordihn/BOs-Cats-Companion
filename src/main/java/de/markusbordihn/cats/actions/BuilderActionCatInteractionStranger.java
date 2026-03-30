@@ -32,6 +32,7 @@ import de.markusbordihn.cats.interaction.ItemInteractionStranger;
 import javax.annotation.Nonnull;
 
 public class BuilderActionCatInteractionStranger extends BuilderActionCatInteractionBase {
+
   public static final String BUILDER_ID = "CatInteractionStranger";
 
   @Override

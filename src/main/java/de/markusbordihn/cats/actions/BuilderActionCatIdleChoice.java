@@ -30,18 +30,17 @@ import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
-import de.markusbordihn.cats.data.HappinessLevel;
-import java.util.HashMap;
+import de.markusbordihn.cats.data.CatBehaviorProfile;
+import de.markusbordihn.cats.data.CatBehaviorProfileResolver;
+import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BuilderActionCatMoodParticles extends BuilderActionBase {
+public class BuilderActionCatIdleChoice extends BuilderActionBase {
 
-  public static final String BUILDER_ID = "CatMoodParticles";
-
-  private static final double MIN_PARTICLE_INTERVAL = 15.0;
-  private static final double MAX_PARTICLE_INTERVAL = 30.0;
+  public static final String BUILDER_ID = "CatIdleChoice";
 
   public String getBuilderId() {
     return BUILDER_ID;
@@ -55,47 +54,60 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
   @Nonnull
   @Override
-  public BuilderActionCatMoodParticles readConfig(JsonElement config) {
+  public BuilderActionCatIdleChoice readConfig(@Nullable JsonElement config) {
     return this;
   }
 
   @Nonnull
   @Override
-  public ActionCatMoodParticles build(BuilderSupport support) {
-    return new ActionCatMoodParticles(this);
+  public ActionCatIdleChoice build(BuilderSupport support) {
+    return new ActionCatIdleChoice(this);
   }
 
   @Nonnull
   @Override
   public String getShortDescription() {
-    return "Periodically shows mood particles via transient sub-states";
+    return "Picks a personality-weighted idle sub-state for a waiting cat";
   }
 
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Accumulates deltaTime per entity and every 15-30s sets a transient mood sub-state "
-        + "(MoodEcstatic/Happy/Sad/Miserable). JSON SpawnParticles blocks react to the state "
-        + "and reset it via Timeout. NEUTRAL mood shows no particles.";
+    return "Resolves the cat's CatBehaviorProfile and selects a transient NPC sub-state "
+        + "(Stretching, Licking, Sitting, Playing) via weighted random draw. "
+        + "Does not modify CatStateComponent. The JSON Timeout for each sub-state "
+        + "handles the return to .Waiting.";
   }
 
-  public static class ActionCatMoodParticles extends ActionBase {
+  public static class ActionCatIdleChoice extends ActionBase {
 
-    private static final HashMap<Ref<EntityStore>, Double> elapsedByEntity = new HashMap<>();
-
-    public ActionCatMoodParticles(BuilderActionBase builder) {
+    public ActionCatIdleChoice(BuilderActionBase builder) {
       super(builder);
     }
 
-    @Nullable
-    private static String toMoodSubState(@Nonnull HappinessLevel happinessLevel) {
-      return switch (happinessLevel) {
-        case ECSTATIC -> "MoodEcstatic";
-        case HAPPY -> "MoodHappy";
-        case SAD -> "MoodSad";
-        case MISERABLE -> "MoodMiserable";
-        default -> null;
-      };
+    @Nonnull
+    private static String pickSubState(@Nonnull CatBehaviorProfile profile) {
+      float lickingWeight = profile.restWeight();
+      float sittingWeight = 0.3f;
+      float stretchingWeight = profile.activityWeight() > 0.2f ? profile.activityWeight() : 0f;
+      float playingWeight = profile.playWeight() > 0.4f ? profile.playWeight() * 0.7f : 0f;
+
+      float totalWeight = lickingWeight + sittingWeight + stretchingWeight + playingWeight;
+
+      float roll = ThreadLocalRandom.current().nextFloat() * totalWeight;
+      float cumulative = lickingWeight;
+      if (roll < cumulative) {
+        return "Licking";
+      }
+      cumulative += sittingWeight;
+      if (roll < cumulative) {
+        return "Sitting";
+      }
+      cumulative += stretchingWeight;
+      if (roll < cumulative) {
+        return "Stretching";
+      }
+      return "Playing";
     }
 
     @Override
@@ -115,40 +127,31 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      double elapsedSeconds =
-          elapsedByEntity.compute(
-              entityRef,
-              (key, previous) ->
-                  previous == null
-                      ? ThreadLocalRandom.current().nextDouble(0, MAX_PARTICLE_INTERVAL)
-                      : previous + deltaTime);
-
-      if (elapsedSeconds < MIN_PARTICLE_INTERVAL) {
-        return true;
-      }
-
-      double particleThreshold =
-          ThreadLocalRandom.current().nextDouble(MIN_PARTICLE_INTERVAL, MAX_PARTICLE_INTERVAL);
-      if (elapsedSeconds < particleThreshold) {
-        return true;
-      }
-
-      elapsedByEntity.put(entityRef, 0.0);
       if (role == null) {
+        return true;
+      }
+
+      CatsManager catsManager = CatsManager.getInstance();
+      if (catsManager == null) {
+        return true;
+      }
+
+      CatDataEntry catData = catsManager.getCatData(entityRef, store);
+      if (catData == null) {
         return true;
       }
 
       CatMoodComponent moodComponent =
           store.getComponent(entityRef, CatMoodComponent.getComponentType());
-      if (moodComponent == null) {
-        return true;
-      }
 
-      String moodSubState = toMoodSubState(moodComponent.getLevel());
-      if (moodSubState != null) {
-        role.getStateSupport().setState(entityRef, "Pet", moodSubState, store);
-      }
+      CatBehaviorProfile profile =
+          CatBehaviorProfileResolver.resolve(
+              catData.personalityType(),
+              catData.secondaryPersonality(),
+              moodComponent != null ? moodComponent.getLevel() : null);
 
+      String chosen = pickSubState(profile);
+      role.getStateSupport().setState(entityRef, "Pet", chosen, store);
       return true;
     }
   }

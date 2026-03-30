@@ -38,6 +38,7 @@ import de.markusbordihn.cats.manager.CatsManager;
 import javax.annotation.Nonnull;
 
 public class BuilderActionCatTeleportToBed extends BuilderActionBase {
+
   public static final String BUILDER_ID = "CatTeleportToBed";
 
   public String getBuilderId() {
@@ -100,7 +101,6 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      // Get the bed target position
       CatBedTargetComponent bedTarget =
           store.getComponent(entityRef, CatBedTargetComponent.getComponentType());
       if (bedTarget == null || !bedTarget.hasTarget()) {
@@ -108,31 +108,24 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
       }
       Vector3d targetPos = bedTarget.getTargetPosition();
 
-      // Get current rotation to preserve it
       TransformComponent currentTransform =
           store.getComponent(entityRef, TransformComponent.getComponentType());
-
-      // Teleport to bed position (slightly above the bed surface)
       TransformComponent newTransform =
           new TransformComponent(
               new Vector3d(targetPos.x, targetPos.y + 0.5, targetPos.z),
               currentTransform != null ? currentTransform.getRotation() : new Vector3f(0, 0, 0));
       store.putComponent(entityRef, TransformComponent.getComponentType(), newTransform);
 
-      // Update state (component + persistent data)
       CatsManager catsManager = CatsManager.getInstance();
       if (catsManager != null) {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
       }
 
-      // Set NPC role state to Sleeping
       if (role != null && role.getStateSupport() != null) {
         role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
       }
 
-      // Remove the bed target component (no longer needed)
       store.removeComponent(entityRef, CatBedTargetComponent.getComponentType());
-
       return true;
     }
   }
