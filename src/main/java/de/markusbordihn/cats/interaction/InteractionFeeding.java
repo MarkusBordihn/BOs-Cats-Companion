@@ -67,7 +67,7 @@ public class InteractionFeeding {
       worldTime = npcEntity != null ? store.getResource(WorldTimeResource.getResourceType()) : null;
     }
 
-    if (npcEntity != null && worldTime != null) {
+    if (npcEntity != null) {
       Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
       if (treatAlarm.isSet() && !treatAlarm.hasPassed(worldTime.getGameTime())) {
         if (player != null) {
@@ -89,7 +89,7 @@ public class InteractionFeeding {
       boolean wasFullHealth = isTreat && isAtFullHealth(entityRef, store);
       healCat(entityRef, store, player, healAmount, isTreat);
 
-      if (npcEntity != null && worldTime != null) {
+      if (npcEntity != null) {
         Duration cooldown =
             wasFullHealth ? TREAT_COOLDOWN_FULL_HEALTH_DURATION : TREAT_COOLDOWN_DURATION;
         Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
@@ -100,6 +100,8 @@ public class InteractionFeeding {
       if (catsManager != null) {
         catsManager.boostHappiness(
             entityRef, isTreat ? HappinessSource.TREAT : HappinessSource.FEEDING, store);
+        catsManager.satisfyNeed(
+            entityRef, de.markusbordihn.cats.data.CatNeedType.SOCIAL, 8f, store);
       }
     }
 
@@ -110,7 +112,9 @@ public class InteractionFeeding {
 
   private static boolean isAtFullHealth(Ref<EntityStore> entityRef, Store<EntityStore> store) {
     EntityStatMap statMap = store.getComponent(entityRef, EntityStatMap.getComponentType());
-    if (statMap == null) return false;
+    if (statMap == null) {
+      return false;
+    }
     EntityStatValue healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
     return healthStat != null && healthStat.get() >= healthStat.getMax();
   }
@@ -136,7 +140,6 @@ public class InteractionFeeding {
 
     float currentHealth = healthStat.get();
     float maxHealth = healthStat.getMax();
-
     if (currentHealth >= maxHealth) {
       if (player != null) {
         String msgKey =

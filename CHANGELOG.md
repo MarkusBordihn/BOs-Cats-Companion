@@ -7,6 +7,22 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.11.0
+
+- Fixed #2 tamed cats following any nearby player instead of only their owner.
+- Fixed action wheel showing stale state (e.g. "Sleeping") when the cat was already awake and
+  following.
+- Fixed mood particles interrupting follow behavior.
+- Fixed label and value order in the action wheel needs panel.
+- Added need-driven routine loop (Milestone 4): cats accumulate Rest, Social, and Play needs over
+  time and autonomously transition to matching behaviors when a need becomes critical.
+- Added need satisfaction from interactions: petting, playing, and feeding reduce the corresponding
+  needs. Personality type affects how fast each need grows.
+- Added needs display to the action wheel info panel and /cat info command.
+- Improved action wheel info panel with styled background, section headers, and color-coded values.
+- Improved mood particle interval to reduce visual noise.
+- General code optimizations and style guide improvements.
+
 ### 2.10.1
 
 - Fixed broken navigation and pathfinding for tamed cats after migrating to Hytale

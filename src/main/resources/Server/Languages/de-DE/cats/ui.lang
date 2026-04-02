@@ -63,3 +63,7 @@ panel.secondary=Sekundär:
 panel.gifts=Geschenke:
 panel.rename=Umbenennen
 panel.personality.none=Unbekannt
+panel.needs=Bedürfnisse:
+panel.needs.rest=Ruhe:
+panel.needs.social=Sozial:
+panel.needs.play=Spiel:

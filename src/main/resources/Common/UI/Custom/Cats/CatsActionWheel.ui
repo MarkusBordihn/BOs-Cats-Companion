@@ -59,16 +59,45 @@ $Common = "../Common.ui";
   Pressed: (Background: (TexturePath: "CatsActionWheelButton7_press.png"), LabelStyle: @SliceButtonLabelStyle)
 );
 
+@InfoSectionHeaderStyle = LabelStyle(
+  FontSize: 11,
+  RenderUppercase: true,
+  RenderBold: true,
+  TextColor: #7a9cc6,
+  HorizontalAlignment: Start,
+  VerticalAlignment: Center
+);
+@InfoValueStyle = LabelStyle(
+  FontSize: 15,
+  RenderBold: true,
+  TextColor: #dce8f0,
+  HorizontalAlignment: Start,
+  VerticalAlignment: Center
+);
+@InfoNeedLabelStyle = LabelStyle(
+  FontSize: 13,
+  TextColor: #68879b,
+  HorizontalAlignment: Start,
+  VerticalAlignment: Center
+);
+@InfoNeedValueStyle = LabelStyle(
+  FontSize: 13,
+  RenderBold: true,
+  TextColor: #e8d79a,
+  HorizontalAlignment: Start,
+  VerticalAlignment: Center
+);
+
 $Common.@PageOverlay {
   LayoutMode: Middle;
 
   Group #CatsActionMenuWheel {
-    Anchor: (Width: 920, Height: 760);
+    Anchor: (Width: 1280, Height: 760);
     Visible: false;
     Background: (TexturePath: "CatsActionWheelBackground.png");
 
     Label #CatsActionMenuTitle {
-      Anchor: (Top: 18, Width: 620, Height: 42, Left: 150);
+      Anchor: (Top: 18, Width: 800, Height: 42, Left: 240);
       Text: "";
       Style: (
         FontSize: 38,
@@ -80,7 +109,7 @@ $Common.@PageOverlay {
     }
 
     Label #CatsActionMenuSubtitle {
-      Anchor: (Top: 62, Width: 620, Height: 26, Left: 150);
+      Anchor: (Top: 62, Width: 800, Height: 26, Left: 240);
       Text: "";
       Style: (
         FontSize: 16,
@@ -91,7 +120,7 @@ $Common.@PageOverlay {
     }
 
     TextButton #CatsActionWheelCenterButton {
-      Anchor: (Top: 271, Left: 311, Width: 298, Height: 298);
+      Anchor: (Top: 271, Left: 491, Width: 298, Height: 298);
       Style: TextButtonStyle(
         Default:  (Background: (Color: #00000000), LabelStyle: @SliceButtonLabelStyle),
         Hovered:  (Background: (TexturePath: "CatsActionWheelCenter_hover.png"), LabelStyle: @SliceButtonLabelStyle),
@@ -103,7 +132,7 @@ $Common.@PageOverlay {
     }
 
     Label #CatsActionWheelStopLabel {
-      Anchor: (Top: 400, Width: 220, Height: 44, Left: 350);
+      Anchor: (Top: 400, Width: 220, Height: 44, Left: 530);
       Text: "";
       Style: (
         FontSize: 32,
@@ -116,7 +145,7 @@ $Common.@PageOverlay {
     }
 
     Label #CatsActionWheelStatusHeader {
-      Anchor: (Top: 456, Width: 180, Height: 18, Left: 370);
+      Anchor: (Top: 456, Width: 180, Height: 18, Left: 550);
       Text: "";
       Style: (
         FontSize: 11,
@@ -127,7 +156,7 @@ $Common.@PageOverlay {
     }
 
     Label #CatsActionMenuCenterText {
-      Anchor: (Top: 476, Width: 200, Height: 30, Left: 360);
+      Anchor: (Top: 476, Width: 200, Height: 30, Left: 540);
       Text: "";
       Style: (
         FontSize: 14,
@@ -140,37 +169,54 @@ $Common.@PageOverlay {
       );
     }
 
-    TextButton #CatsActionWheelButton0 { Anchor: (Top: 112, Left: 340, Width: 242, Height: 175); Style: @Slice0ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton1 { Anchor: (Top: 134, Left: 513, Width: 233, Height: 233); Style: @Slice1ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton2 { Anchor: (Top: 300, Left: 592, Width: 175, Height: 242); Style: @Slice2ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton3 { Anchor: (Top: 473, Left: 513, Width: 233, Height: 233); Style: @Slice3ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton4 { Anchor: (Top: 552, Left: 340, Width: 242, Height: 175); Style: @Slice4ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton5 { Anchor: (Top: 473, Left: 174, Width: 233, Height: 233); Style: @Slice5ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton6 { Anchor: (Top: 300, Left: 152, Width: 175, Height: 242); Style: @Slice6ButtonStyle; Text: ""; Visible: false; }
-    TextButton #CatsActionWheelButton7 { Anchor: (Top: 134, Left: 174, Width: 233, Height: 233); Style: @Slice7ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton0 { Anchor: (Top: 112, Left: 520, Width: 242, Height: 175); Style: @Slice0ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton1 { Anchor: (Top: 134, Left: 693, Width: 233, Height: 233); Style: @Slice1ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton2 { Anchor: (Top: 300, Left: 772, Width: 175, Height: 242); Style: @Slice2ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton3 { Anchor: (Top: 473, Left: 693, Width: 233, Height: 233); Style: @Slice3ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton4 { Anchor: (Top: 552, Left: 520, Width: 242, Height: 175); Style: @Slice4ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton5 { Anchor: (Top: 473, Left: 354, Width: 233, Height: 233); Style: @Slice5ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton6 { Anchor: (Top: 300, Left: 332, Width: 175, Height: 242); Style: @Slice6ButtonStyle; Text: ""; Visible: false; }
+    TextButton #CatsActionWheelButton7 { Anchor: (Top: 134, Left: 354, Width: 233, Height: 233); Style: @Slice7ButtonStyle; Text: ""; Visible: false; }
 
-    Label #CatsActionWheelLabel0 { Anchor: (Top: 164, Left: 376, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel1 { Anchor: (Top: 233, Left: 541, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel2 { Anchor: (Top: 398, Left: 610, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel3 { Anchor: (Top: 563, Left: 541, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel4 { Anchor: (Top: 632, Left: 376, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel5 { Anchor: (Top: 563, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel6 { Anchor: (Top: 398, Left: 142, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
-    Label #CatsActionWheelLabel7 { Anchor: (Top: 233, Left: 211, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel0 { Anchor: (Top: 164, Left: 556, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel1 { Anchor: (Top: 233, Left: 721, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel2 { Anchor: (Top: 398, Left: 790, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel3 { Anchor: (Top: 563, Left: 721, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel4 { Anchor: (Top: 632, Left: 556, Width: 168, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel5 { Anchor: (Top: 563, Left: 391, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel6 { Anchor: (Top: 398, Left: 322, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
+    Label #CatsActionWheelLabel7 { Anchor: (Top: 233, Left: 391, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
 
-    Group { Anchor: (Top: 325, Right: 0, Width: 155, Height: 200); Background: (Color: #00000088); }
+    Group #CatInfoPanel {
+      Anchor: (Top: 248, Left: 990, Width: 282, Height: 258);
+      Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);
+    }
 
-    Label #CatInfoPanelPersonalityHeader { Anchor: (Top: 335, Right: 0, Width: 155, Height: 18); Text: "Personality:"; Style: @SliceLabelStyle; Visible: true; }
-    Label #CatInfoPanelPersonality       { Anchor: (Top: 355, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
-    Label #CatInfoPanelSecondaryHeader   { Anchor: (Top: 387, Right: 0, Width: 155, Height: 18); Text: "Secondary:"; Style: @SliceLabelStyle; Visible: true; }
-    Label #CatInfoPanelSecondary         { Anchor: (Top: 407, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
-    Label #CatInfoPanelGiftsHeader       { Anchor: (Top: 445, Right: 0, Width: 155, Height: 18); Text: "Gifts:"; Style: @SliceLabelStyle; Visible: true; }
-    Label #CatInfoPanelGifts             { Anchor: (Top: 465, Right: 0, Width: 155, Height: 26); Text: ""; Style: @SliceLabelStyle; Visible: true; }
+    Label #CatInfoPanelPersonalityHeader { Anchor: (Top: 264, Left: 1006, Width: 252, Height: 14); Text: ""; Style: @InfoSectionHeaderStyle; }
+    Label #CatInfoPanelPersonality       { Anchor: (Top: 281, Left: 1006, Width: 252, Height: 20); Text: ""; Style: @InfoValueStyle; }
+    Group { Anchor: (Top: 306, Left: 1010, Width: 248, Height: 1); Background: (Color: #2b3542); }
+
+    Label #CatInfoPanelSecondaryHeader   { Anchor: (Top: 312, Left: 1006, Width: 252, Height: 14); Text: ""; Style: @InfoSectionHeaderStyle; }
+    Label #CatInfoPanelSecondary         { Anchor: (Top: 329, Left: 1006, Width: 252, Height: 20); Text: ""; Style: @InfoValueStyle; }
+    Group { Anchor: (Top: 354, Left: 1010, Width: 248, Height: 1); Background: (Color: #2b3542); }
+
+    Label #CatInfoPanelGiftsHeader       { Anchor: (Top: 360, Left: 1006, Width: 252, Height: 14); Text: ""; Style: @InfoSectionHeaderStyle; }
+    Label #CatInfoPanelGifts             { Anchor: (Top: 377, Left: 1006, Width: 252, Height: 20); Text: ""; Style: @InfoValueStyle; }
+    Group { Anchor: (Top: 402, Left: 1010, Width: 248, Height: 1); Background: (Color: #2b3542); }
+
+    Label #CatInfoPanelNeedsHeader       { Anchor: (Top: 408, Left: 1006, Width: 252, Height: 14); Text: ""; Style: @InfoSectionHeaderStyle; }
+
+    Label #CatInfoPanelNeedsRestLbl   { Anchor: (Top: 427, Left: 1006, Width: 100, Height: 18); Text: ""; Style: @InfoNeedLabelStyle; }
+    Label #CatInfoPanelNeedsRest      { Anchor: (Top: 427, Left: 1112, Width: 138, Height: 18); Text: ""; Style: @InfoNeedValueStyle; }
+    Label #CatInfoPanelNeedsSocialLbl { Anchor: (Top: 449, Left: 1006, Width: 100, Height: 18); Text: ""; Style: @InfoNeedLabelStyle; }
+    Label #CatInfoPanelNeedsSocial    { Anchor: (Top: 449, Left: 1112, Width: 138, Height: 18); Text: ""; Style: @InfoNeedValueStyle; }
+    Label #CatInfoPanelNeedsPlayLbl   { Anchor: (Top: 471, Left: 1006, Width: 100, Height: 18); Text: ""; Style: @InfoNeedLabelStyle; }
+    Label #CatInfoPanelNeedsPlay      { Anchor: (Top: 471, Left: 1112, Width: 138, Height: 18); Text: ""; Style: @InfoNeedValueStyle; }
 
     $Common.@SmallTertiaryTextButton #CatInfoPanelRenameButton {
       @Text = "Rename Cat";
       @Sounds = $Common.@ButtonSounds;
-      @Anchor = (Top: 730, Left: 360, Width: 200);
+      @Anchor = (Top: 514, Left: 1002, Width: 258);
       Visible: true;
     }
   }

@@ -41,6 +41,7 @@ import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingEmptyHand;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingFood;
 import de.markusbordihn.cats.sensors.BuilderSensorIsHoldingYarnBall;
 import de.markusbordihn.cats.sensors.BuilderSensorIsOwner;
+import de.markusbordihn.cats.sensors.BuilderSensorOwnerPlayer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
@@ -64,6 +65,7 @@ public class NPCSetupHandler {
     BuilderSensorIsHoldingEmptyHand.SENSOR_ID,
     BuilderSensorIsHoldingYarnBall.SENSOR_ID,
     BuilderSensorCatPersonalityWeight.SENSOR_ID,
+    BuilderSensorOwnerPlayer.SENSOR_ID,
   };
 
   @SuppressWarnings("rawtypes")
@@ -75,6 +77,7 @@ public class NPCSetupHandler {
     BuilderSensorIsHoldingEmptyHand::new,
     BuilderSensorIsHoldingYarnBall::new,
     BuilderSensorCatPersonalityWeight::new,
+    BuilderSensorOwnerPlayer::new,
   };
 
   private boolean actionsRegistered = false;

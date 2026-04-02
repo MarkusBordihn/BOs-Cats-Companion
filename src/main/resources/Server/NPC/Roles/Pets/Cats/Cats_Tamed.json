@@ -853,40 +853,49 @@
                   "Instructions": [
                     {
                       "Sensor": {
-                        "Type": "Player",
+                        "Type": "CatsOwnerPlayer",
                         "Range": 18,
                         "LockOnTarget": true
                       },
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
-                        }
-                      ],
-                      "BodyMotion": {
-                        "Type": "Sequence",
-                        "Looped": true,
-                        "Motions": [
-                          {
-                            "Type": "Timer",
-                            "Time": [2, 4],
-                            "Motion": {
-                              "Type": "Seek",
-                              "SlowDownDistance": 5,
-                              "StopDistance": 2,
-                              "RelativeSpeed": 1.1
-                            }
+                          "Sensor": {
+                            "Type": "Target",
+                            "TargetSlot": "LockedTarget",
+                            "Range": 18
                           },
-                          {
-                            "Type": "Timer",
-                            "Time": [0.3, 1.0],
-                            "Motion": {
-                              "Type": "Nothing"
+                          "Actions": [
+                            {
+                              "Type": "PlayAnimation",
+                              "Animation": "Idle",
+                              "Slot": "Action"
                             }
+                          ],
+                          "BodyMotion": {
+                            "Type": "Sequence",
+                            "Looped": true,
+                            "Motions": [
+                              {
+                                "Type": "Timer",
+                                "Time": [2, 4],
+                                "Motion": {
+                                  "Type": "Seek",
+                                  "SlowDownDistance": 5,
+                                  "StopDistance": 2,
+                                  "RelativeSpeed": 1.1
+                                }
+                              },
+                              {
+                                "Type": "Timer",
+                                "Time": [0.3, 1.0],
+                                "Motion": {
+                                  "Type": "Nothing"
+                                }
+                              }
+                            ]
                           }
-                        ]
-                      }
+                        }
+                      ]
                     }
                   ]
                 },
@@ -900,61 +909,79 @@
                     {
                       "Weight": 40,
                       "Sensor": {
-                        "Type": "Player",
+                        "Type": "CatsOwnerPlayer",
                         "Range": 18,
                         "LockOnTarget": true
                       },
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
-                        }
-                      ],
-                      "BodyMotion": {
-                        "Type": "Sequence",
-                        "Looped": true,
-                        "Motions": [
-                          {
-                            "Type": "Timer",
-                            "Time": [4, 6],
-                            "Motion": {
-                              "Type": "Seek",
-                              "SlowDownDistance": 5,
-                              "StopDistance": 3,
-                              "RelativeSpeed": 0.8
-                            }
+                          "Sensor": {
+                            "Type": "Target",
+                            "TargetSlot": "LockedTarget",
+                            "Range": 18
                           },
-                          {
-                            "Type": "Timer",
-                            "Time": [0.5, 1.5],
-                            "Motion": {
-                              "Type": "Nothing"
+                          "Actions": [
+                            {
+                              "Type": "PlayAnimation",
+                              "Animation": "Idle",
+                              "Slot": "Action"
                             }
+                          ],
+                          "BodyMotion": {
+                            "Type": "Sequence",
+                            "Looped": true,
+                            "Motions": [
+                              {
+                                "Type": "Timer",
+                                "Time": [4, 6],
+                                "Motion": {
+                                  "Type": "Seek",
+                                  "SlowDownDistance": 5,
+                                  "StopDistance": 3,
+                                  "RelativeSpeed": 0.8
+                                }
+                              },
+                              {
+                                "Type": "Timer",
+                                "Time": [0.5, 1.5],
+                                "Motion": {
+                                  "Type": "Nothing"
+                                }
+                              }
+                            ]
                           }
-                        ]
-                      }
+                        }
+                      ]
                     },
                     {
                       "Weight": 60,
                       "Sensor": {
-                        "Type": "Player",
+                        "Type": "CatsOwnerPlayer",
                         "Range": 18,
                         "LockOnTarget": true
                       },
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
+                          "Sensor": {
+                            "Type": "Target",
+                            "TargetSlot": "LockedTarget",
+                            "Range": 18
+                          },
+                          "Actions": [
+                            {
+                              "Type": "PlayAnimation",
+                              "Animation": "Idle",
+                              "Slot": "Action"
+                            }
+                          ],
+                          "BodyMotion": {
+                            "Type": "Seek",
+                            "SlowDownDistance": 5,
+                            "StopDistance": 3,
+                            "RelativeSpeed": 0.8
+                          }
                         }
-                      ],
-                      "BodyMotion": {
-                        "Type": "Seek",
-                        "SlowDownDistance": 5,
-                        "StopDistance": 3,
-                        "RelativeSpeed": 0.8
-                      }
+                      ]
                     }
                   ]
                 },
@@ -968,40 +995,49 @@
                   "Instructions": [
                     {
                       "Sensor": {
-                        "Type": "Player",
+                        "Type": "CatsOwnerPlayer",
                         "Range": 18,
                         "LockOnTarget": true
                       },
-                      "Actions": [
+                      "Instructions": [
                         {
-                          "Type": "PlayAnimation",
-                          "Animation": "Idle",
-                          "Slot": "Action"
-                        }
-                      ],
-                      "BodyMotion": {
-                        "Type": "Sequence",
-                        "Looped": true,
-                        "Motions": [
-                          {
-                            "Type": "Timer",
-                            "Time": [6, 10],
-                            "Motion": {
-                              "Type": "Seek",
-                              "SlowDownDistance": 5,
-                              "StopDistance": 4,
-                              "RelativeSpeed": 0.5
-                            }
+                          "Sensor": {
+                            "Type": "Target",
+                            "TargetSlot": "LockedTarget",
+                            "Range": 18
                           },
-                          {
-                            "Type": "Timer",
-                            "Time": [2, 4],
-                            "Motion": {
-                              "Type": "Nothing"
+                          "Actions": [
+                            {
+                              "Type": "PlayAnimation",
+                              "Animation": "Idle",
+                              "Slot": "Action"
                             }
+                          ],
+                          "BodyMotion": {
+                            "Type": "Sequence",
+                            "Looped": true,
+                            "Motions": [
+                              {
+                                "Type": "Timer",
+                                "Time": [6, 10],
+                                "Motion": {
+                                  "Type": "Seek",
+                                  "SlowDownDistance": 5,
+                                  "StopDistance": 4,
+                                  "RelativeSpeed": 0.5
+                                }
+                              },
+                              {
+                                "Type": "Timer",
+                                "Time": [2, 4],
+                                "Motion": {
+                                  "Type": "Nothing"
+                                }
+                              }
+                            ]
                           }
-                        ]
-                      }
+                        }
+                      ]
                     }
                   ]
                 },

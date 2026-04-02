@@ -45,6 +45,17 @@ final class CatInfoCommand extends CatCommand {
     this.entityArg = this.withOptionalArg("entity", "The cat entity to check", ArgTypes.ENTITY_ID);
   }
 
+  private static String formatNeed(float value) {
+    int needValue = (int) value;
+    if (needValue > 70) {
+      return needValue + " (!)";
+    }
+    if (needValue > 50) {
+      return needValue + " (~)";
+    }
+    return String.valueOf(needValue);
+  }
+
   @Override
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
@@ -59,7 +70,6 @@ final class CatInfoCommand extends CatCommand {
 
     Ref<EntityStore> entityRef = entityOpt.get();
 
-    // Get UUID (persistent identifier)
     CatsManager catsManager = CatsManager.getInstance();
     UUID catUuid = catsManager.getUuid(entityRef, store);
     if (catUuid == null) {
@@ -151,6 +161,15 @@ final class CatInfoCommand extends CatCommand {
         context.sendMessage(
             Message.raw("Gifts Given: " + catData.totalGifts()).color(Constants.COLOR_GOLD));
       }
+
+      context.sendMessage(
+          Message.raw(
+                  String.format(
+                      "Needs: rest=%s social=%s play=%s",
+                      formatNeed(catData.restNeed()),
+                      formatNeed(catData.socialNeed()),
+                      formatNeed(catData.playNeed())))
+              .color(Constants.COLOR_INFO));
 
       if (catData.position() != null) {
         String position =

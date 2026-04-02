@@ -49,7 +49,6 @@ public class InteractionPlayingWithYarnBall {
 
     Alarm boostAlarm = npcEntity.getAlarmStore().get(npcEntity, PLAY_BOOST_ALARM);
     WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
-
     if (boostAlarm.isSet() && !boostAlarm.hasPassed(worldTimeResource.getGameTime())) {
       return false;
     }
@@ -64,6 +63,7 @@ public class InteractionPlayingWithYarnBall {
                 1, (long) (BASE_COOLDOWN_MINUTES / catData.personalityType().getPlayModifier()));
       }
       catsManager.boostHappiness(entityRef, HappinessSource.PLAYING, store);
+      catsManager.satisfyNeed(entityRef, de.markusbordihn.cats.data.CatNeedType.PLAY, 20f, store);
       boostAlarm.set(
           entityRef,
           worldTimeResource.getGameTime().plus(Duration.ofMinutes(cooldownMinutes)),

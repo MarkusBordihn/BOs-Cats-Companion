@@ -37,6 +37,7 @@ import de.markusbordihn.cats.compat.LuckPermsCompat;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatFetchTargetComponent;
 import de.markusbordihn.cats.component.CatMoodComponent;
+import de.markusbordihn.cats.component.CatNeedsComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
@@ -72,6 +73,7 @@ public class Cats extends JavaPlugin {
   public ComponentType<EntityStore, CatFetchTargetComponent> catFetchTargetComponentType;
   public ComponentType<EntityStore, CatTamingProgressComponent> catTamingProgressComponentType;
   public ComponentType<EntityStore, CatMoodComponent> catMoodComponentType;
+  public ComponentType<EntityStore, CatNeedsComponent> catNeedsComponentType;
   public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private CatCommands catCommands;
 
@@ -126,6 +128,10 @@ public class Cats extends JavaPlugin {
     catMoodComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatMoodComponent.class, CatMoodComponent.ID, CatMoodComponent.CODEC);
+    catNeedsComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(
+                CatNeedsComponent.class, CatNeedsComponent.ID, CatNeedsComponent.CODEC);
     catsDataResourceType =
         getEntityStoreRegistry()
             .registerResource(CatsDataResource.class, CatsDataResource.ID, CatsDataResource.CODEC);
@@ -138,15 +144,9 @@ public class Cats extends JavaPlugin {
     LOGGER.at(Level.INFO).log("Registering cat damage filter system...");
     DamageSetupHandler damageSetupHandler = new DamageSetupHandler(getEntityStoreRegistry());
     if (!damageSetupHandler.tryRegister()) {
-      if (getEventRegistry() != null) {
-        LOGGER.at(Level.INFO).log(
-            "DamageModule not ready yet, deferring damage filter registration...");
-        getEventRegistry()
-            .registerGlobal(PluginSetupEvent.class, damageSetupHandler::onPluginSetup);
-      } else {
-        LOGGER.at(Level.WARNING).log(
-            "Cannot register damage filter system: event registry not available");
-      }
+      LOGGER.at(Level.INFO).log(
+          "DamageModule not ready yet, deferring damage filter registration...");
+      getEventRegistry().registerGlobal(PluginSetupEvent.class, damageSetupHandler::onPluginSetup);
     }
 
     this.getCodecRegistry(Interaction.CODEC)
@@ -177,12 +177,9 @@ public class Cats extends JavaPlugin {
     if (NPCPlugin.get() instanceof NPCPlugin npcPlugin) {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin ...");
       npcSetupHandler.onNpcPluginReady(npcPlugin);
-    } else if (getEventRegistry() != null) {
+    } else {
       LOGGER.at(Level.INFO).log("Registering NPC Plugin setup listener...");
       getEventRegistry().registerGlobal(PluginSetupEvent.class, npcSetupHandler::onPluginSetup);
-    } else {
-      LOGGER.at(Level.SEVERE).log(
-          "Event registry is not available, cannot register NPC Plugin setup listener");
     }
 
     LOGGER.at(Level.INFO).log("Registering commands...");
@@ -190,21 +187,13 @@ public class Cats extends JavaPlugin {
     this.getCommandRegistry().registerCommand(catCommands);
 
     LOGGER.at(Level.INFO).log("Registering spawn config system...");
-    if (getEventRegistry() != null) {
-      getEventRegistry()
-          .register(
-              LoadedAssetsEvent.class,
-              WorldNPCSpawn.class,
-              CatSpawnConfigSystem::onWorldNPCSpawnsLoaded);
-    } else {
-      LOGGER.at(Level.WARNING).log(
-          "Event registry not available, spawn config modifications will not be applied");
-    }
-
-    if (getEventRegistry() != null) {
-      getEventRegistry()
-          .registerGlobal(PlayerInteractEvent.class, CatCarrierInteraction::onPlayerInteract);
-    }
+    getEventRegistry()
+        .register(
+            LoadedAssetsEvent.class,
+            WorldNPCSpawn.class,
+            CatSpawnConfigSystem::onWorldNPCSpawnsLoaded);
+    getEventRegistry()
+        .registerGlobal(PlayerInteractEvent.class, CatCarrierInteraction::onPlayerInteract);
   }
 
   @Override
@@ -216,7 +205,6 @@ public class Cats extends JavaPlugin {
       PermissionManager.initializeDefaultPermissions(catCommands.buildPlayerPermissionNodes());
     }
 
-    // Detect LuckPerms after Universe is ready
     Universe.get().getUniverseReady().thenRun(LuckPermsCompat::detect);
   }
 

@@ -40,8 +40,8 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
   public static final String BUILDER_ID = "CatMoodParticles";
 
-  private static final double MIN_PARTICLE_INTERVAL = 15.0;
-  private static final double MAX_PARTICLE_INTERVAL = 30.0;
+  private static final double MIN_PARTICLE_INTERVAL = 45.0;
+  private static final double MAX_PARTICLE_INTERVAL = 120.0;
 
   public String getBuilderId() {
     return BUILDER_ID;
@@ -74,9 +74,9 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Accumulates deltaTime per entity and every 15-30s sets a transient mood sub-state "
+    return "Accumulates deltaTime per entity and every 45-120s sets a transient mood sub-state "
         + "(MoodEcstatic/Happy/Sad/Miserable). JSON SpawnParticles blocks react to the state "
-        + "and reset it via Timeout. NEUTRAL mood shows no particles.";
+        + "and reset it via Timeout. NEUTRAL mood shows no particles. Skipped during Default (following) state.";
   }
 
   public static class ActionCatMoodParticles extends ActionBase {
@@ -134,7 +134,8 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
       }
 
       elapsedByEntity.put(entityRef, 0.0);
-      if (role == null) {
+
+      if (role.getStateSupport().inState("Pet", "Default")) {
         return true;
       }
 

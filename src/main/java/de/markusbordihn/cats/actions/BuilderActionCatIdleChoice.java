@@ -22,18 +22,24 @@ package de.markusbordihn.cats.actions;
 import com.google.gson.JsonElement;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
+import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBehaviorProfile;
 import de.markusbordihn.cats.data.CatBehaviorProfileResolver;
 import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.CatNeedType;
+import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.ui.CatActionHelper;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,8 +81,8 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
   public String getLongDescription() {
     return "Resolves the cat's CatBehaviorProfile and selects a transient NPC sub-state "
         + "(Stretching, Licking, Sitting, Playing) via weighted random draw. "
-        + "Does not modify CatStateComponent. The JSON Timeout for each sub-state "
-        + "handles the return to .Waiting.";
+        + "Corrects stale CatStateComponent if JSON woke the cat without syncing. "
+        + "The JSON Timeout for each sub-state handles the return to .Waiting.";
   }
 
   public static class ActionCatIdleChoice extends ActionBase {
@@ -143,14 +149,65 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
 
       CatMoodComponent moodComponent =
           store.getComponent(entityRef, CatMoodComponent.getComponentType());
+      catsManager.updateNeeds(entityRef, store);
 
-      CatBehaviorProfile profile =
-          CatBehaviorProfileResolver.resolve(
-              catData.personalityType(),
-              catData.secondaryPersonality(),
-              moodComponent != null ? moodComponent.getLevel() : null);
+      CatStateComponent stateComponent =
+          store.getComponent(entityRef, CatStateComponent.getComponentType());
+      if (stateComponent != null
+          && (stateComponent.getState() == CatState.SLEEPING
+              || stateComponent.getState() == CatState.GOING_TO_BED)) {
+        catsManager.updateCatState(entityRef, CatState.WAITING, store);
+      }
 
-      String chosen = pickSubState(profile);
+      CatNeedType criticalNeed = catsManager.getCriticalNeed(entityRef, store);
+      if (criticalNeed != CatNeedType.NONE) {
+        StateSupport stateSupport = role.getStateSupport();
+        String overrideState =
+            switch (criticalNeed) {
+              case REST -> {
+                if (stateSupport.inState("Pet", "GoingToBed")
+                    || stateSupport.inState("Pet", "Sleeping")) {
+                  yield null;
+                }
+                World world =
+                    store.getExternalData() instanceof EntityStore entityStoreData
+                        ? entityStoreData.getWorld()
+                        : null;
+                yield (world != null && CatActionHelper.hasBedAvailable(entityRef, store, world))
+                    ? "GoingToBed"
+                    : "Sleeping";
+              }
+              case SOCIAL -> stateSupport.inState("Pet", "Default") ? null : "Default";
+              case PLAY ->
+                  (stateSupport.inState("Pet", "Playing")
+                          || stateSupport.inState("Pet", "Searching"))
+                      ? null
+                      : "Playing";
+              case NONE -> null;
+            };
+        if (overrideState != null) {
+          CatState catStateForOverride =
+              switch (overrideState) {
+                case "Default" -> CatState.FOLLOWING;
+                case "GoingToBed" -> CatState.GOING_TO_BED;
+                case "Sleeping" -> CatState.SLEEPING;
+                case "Playing" -> CatState.PLAYING;
+                default -> null;
+              };
+          if (catStateForOverride != null) {
+            catsManager.updateCatState(entityRef, catStateForOverride, store);
+          }
+          role.getStateSupport().setState(entityRef, "Pet", overrideState, store);
+          return true;
+        }
+      }
+
+      String chosen =
+          pickSubState(
+              CatBehaviorProfileResolver.resolve(
+                  catData.personalityType(),
+                  catData.secondaryPersonality(),
+                  moodComponent != null ? moodComponent.getLevel() : null));
       role.getStateSupport().setState(entityRef, "Pet", chosen, store);
       return true;
     }

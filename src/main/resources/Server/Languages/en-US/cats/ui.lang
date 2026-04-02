@@ -63,3 +63,7 @@ panel.secondary=Secondary:
 panel.gifts=Gifts:
 panel.rename=Rename
 panel.personality.none=Unknown
+panel.needs=Needs:
+panel.needs.rest=Rest:
+panel.needs.social=Social:
+panel.needs.play=Play:

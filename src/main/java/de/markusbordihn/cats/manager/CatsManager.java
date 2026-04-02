@@ -41,6 +41,7 @@ import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.CatStatus;
 import de.markusbordihn.cats.data.CatType;
@@ -70,6 +71,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   private final ComponentType<EntityStore, CatStateComponent> componentType;
   private final Map<UUID, Ref<EntityStore>> catRefCache = new HashMap<>();
   private final CatsHappinessManager happinessManager = new CatsHappinessManager();
+  private final CatNeedsManager needsManager = new CatNeedsManager();
 
   public CatsManager(ComponentType<EntityStore, CatStateComponent> componentType) {
     this.componentType = componentType;
@@ -109,7 +111,7 @@ public class CatsManager extends RefSystem<EntityStore> {
         }
 
         CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-        if (resource != null && resource.getCat(entityUuid) == null) {
+        if (resource.getCat(entityUuid) == null) {
           registerCat(ref, store);
           LOGGER.at(Level.INFO).log(
               "Auto-registered missing cat entry for UUID %s (Owner: %s)",
@@ -129,13 +131,11 @@ public class CatsManager extends RefSystem<EntityStore> {
     if (entityUuid != null) {
       catRefCache.remove(entityUuid);
       CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-      if (resource != null) {
-        CatDataEntry catData = resource.getCat(entityUuid);
-        if (catData != null && reason == RemoveReason.REMOVE) {
-          if (catData.status() == CatStatus.SPAWNED) {
-            resource.updateCat(entityUuid, catData.withStatus(CatStatus.DESPAWNED));
-          }
-        }
+      CatDataEntry catData = resource.getCat(entityUuid);
+      if (catData != null
+          && reason == RemoveReason.REMOVE
+          && catData.status() == CatStatus.SPAWNED) {
+        resource.updateCat(entityUuid, catData.withStatus(CatStatus.DESPAWNED));
       }
     }
   }
@@ -159,12 +159,9 @@ public class CatsManager extends RefSystem<EntityStore> {
   @Nonnull
   public Set<Ref<EntityStore>> getCatsByOwner(
       @Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
-    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    if (resource == null) {
-      return Collections.emptySet();
-    }
 
     Set<Ref<EntityStore>> catRefs = new HashSet<>();
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     for (CatDataEntry catDataEntry : resource.getCatsByOwner(ownerUuid)) {
       if (catDataEntry.isSpawned()) {
         Ref<EntityStore> catRef = getCatByUuid(catDataEntry.uuid(), store);
@@ -177,8 +174,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   }
 
   public int getCatCountByOwner(@Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
-    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    return resource != null ? resource.getOwnedCatCount(ownerUuid) : 0;
+    return store.getResource(CatsDataResource.getResourceType()).getOwnedCatCount(ownerUuid);
   }
 
   public void registerOwner(
@@ -192,11 +188,6 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
 
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    if (resource == null) {
-      LOGGER.at(Level.WARNING).log("CatsDataResource not available");
-      return;
-    }
-
     CatDataEntry catDataEntry = resource.getCat(catUuid);
     if (catDataEntry != null) {
       resource.updateCat(catUuid, catDataEntry.withOwnerUuid(newOwnerUuid));
@@ -210,11 +201,9 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
 
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    if (resource != null) {
-      CatDataEntry catDataEntry = resource.getCat(catUuid);
-      if (catDataEntry != null) {
-        resource.updateCat(catUuid, catDataEntry.withOwner(null, null));
-      }
+    CatDataEntry catDataEntry = resource.getCat(catUuid);
+    if (catDataEntry != null) {
+      resource.updateCat(catUuid, catDataEntry.withOwner(null, null));
     }
   }
 
@@ -222,12 +211,6 @@ public class CatsManager extends RefSystem<EntityStore> {
     UUID catUuid = getUuid(catRef, store);
     if (catUuid == null) {
       LOGGER.at(Level.WARNING).log("Cannot register cat - cat has no UUID");
-      return;
-    }
-
-    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    if (resource == null) {
-      LOGGER.at(Level.WARNING).log("CatsDataResource not available");
       return;
     }
 
@@ -249,6 +232,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       catType = CatType.fromRoleName(npcEntity.getRole().getRoleName());
     }
 
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     CatDataEntry existingEntry = resource.getCat(catUuid);
     if (existingEntry != null) {
       resource.updateCat(
@@ -348,7 +332,7 @@ public class CatsManager extends RefSystem<EntityStore> {
         if (catDataEntry.state().isSleepingState() && !state.isSleepingState()) {
           updatedEntry = updatedEntry.withLastMoodUpdate(System.currentTimeMillis());
           LOGGER.at(Level.FINE).log(
-              "Cat %s woke up – mood timer reset to prevent sleep decay", catUuid);
+              "Cat %s woke up, mood timer reset to prevent sleep decay", catUuid);
         }
 
         resource.updateCat(catUuid, updatedEntry);
@@ -501,6 +485,30 @@ public class CatsManager extends RefSystem<EntityStore> {
   public HappinessLevel getHappinessLevel(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     return happinessManager.getHappinessLevel(catRef, store);
+  }
+
+  public boolean updateNeeds(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    return needsManager.updateNeeds(catRef, store);
+  }
+
+  public void satisfyNeed(
+      @Nonnull Ref<EntityStore> catRef,
+      @Nonnull CatNeedType needType,
+      float amount,
+      @Nonnull Store<EntityStore> store) {
+    needsManager.satisfyNeed(catRef, needType, amount, store);
+  }
+
+  @Nonnull
+  public CatNeedType getCriticalNeed(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    return needsManager.getCriticalNeed(catRef, store);
+  }
+
+  @Nonnull
+  public CatNeedType getHighestNeed(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    return needsManager.getHighestNeed(catRef, store);
   }
 
   @Nullable

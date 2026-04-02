@@ -47,7 +47,11 @@ public record CatDataEntry(
     int happiness,
     long lastMoodUpdate,
     long lastGiftTime,
-    int totalGifts) {
+    int totalGifts,
+    float restNeed,
+    float socialNeed,
+    float playNeed,
+    long lastNeedUpdate) {
 
   private static final String UUID_TAG = "UUID";
   private static final String OWNER_UUID_TAG = "OwnerUUID";
@@ -64,80 +68,110 @@ public record CatDataEntry(
   private static final String LAST_MOOD_UPDATE_TAG = "LastMoodUpdate";
   private static final String LAST_GIFT_TIME_TAG = "LastGiftTime";
   private static final String TOTAL_GIFTS_TAG = "TotalGifts";
+  private static final String REST_NEED_TAG = "RestNeed";
+  private static final String SOCIAL_NEED_TAG = "SocialNeed";
+  private static final String PLAY_NEED_TAG = "PlayNeed";
+  private static final String LAST_NEED_UPDATE_TAG = "LastNeedUpdate";
   private static final UUIDBinaryCodec UUID_CODEC = new UUIDBinaryCodec();
   private static final StringCodec STRING_CODEC = new StringCodec();
   public static final Codec<CatDataEntry> CODEC =
       new Codec<>() {
         @Override
         public CatDataEntry decode(@Nonnull BsonValue bson, @Nonnull ExtraInfo info) {
-          BsonDocument doc = bson.asDocument();
+          BsonDocument bsonDocument = bson.asDocument();
           return new CatDataEntry(
-              UUID_CODEC.decode(doc.get(UUID_TAG), info),
-              doc.containsKey(OWNER_UUID_TAG)
-                  ? UUID_CODEC.decode(doc.get(OWNER_UUID_TAG), info)
+              UUID_CODEC.decode(bsonDocument.get(UUID_TAG), info),
+              bsonDocument.containsKey(OWNER_UUID_TAG)
+                  ? UUID_CODEC.decode(bsonDocument.get(OWNER_UUID_TAG), info)
                   : null,
-              doc.containsKey(OWNER_NAME_TAG)
-                  ? STRING_CODEC.decode(doc.get(OWNER_NAME_TAG), info)
+              bsonDocument.containsKey(OWNER_NAME_TAG)
+                  ? STRING_CODEC.decode(bsonDocument.get(OWNER_NAME_TAG), info)
                   : null,
-              CatType.CODEC.decode(doc.get(TYPE_TAG), info),
-              doc.containsKey(NAME_TAG) ? STRING_CODEC.decode(doc.get(NAME_TAG), info) : null,
-              CatState.CODEC.decode(doc.get(STATE_TAG), info),
-              doc.containsKey(POSITION_TAG)
-                  ? Vector3i.CODEC.decode(doc.get(POSITION_TAG), info)
+              CatType.CODEC.decode(bsonDocument.get(TYPE_TAG), info),
+              bsonDocument.containsKey(NAME_TAG)
+                  ? STRING_CODEC.decode(bsonDocument.get(NAME_TAG), info)
                   : null,
-              CatStatus.CODEC.decode(doc.get(STATUS_TAG), info),
-              doc.containsKey(PERSONALITY_TAG)
-                  ? PersonalityType.CODEC.decode(doc.get(PERSONALITY_TAG), info)
+              CatState.CODEC.decode(bsonDocument.get(STATE_TAG), info),
+              bsonDocument.containsKey(POSITION_TAG)
+                  ? Vector3i.CODEC.decode(bsonDocument.get(POSITION_TAG), info)
                   : null,
-              doc.containsKey(SECONDARY_PERSONALITY_TAG)
-                  ? PersonalityType.CODEC.decode(doc.get(SECONDARY_PERSONALITY_TAG), info)
+              CatStatus.CODEC.decode(bsonDocument.get(STATUS_TAG), info),
+              bsonDocument.containsKey(PERSONALITY_TAG)
+                  ? PersonalityType.CODEC.decode(bsonDocument.get(PERSONALITY_TAG), info)
                   : null,
-              doc.containsKey(PERSONALITY_PROGRESS_TAG)
-                  ? doc.getInt32(PERSONALITY_PROGRESS_TAG).getValue()
+              bsonDocument.containsKey(SECONDARY_PERSONALITY_TAG)
+                  ? PersonalityType.CODEC.decode(bsonDocument.get(SECONDARY_PERSONALITY_TAG), info)
+                  : null,
+              bsonDocument.containsKey(PERSONALITY_PROGRESS_TAG)
+                  ? bsonDocument.getInt32(PERSONALITY_PROGRESS_TAG).getValue()
                   : 0,
-              doc.containsKey(HAPPINESS_TAG)
-                  ? doc.getInt32(HAPPINESS_TAG).getValue()
+              bsonDocument.containsKey(HAPPINESS_TAG)
+                  ? bsonDocument.getInt32(HAPPINESS_TAG).getValue()
                   : MoodData.DEFAULT_HAPPINESS,
-              doc.containsKey(LAST_MOOD_UPDATE_TAG)
-                  ? doc.getInt64(LAST_MOOD_UPDATE_TAG).getValue()
+              bsonDocument.containsKey(LAST_MOOD_UPDATE_TAG)
+                  ? bsonDocument.getInt64(LAST_MOOD_UPDATE_TAG).getValue()
                   : 0L,
-              doc.containsKey(LAST_GIFT_TIME_TAG)
-                  ? doc.getInt64(LAST_GIFT_TIME_TAG).getValue()
+              bsonDocument.containsKey(LAST_GIFT_TIME_TAG)
+                  ? bsonDocument.getInt64(LAST_GIFT_TIME_TAG).getValue()
                   : 0L,
-              doc.containsKey(TOTAL_GIFTS_TAG) ? doc.getInt32(TOTAL_GIFTS_TAG).getValue() : 0);
+              bsonDocument.containsKey(TOTAL_GIFTS_TAG)
+                  ? bsonDocument.getInt32(TOTAL_GIFTS_TAG).getValue()
+                  : 0,
+              bsonDocument.containsKey(REST_NEED_TAG)
+                  ? (float) bsonDocument.getDouble(REST_NEED_TAG).getValue()
+                  : CatNeedsData.DEFAULT_REST_NEED,
+              bsonDocument.containsKey(SOCIAL_NEED_TAG)
+                  ? (float) bsonDocument.getDouble(SOCIAL_NEED_TAG).getValue()
+                  : CatNeedsData.DEFAULT_SOCIAL_NEED,
+              bsonDocument.containsKey(PLAY_NEED_TAG)
+                  ? (float) bsonDocument.getDouble(PLAY_NEED_TAG).getValue()
+                  : CatNeedsData.DEFAULT_PLAY_NEED,
+              bsonDocument.containsKey(LAST_NEED_UPDATE_TAG)
+                  ? bsonDocument.getInt64(LAST_NEED_UPDATE_TAG).getValue()
+                  : 0L);
         }
 
         @Override
         public BsonValue encode(@Nonnull CatDataEntry entry, @Nonnull ExtraInfo info) {
-          BsonDocument doc = new BsonDocument();
-          doc.put(UUID_TAG, UUID_CODEC.encode(entry.uuid, info));
+          BsonDocument bsonDocument = new BsonDocument();
+          bsonDocument.put(UUID_TAG, UUID_CODEC.encode(entry.uuid, info));
           if (entry.ownerUuid != null)
-            doc.put(OWNER_UUID_TAG, UUID_CODEC.encode(entry.ownerUuid, info));
+            bsonDocument.put(OWNER_UUID_TAG, UUID_CODEC.encode(entry.ownerUuid, info));
           if (entry.ownerName != null)
-            doc.put(OWNER_NAME_TAG, STRING_CODEC.encode(entry.ownerName, info));
-          doc.put(TYPE_TAG, CatType.CODEC.encode(entry.catType, info));
-          if (entry.name != null) doc.put(NAME_TAG, STRING_CODEC.encode(entry.name, info));
-          doc.put(STATE_TAG, CatState.CODEC.encode(entry.state, info));
+            bsonDocument.put(OWNER_NAME_TAG, STRING_CODEC.encode(entry.ownerName, info));
+          bsonDocument.put(TYPE_TAG, CatType.CODEC.encode(entry.catType, info));
+          if (entry.name != null) bsonDocument.put(NAME_TAG, STRING_CODEC.encode(entry.name, info));
+          bsonDocument.put(STATE_TAG, CatState.CODEC.encode(entry.state, info));
           if (entry.position != null)
-            doc.put(POSITION_TAG, Vector3i.CODEC.encode(entry.position, info));
-          doc.put(STATUS_TAG, CatStatus.CODEC.encode(entry.status, info));
+            bsonDocument.put(POSITION_TAG, Vector3i.CODEC.encode(entry.position, info));
+          bsonDocument.put(STATUS_TAG, CatStatus.CODEC.encode(entry.status, info));
           if (entry.personalityType != null)
-            doc.put(PERSONALITY_TAG, PersonalityType.CODEC.encode(entry.personalityType, info));
+            bsonDocument.put(
+                PERSONALITY_TAG, PersonalityType.CODEC.encode(entry.personalityType, info));
           if (entry.secondaryPersonality != null)
-            doc.put(
+            bsonDocument.put(
                 SECONDARY_PERSONALITY_TAG,
                 PersonalityType.CODEC.encode(entry.secondaryPersonality, info));
           if (entry.personalityProgress != 0)
-            doc.put(PERSONALITY_PROGRESS_TAG, new org.bson.BsonInt32(entry.personalityProgress));
+            bsonDocument.put(
+                PERSONALITY_PROGRESS_TAG, new org.bson.BsonInt32(entry.personalityProgress));
           if (entry.happiness != MoodData.DEFAULT_HAPPINESS)
-            doc.put(HAPPINESS_TAG, new org.bson.BsonInt32(entry.happiness));
+            bsonDocument.put(HAPPINESS_TAG, new org.bson.BsonInt32(entry.happiness));
           if (entry.lastMoodUpdate != 0L)
-            doc.put(LAST_MOOD_UPDATE_TAG, new org.bson.BsonInt64(entry.lastMoodUpdate));
+            bsonDocument.put(LAST_MOOD_UPDATE_TAG, new org.bson.BsonInt64(entry.lastMoodUpdate));
           if (entry.lastGiftTime != 0L)
-            doc.put(LAST_GIFT_TIME_TAG, new org.bson.BsonInt64(entry.lastGiftTime));
+            bsonDocument.put(LAST_GIFT_TIME_TAG, new org.bson.BsonInt64(entry.lastGiftTime));
           if (entry.totalGifts != 0)
-            doc.put(TOTAL_GIFTS_TAG, new org.bson.BsonInt32(entry.totalGifts));
-          return doc;
+            bsonDocument.put(TOTAL_GIFTS_TAG, new org.bson.BsonInt32(entry.totalGifts));
+          if (entry.restNeed != CatNeedsData.DEFAULT_REST_NEED)
+            bsonDocument.put(REST_NEED_TAG, new org.bson.BsonDouble(entry.restNeed));
+          if (entry.socialNeed != CatNeedsData.DEFAULT_SOCIAL_NEED)
+            bsonDocument.put(SOCIAL_NEED_TAG, new org.bson.BsonDouble(entry.socialNeed));
+          if (entry.playNeed != CatNeedsData.DEFAULT_PLAY_NEED)
+            bsonDocument.put(PLAY_NEED_TAG, new org.bson.BsonDouble(entry.playNeed));
+          if (entry.lastNeedUpdate != 0L)
+            bsonDocument.put(LAST_NEED_UPDATE_TAG, new org.bson.BsonInt64(entry.lastNeedUpdate));
+          return bsonDocument;
         }
 
         @Override
@@ -170,7 +204,11 @@ public record CatDataEntry(
         MoodData.DEFAULT_HAPPINESS,
         0L,
         0L,
-        0);
+        0,
+        CatNeedsData.DEFAULT_REST_NEED,
+        CatNeedsData.DEFAULT_SOCIAL_NEED,
+        CatNeedsData.DEFAULT_PLAY_NEED,
+        0L);
   }
 
   public static CatDataEntry empty() {
@@ -213,7 +251,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withOwnerUuid(@Nullable UUID newOwnerUuid) {
@@ -232,7 +274,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withOwnerName(@Nullable String newOwnerName) {
@@ -251,7 +297,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withOwner(@Nullable UUID newOwnerUuid, @Nullable String newOwnerName) {
@@ -270,7 +320,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withCatType(@Nonnull CatType newCatType) {
@@ -289,7 +343,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withName(@Nullable String newName) {
@@ -308,7 +366,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withState(@Nonnull CatState newState) {
@@ -327,7 +389,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withPosition(@Nullable Vector3i newPosition) {
@@ -346,7 +412,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withStatus(@Nonnull CatStatus newStatus) {
@@ -365,7 +435,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withPersonalityType(@Nullable PersonalityType newPersonalityType) {
@@ -384,7 +458,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withSecondaryPersonality(@Nullable PersonalityType newSecondaryPersonality) {
@@ -403,7 +481,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withPersonalityProgress(int newPersonalityProgress) {
@@ -422,7 +504,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withHappiness(int newHappiness) {
@@ -441,7 +527,11 @@ public record CatDataEntry(
         Math.clamp(newHappiness, MoodData.MIN_HAPPINESS, MoodData.MAX_HAPPINESS),
         lastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withLastMoodUpdate(long newLastMoodUpdate) {
@@ -460,7 +550,11 @@ public record CatDataEntry(
         happiness,
         newLastMoodUpdate,
         lastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withLastGiftTime(long newLastGiftTime) {
@@ -479,7 +573,11 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         newLastGiftTime,
-        totalGifts);
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
   }
 
   public CatDataEntry withTotalGifts(int newTotalGifts) {
@@ -498,6 +596,126 @@ public record CatDataEntry(
         happiness,
         lastMoodUpdate,
         lastGiftTime,
-        newTotalGifts);
+        newTotalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
+  }
+
+  public CatDataEntry withNeeds(
+      float newRestNeed, float newSocialNeed, float newPlayNeed, long newLastNeedUpdate) {
+    return new CatDataEntry(
+        uuid,
+        ownerUuid,
+        ownerName,
+        catType,
+        name,
+        state,
+        position,
+        status,
+        personalityType,
+        secondaryPersonality,
+        personalityProgress,
+        happiness,
+        lastMoodUpdate,
+        lastGiftTime,
+        totalGifts,
+        Math.clamp(newRestNeed, 0f, 100f),
+        Math.clamp(newSocialNeed, 0f, 100f),
+        Math.clamp(newPlayNeed, 0f, 100f),
+        newLastNeedUpdate);
+  }
+
+  public CatDataEntry withRestNeed(float newRestNeed) {
+    return new CatDataEntry(
+        uuid,
+        ownerUuid,
+        ownerName,
+        catType,
+        name,
+        state,
+        position,
+        status,
+        personalityType,
+        secondaryPersonality,
+        personalityProgress,
+        happiness,
+        lastMoodUpdate,
+        lastGiftTime,
+        totalGifts,
+        Math.clamp(newRestNeed, 0f, 100f),
+        socialNeed,
+        playNeed,
+        lastNeedUpdate);
+  }
+
+  public CatDataEntry withSocialNeed(float newSocialNeed) {
+    return new CatDataEntry(
+        uuid,
+        ownerUuid,
+        ownerName,
+        catType,
+        name,
+        state,
+        position,
+        status,
+        personalityType,
+        secondaryPersonality,
+        personalityProgress,
+        happiness,
+        lastMoodUpdate,
+        lastGiftTime,
+        totalGifts,
+        restNeed,
+        Math.clamp(newSocialNeed, 0f, 100f),
+        playNeed,
+        lastNeedUpdate);
+  }
+
+  public CatDataEntry withPlayNeed(float newPlayNeed) {
+    return new CatDataEntry(
+        uuid,
+        ownerUuid,
+        ownerName,
+        catType,
+        name,
+        state,
+        position,
+        status,
+        personalityType,
+        secondaryPersonality,
+        personalityProgress,
+        happiness,
+        lastMoodUpdate,
+        lastGiftTime,
+        totalGifts,
+        restNeed,
+        socialNeed,
+        Math.clamp(newPlayNeed, 0f, 100f),
+        lastNeedUpdate);
+  }
+
+  public CatDataEntry withLastNeedUpdate(long newLastNeedUpdate) {
+    return new CatDataEntry(
+        uuid,
+        ownerUuid,
+        ownerName,
+        catType,
+        name,
+        state,
+        position,
+        status,
+        personalityType,
+        secondaryPersonality,
+        personalityProgress,
+        happiness,
+        lastMoodUpdate,
+        lastGiftTime,
+        totalGifts,
+        restNeed,
+        socialNeed,
+        playNeed,
+        newLastNeedUpdate);
   }
 }

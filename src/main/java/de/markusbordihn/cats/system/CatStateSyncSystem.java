@@ -32,8 +32,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.component.CatMoodComponent;
+import de.markusbordihn.cats.component.CatNeedsComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.CatNeedsData;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.MoodData;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -51,7 +53,7 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
   @Nonnull
   @Override
   public Query<EntityStore> getQuery() {
-    return componentType;
+    return this.componentType;
   }
 
   @Override
@@ -61,7 +63,7 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
 
-    CatStateComponent stateComponent = store.getComponent(entityRef, componentType);
+    CatStateComponent stateComponent = store.getComponent(entityRef, this.componentType);
     if (stateComponent == null) {
       return;
     }
@@ -110,6 +112,15 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
             entityRef,
             CatMoodComponent.getComponentType(),
             new CatMoodComponent(new MoodData(catData.happiness(), catData.lastMoodUpdate())));
+        commandBuffer.putComponent(
+            entityRef,
+            CatNeedsComponent.getComponentType(),
+            new CatNeedsComponent(
+                new CatNeedsData(
+                    catData.restNeed(),
+                    catData.socialNeed(),
+                    catData.playNeed(),
+                    catData.lastNeedUpdate())));
         if (catData.personalityType() == null) {
           catsManager.assignPersonality(entityRef, store);
         }

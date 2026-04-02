@@ -76,6 +76,13 @@ public final class CatActionWheelPage
   private static final String UI_PANEL_GIFTS_HEADER = "#CatInfoPanelGiftsHeader";
   private static final String UI_PANEL_GIFTS = "#CatInfoPanelGifts";
   private static final String UI_PANEL_RENAME_BUTTON = "#CatInfoPanelRenameButton";
+  private static final String UI_PANEL_NEEDS_HEADER = "#CatInfoPanelNeedsHeader";
+  private static final String UI_PANEL_NEEDS_REST_LBL = "#CatInfoPanelNeedsRestLbl";
+  private static final String UI_PANEL_NEEDS_REST = "#CatInfoPanelNeedsRest";
+  private static final String UI_PANEL_NEEDS_SOCIAL_LBL = "#CatInfoPanelNeedsSocialLbl";
+  private static final String UI_PANEL_NEEDS_SOCIAL = "#CatInfoPanelNeedsSocial";
+  private static final String UI_PANEL_NEEDS_PLAY_LBL = "#CatInfoPanelNeedsPlayLbl";
+  private static final String UI_PANEL_NEEDS_PLAY = "#CatInfoPanelNeedsPlay";
   private final Ref<EntityStore> catRef;
   private final Player player;
   private final Ref<EntityStore> playerEntityRef;
@@ -118,6 +125,18 @@ public final class CatActionWheelPage
         world,
         CatActionHelper.hasBedAvailable(catRef, store, world),
         stateComponent != null ? stateComponent.getState() : CatState.WANDERING);
+  }
+
+  @Nonnull
+  private static String formatNeedValue(float value) {
+    int needValue = (int) value;
+    if (needValue > 70) {
+      return needValue + " (!)";
+    }
+    if (needValue > 50) {
+      return needValue + " (~)";
+    }
+    return String.valueOf(needValue);
   }
 
   @Override
@@ -326,6 +345,9 @@ public final class CatActionWheelPage
     PersonalityType primary = catData != null ? catData.personalityType() : null;
     PersonalityType secondary = catData != null ? catData.secondaryPersonality() : null;
     int gifts = catData != null ? catData.totalGifts() : 0;
+    float restNeed = catData != null ? catData.restNeed() : 0f;
+    float socialNeed = catData != null ? catData.socialNeed() : 0f;
+    float playNeed = catData != null ? catData.playNeed() : 0f;
 
     commandBuilder.set(UI_PANEL_PERSONALITY_HEADER + ".Visible", true);
     commandBuilder.set(UI_PANEL_PERSONALITY + ".Visible", true);
@@ -341,6 +363,18 @@ public final class CatActionWheelPage
     commandBuilder.set(UI_PANEL_SECONDARY + ".Text", formatPersonality(secondary));
     commandBuilder.set(UI_PANEL_GIFTS_HEADER + ".Text", Message.translation("cats.ui.panel.gifts"));
     commandBuilder.set(UI_PANEL_GIFTS + ".Text", String.valueOf(gifts));
+
+    commandBuilder.set(UI_PANEL_NEEDS_HEADER + ".Text", Message.translation("cats.ui.panel.needs"));
+    commandBuilder.set(
+        UI_PANEL_NEEDS_REST_LBL + ".Text", Message.translation("cats.ui.panel.needs.rest"));
+    commandBuilder.set(UI_PANEL_NEEDS_REST + ".Text", formatNeedValue(restNeed));
+    commandBuilder.set(
+        UI_PANEL_NEEDS_SOCIAL_LBL + ".Text", Message.translation("cats.ui.panel.needs.social"));
+    commandBuilder.set(UI_PANEL_NEEDS_SOCIAL + ".Text", formatNeedValue(socialNeed));
+    commandBuilder.set(
+        UI_PANEL_NEEDS_PLAY_LBL + ".Text", Message.translation("cats.ui.panel.needs.play"));
+    commandBuilder.set(UI_PANEL_NEEDS_PLAY + ".Text", formatNeedValue(playNeed));
+
     commandBuilder.set(
         UI_PANEL_RENAME_BUTTON + ".Text", Message.translation("cats.ui.panel.rename"));
 
