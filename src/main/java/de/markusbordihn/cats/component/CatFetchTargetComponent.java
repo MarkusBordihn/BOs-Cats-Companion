@@ -24,6 +24,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.UUIDBinaryCodec;
 import com.hypixel.hytale.codec.codecs.simple.BooleanCodec;
 import com.hypixel.hytale.codec.codecs.simple.DoubleCodec;
+import com.hypixel.hytale.codec.codecs.simple.LongCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.math.vector.Vector3d;
@@ -43,6 +44,9 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
   private static final String OWNER_UUID_TAG = "OwnerUUID";
   private static final String RETURNING_TAG = "ReturningToPlayer";
   private static final String HAS_TARGET_TAG = "HasTarget";
+  private static final String FETCH_START_TAG = "FetchStartMs";
+  private static final String PICKUP_TIME_TAG = "PickupTimeMs";
+  private static final String LAST_PATH_TAG = "LastPathMs";
 
   @Nonnull
   public static final BuilderCodec<CatFetchTargetComponent> CODEC =
@@ -83,6 +87,24 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
               comp -> comp.returningToPlayer)
           .documentation("True when the cat has picked up the ball and is returning to the player")
           .add()
+          .append(
+              new KeyedCodec<>(FETCH_START_TAG, new LongCodec()),
+              (comp, fetchStartMs) -> comp.fetchStartMs = fetchStartMs,
+              comp -> comp.fetchStartMs)
+          .documentation("Timestamp when fetch started")
+          .add()
+          .append(
+              new KeyedCodec<>(PICKUP_TIME_TAG, new LongCodec()),
+              (comp, pickupTimeMs) -> comp.pickupTimeMs = pickupTimeMs,
+              comp -> comp.pickupTimeMs)
+          .documentation("Timestamp when cat arrived at ball for pickup delay")
+          .add()
+          .append(
+              new KeyedCodec<>(LAST_PATH_TAG, new LongCodec()),
+              (comp, lastPathMs) -> comp.lastPathMs = lastPathMs,
+              comp -> comp.lastPathMs)
+          .documentation("Timestamp of last path recalculation")
+          .add()
           .build();
 
   private double ballX;
@@ -91,6 +113,9 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
   @Nullable private UUID ownerUuid;
   private boolean returningToPlayer;
   private boolean hasTarget;
+  private long fetchStartMs;
+  private long pickupTimeMs;
+  private long lastPathMs;
 
   public CatFetchTargetComponent() {
     this.hasTarget = false;
@@ -103,6 +128,7 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
     this.ownerUuid = ownerUuid;
     this.returningToPlayer = false;
     this.hasTarget = true;
+    this.fetchStartMs = System.currentTimeMillis();
   }
 
   @Nullable
@@ -135,6 +161,32 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
     return hasTarget;
   }
 
+  public long getFetchStartMs() {
+    return fetchStartMs;
+  }
+
+  public long getPickupTimeMs() {
+    return pickupTimeMs;
+  }
+
+  public void setPickupTimeMs(long pickupTimeMs) {
+    this.pickupTimeMs = pickupTimeMs;
+  }
+
+  public long getLastPathMs() {
+    return lastPathMs;
+  }
+
+  public void setLastPathMs(long lastPathMs) {
+    this.lastPathMs = lastPathMs;
+  }
+
+  public void markReturning() {
+    this.returningToPlayer = true;
+    this.pickupTimeMs = 0;
+    this.lastPathMs = 0;
+  }
+
   @Override
   @Nonnull
   public CatFetchTargetComponent clone() {
@@ -145,6 +197,9 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
     clone.ownerUuid = this.ownerUuid;
     clone.returningToPlayer = this.returningToPlayer;
     clone.hasTarget = this.hasTarget;
+    clone.fetchStartMs = this.fetchStartMs;
+    clone.pickupTimeMs = this.pickupTimeMs;
+    clone.lastPathMs = this.lastPathMs;
     return clone;
   }
 }

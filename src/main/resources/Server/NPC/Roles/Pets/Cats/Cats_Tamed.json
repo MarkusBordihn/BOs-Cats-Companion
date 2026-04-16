@@ -184,24 +184,6 @@
               ]
             },
             {
-              "$Comment": "Daytime wake-up: if sleeping during daytime, wake up and set cooldown",
-              "Sensor": {
-                "Type": "And",
-                "Sensors": [
-                  {"Type": "Time", "Period": [6.01, 17.99]},
-                  {"Type": "State", "State": ".Sleeping"}
-                ]
-              },
-              "Actions": [
-                {"Type": "State", "State": ".Waiting"},
-                {
-                  "Type": "SetAlarm",
-                  "Name": "Sleep_Cooldown",
-                  "DurationRange": ["PT2H", "PT4H"]
-                }
-              ]
-            },
-            {
               "$Comment": "Greet owner",
               "Sensor": {
                 "Type": "And",
@@ -240,6 +222,27 @@
                     "Sensor": {
                       "Type": "State",
                       "State": ".Dying"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".PrepareSleep"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".PrepareFollow"
+                    }
+                  },
+                  {
+                    "Type": "Not",
+                    "Sensor": {
+                      "Type": "State",
+                      "State": ".PreparePlay"
                     }
                   }
                 ]
@@ -312,6 +315,105 @@
               ]
             },
             {
+              "$Comment": "Prepare to sleep - stretch and yawn before entering the sleep pipeline",
+              "Sensor": {
+                "Type": "State",
+                "State": ".PrepareSleep"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Stretch",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "PlaySound",
+                  "SoundEventId": "SFX_Fox_Sleep"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.7, 0],
+                  "ParticleSystem": "Sleepy",
+                  "Once": true
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [2, 3],
+                  "Action": {
+                    "Type": "CatGoToBed"
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
+              "$Comment": "Prepare to follow - alerted look, brief wander to unstick from stairs, then enter Default",
+              "Sensor": {
+                "Type": "State",
+                "State": ".PrepareFollow"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Alerted",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "PlaySound",
+                  "SoundEventId": "SFX_Fox_Run"
+                },
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.9, 0],
+                  "ParticleSystem": "Alerted",
+                  "Once": true
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [1.5, 2],
+                  "Action": {
+                    "Type": "State",
+                    "State": ".Default"
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Wander",
+                "RelativeSpeed": 0.4,
+                "WanderDistance": 2
+              }
+            },
+            {
+              "$Comment": "Prepare to play - quick paw swipe before entering Playing state",
+              "Sensor": {
+                "Type": "State",
+                "State": ".PreparePlay"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Swing_Left",
+                  "Slot": "Action"
+                },
+                {
+                  "Type": "Timeout",
+                  "Delay": [1, 1.5],
+                  "Action": {
+                    "Type": "State",
+                    "State": ".Playing"
+                  }
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
+            },
+            {
               "Sensor": {
                 "Type": "State",
                 "State": ".Sitting"
@@ -341,29 +443,77 @@
                 "Type": "State",
                 "State": ".Sleeping"
               },
-              "ActionsBlocking": true,
-              "Actions": [
+              "Instructions": [
                 {
-                  "Type": "PlayAnimation",
-                  "Animation": "Sleep",
-                  "Slot": "Action"
+                  "$Comment": "Daytime nap - sleep briefly then wake and set cooldown",
+                  "Sensor": {
+                    "Type": "Time",
+                    "Period": [6.01, 17.99]
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sleep",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "PlaySound",
+                      "SoundEventId": "SFX_Fox_Sleep"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [15, 30],
+                      "Action": {
+                        "Type": "Sequence",
+                        "Actions": [
+                          {
+                            "Type": "State",
+                            "State": ".Waiting"
+                          },
+                          {
+                            "Type": "SetAlarm",
+                            "Name": "Sleep_Cooldown",
+                            "DurationRange": ["PT2H", "PT4H"]
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
+                  }
                 },
                 {
-                  "Type": "PlaySound",
-                  "SoundEventId": "SFX_Fox_Sleep"
-                },
-                {
-                  "Type": "Timeout",
-                  "Delay": [15, 30],
-                  "Action": {
-                    "Type": "State",
-                    "State": ".Waiting"
+                  "$Comment": "Nighttime sleep - sleep longer",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Sleep",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "PlaySound",
+                      "SoundEventId": "SFX_Fox_Sleep"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [60, 120],
+                      "Action": {
+                        "Type": "State",
+                        "State": ".Waiting"
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Nothing"
                   }
                 }
-              ],
-              "BodyMotion": {
-                "Type": "Nothing"
-              }
+              ]
             },
             {
               "$Comment": "Going to bed",
@@ -397,17 +547,13 @@
                   }
                 },
                 {
+                  "$Comment": "No path - teleport if bed target exists, otherwise sleep on the spot",
                   "Sensor": {
                     "Type": "Any"
                   },
-                  "ActionsBlocking": true,
                   "Actions": [
                     {
-                      "Type": "CatTeleportToBed"
-                    },
-                    {
-                      "Type": "State",
-                      "State": ".Sleeping"
+                      "Type": "CatGoToBed"
                     }
                   ]
                 }
@@ -1048,6 +1194,32 @@
                   "BodyMotion": {
                     "Type": "Teleport"
                   }
+                },
+                {
+                  "$Comment": "Fallback: owner not found - wander briefly then retry follow",
+                  "Sensor": {
+                    "Type": "Any"
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [3, 5],
+                      "Action": {
+                        "Type": "State",
+                        "State": ".Waiting"
+                      }
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Wander",
+                    "RelativeSpeed": 0.4,
+                    "WanderDistance": 3
+                  }
                 }
               ]
             },
@@ -1141,6 +1313,9 @@
                 {"Type": "State", "State": ".MoodMiserable"},
                 {"Type": "State", "State": ".MoodSad"},
                 {"Type": "State", "State": ".Playing"},
+                {"Type": "State", "State": ".PrepareFollow"},
+                {"Type": "State", "State": ".PreparePlay"},
+                {"Type": "State", "State": ".PrepareSleep"},
                 {"Type": "State", "State": ".Searching"},
                 {"Type": "State", "State": ".Sitting"},
                 {"Type": "State", "State": ".Sleeping"},
@@ -1150,6 +1325,7 @@
                 {"Type": "State", "State": "Despawn"},
                 {"Type": "State", "State": "Feeding"},
                 {"Type": "State", "State": "FetchingYarnBall"},
+                {"Type": "State", "State": "ReturningBallToOwner"},
                 {"Type": "State", "State": "Petting"},
                 {"Type": "State", "State": "PlayingWithYarnBall"}
               ]
@@ -1297,14 +1473,14 @@
           }
         },
         {
-          "$Comment": "Fetching Yarn Ball state - cat runs to thrown ball and returns it to owner",
+          "$Comment": "Fetching Yarn Ball state - cat runs to thrown ball and picks it up",
           "Sensor": {
             "Type": "State",
             "State": "FetchingYarnBall"
           },
           "Instructions": [
             {
-              "$Comment": "CatFetchYarnBall runs every tick to manage phase transitions and delivery",
+              "$Comment": "CatFetchYarnBall manages go-to-ball phase, pickup, and transition to return state",
               "Continue": true,
               "Sensor": {
                 "Type": "Any"
@@ -1314,7 +1490,7 @@
               ]
             },
             {
-              "$Comment": "While on transient path - play idle animation and follow path",
+              "$Comment": "While transient path exists - follow it physically",
               "Sensor": {
                 "Type": "Path",
                 "PathType": "TransientPath"
@@ -1330,6 +1506,54 @@
               "BodyMotion": {
                 "Type": "Path"
               }
+            }
+          ]
+        },
+        {
+          "$Comment": "Returning yarn ball to owner - uses Seek to follow owner",
+          "Sensor": {
+            "Type": "State",
+            "State": "ReturningBallToOwner"
+          },
+          "Instructions": [
+            {
+              "$Comment": "Monitor delivery distance and handle ball delivery",
+              "Continue": true,
+              "Sensor": {
+                "Type": "Any"
+              },
+              "Actions": [
+                {"Type": "CatFetchYarnBall"}
+              ]
+            },
+            {
+              "Sensor": {
+                "Type": "CatsOwnerPlayer",
+                "Range": 50,
+                "LockOnTarget": true
+              },
+              "Instructions": [
+                {
+                  "Sensor": {
+                    "Type": "Target",
+                    "TargetSlot": "LockedTarget",
+                    "Range": 50
+                  },
+                  "Actions": [
+                    {
+                      "Type": "PlayAnimation",
+                      "Animation": "Idle",
+                      "Slot": "Action"
+                    }
+                  ],
+                  "BodyMotion": {
+                    "Type": "Seek",
+                    "SlowDownDistance": 3,
+                    "StopDistance": 1,
+                    "RelativeSpeed": 1.0
+                  }
+                }
+              ]
             }
           ]
         },

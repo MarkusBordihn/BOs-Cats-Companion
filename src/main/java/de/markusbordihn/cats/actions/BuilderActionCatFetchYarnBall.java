@@ -38,9 +38,12 @@ import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatFetchTargetComponent;
+import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.interaction.ItemReturnFeedbackHandler;
 import de.markusbordihn.cats.interaction.YarnBallFetchRegistry;
+import de.markusbordihn.cats.interaction.YarnBallGroundRegistry;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -94,18 +97,20 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
   public static class ActionCatFetchYarnBall extends ActionBase {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-    private long fetchStartTimeMs = -1L;
-    private long pickupTimeMs = -1L;
-    private long lastFetchPathMs = -1L;
 
     public ActionCatFetchYarnBall(@Nonnull BuilderActionBase builder) {
       super(builder);
     }
 
     private static void setTransientPath(@Nonnull NPCEntity npcEntity, @Nonnull Vector3d target) {
+      npcEntity.getPathManager().setTransientPath(null);
       TransientPath path = new TransientPath();
       path.addWaypoint(target, new Vector3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
+    }
+
+    private static void clearTransientPath(@Nonnull NPCEntity npcEntity) {
+      npcEntity.getPathManager().setTransientPath(null);
     }
 
     @Nullable
@@ -114,10 +119,12 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (ownerUuid == null) {
         return null;
       }
+
       Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(ownerUuid);
       if (playerRef == null || !playerRef.isValid()) {
         return null;
       }
+
       TransformComponent transform =
           store.getComponent(playerRef, TransformComponent.getComponentType());
       return transform != null ? transform.getPosition() : null;
@@ -128,10 +135,12 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (ownerUuid == null) {
         return null;
       }
+
       Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(ownerUuid);
       if (playerRef == null || !playerRef.isValid()) {
         return null;
       }
+
       return store.getComponent(playerRef, Player.getComponentType());
     }
 
@@ -165,9 +174,6 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       CatFetchTargetComponent fetchTarget =
           store.getComponent(entityRef, CatFetchTargetComponent.getComponentType());
       if (fetchTarget == null || !fetchTarget.hasTarget()) {
-        if (fetchStartTimeMs < 0) {
-          return false;
-        }
         returnToDefaultState(entityRef, role, store);
         return false;
       }
@@ -179,25 +185,24 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         return false;
       }
 
-      NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-      if (npcEntity == null) {
-        cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, null);
-        return false;
-      }
-
-      if (fetchStartTimeMs < 0) {
-        fetchStartTimeMs = System.currentTimeMillis();
-      } else if (System.currentTimeMillis() - fetchStartTimeMs > FETCH_TIMEOUT_MS) {
-        fetchStartTimeMs = -1L;
+      long now = System.currentTimeMillis();
+      if (now - fetchTarget.getFetchStartMs() > FETCH_TIMEOUT_MS) {
+        LOGGER.at(Level.WARNING).log("FetchYarnBall: timeout after %d ms", FETCH_TIMEOUT_MS);
         Player player = getPlayer(fetchTarget.getOwnerUuid(), store);
         cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, player);
         return false;
       }
 
       if (!fetchTarget.isReturningToPlayer()) {
+        NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+        if (npcEntity == null) {
+          cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, null);
+          return false;
+        }
+
         handleGoToBallPhase(entityRef, fetchTarget, catTransform, npcEntity, role, store);
       } else {
-        handleReturnToPlayerPhase(entityRef, fetchTarget, catTransform, npcEntity, role, store);
+        handleReturnToPlayerPhase(entityRef, fetchTarget, catTransform, role, store);
       }
 
       return false;
@@ -212,42 +217,63 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         @Nonnull Store<EntityStore> store) {
 
       Vector3d ballPos = fetchTarget.getBallPosition();
-      double distToBall = distance(catTransform.getPosition(), ballPos);
-
-      if (distToBall >= BALL_ARRIVAL_THRESHOLD) {
-        pickupTimeMs = -1L;
+      if (distance(catTransform.getPosition(), ballPos) >= BALL_ARRIVAL_THRESHOLD) {
         long now = System.currentTimeMillis();
-        if (lastFetchPathMs < 0 || now - lastFetchPathMs >= FETCH_PATH_INTERVAL_MS) {
+        long lastPath = fetchTarget.getLastPathMs();
+        if (lastPath <= 0 || now - lastPath >= FETCH_PATH_INTERVAL_MS) {
           setTransientPath(npcEntity, ballPos);
-          lastFetchPathMs = now;
+          CatFetchTargetComponent updated = fetchTarget.clone();
+          updated.setLastPathMs(now);
+          store.putComponent(entityRef, CatFetchTargetComponent.getComponentType(), updated);
         }
         return;
       }
 
-      if (pickupTimeMs < 0) {
-        pickupTimeMs = System.currentTimeMillis();
+      long pickupTime = fetchTarget.getPickupTimeMs();
+      if (pickupTime <= 0) {
+        LOGGER.at(Level.INFO).log("FetchYarnBall: arrived at ball, starting pickup delay");
+        clearTransientPath(npcEntity);
+        CatFetchTargetComponent updated = fetchTarget.clone();
+        updated.setPickupTimeMs(System.currentTimeMillis());
+        store.putComponent(entityRef, CatFetchTargetComponent.getComponentType(), updated);
         return;
       }
-      if (System.currentTimeMillis() - pickupTimeMs < PICKUP_DELAY_MS) {
+      if (System.currentTimeMillis() - pickupTime < PICKUP_DELAY_MS) {
+        return;
+      }
+
+      LOGGER.at(Level.INFO).log("FetchYarnBall: pickup complete, transitioning to return phase");
+      clearTransientPath(npcEntity);
+
+      CatsManager pickupManager = CatsManager.getInstance();
+      if (pickupManager != null) {
+        pickupManager.boostHappiness(entityRef, HappinessSource.FETCHING, store);
+        pickupManager.satisfyNeed(entityRef, CatNeedType.PLAY, 15f, store);
+      }
+
+      UUID ownerUuid = fetchTarget.getOwnerUuid();
+      Vector3d playerPos = getPlayerPosition(ownerUuid, store);
+      if (playerPos == null) {
+        LOGGER.at(Level.WARNING).log(
+            "FetchYarnBall: owner %s not found after pickup, dropping ball", ownerUuid);
+        YarnBallGroundRegistry.register(ownerUuid, catTransform.getPosition());
+        cleanUp(entityRef, ownerUuid, role, store, null);
         return;
       }
 
       store.putComponent(
           entityRef, CatFetchTargetComponent.getComponentType(), fetchTarget.asReturning());
+      role.getStateSupport().setState(entityRef, "ReturningBallToOwner", "Default", store);
 
-      Vector3d playerPos = getPlayerPosition(fetchTarget.getOwnerUuid(), store);
-      if (playerPos != null) {
-        setTransientPath(npcEntity, playerPos);
-      } else {
-        cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, null);
-      }
+      LOGGER.at(Level.INFO).log(
+          "FetchYarnBall: returning to owner %s at %.1f/%.1f/%.1f (Seek will handle movement)",
+          ownerUuid, playerPos.x, playerPos.y, playerPos.z);
     }
 
     private void handleReturnToPlayerPhase(
         @Nonnull Ref<EntityStore> entityRef,
         @Nonnull CatFetchTargetComponent fetchTarget,
         @Nonnull TransformComponent catTransform,
-        @Nonnull NPCEntity npcEntity,
         @Nonnull Role role,
         @Nonnull Store<EntityStore> store) {
 
@@ -256,17 +282,27 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
 
       if (playerPos == null) {
         LOGGER.at(Level.WARNING).log(
-            "Yarn ball fetch owner not found (UUID: %s), aborting fetch", ownerUuid);
+            "FetchYarnBall: owner %s offline during return, dropping ball", ownerUuid);
+        YarnBallGroundRegistry.register(ownerUuid, catTransform.getPosition());
         cleanUp(entityRef, ownerUuid, role, store, null);
         return;
       }
 
-      if (distance(catTransform.getPosition(), playerPos) < DELIVERY_THRESHOLD) {
+      double dist = distance(catTransform.getPosition(), playerPos);
+      if (dist < DELIVERY_THRESHOLD) {
+        LOGGER.at(Level.INFO).log("FetchYarnBall: delivered ball to owner %s", ownerUuid);
+        CatsManager deliveryManager = CatsManager.getInstance();
+        if (deliveryManager != null) {
+          deliveryManager.boostHappiness(entityRef, HappinessSource.FETCHING, store);
+          deliveryManager.satisfyNeed(entityRef, CatNeedType.PLAY, 10f, store);
+          deliveryManager.satisfyNeed(entityRef, CatNeedType.SOCIAL, 15f, store);
+        }
         cleanUp(entityRef, ownerUuid, role, store, getPlayer(ownerUuid, store));
         return;
       }
 
-      setTransientPath(npcEntity, playerPos);
+      LOGGER.at(Level.FINE).log(
+          "FetchYarnBall: returning to owner, dist=%.1f (Seek handling movement)", dist);
     }
 
     private void cleanUp(
@@ -289,8 +325,6 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
             "FetchYarnBall: player offline, ball lost for owner %s", ownerUuid);
       }
 
-      fetchStartTimeMs = -1L;
-      lastFetchPathMs = -1L;
       if (ownerUuid != null) {
         YarnBallFetchRegistry.complete(ownerUuid);
       }
@@ -302,8 +336,6 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         @Nonnull Ref<EntityStore> entityRef,
         @Nonnull Role role,
         @Nonnull Store<EntityStore> store) {
-      fetchStartTimeMs = -1L;
-      lastFetchPathMs = -1L;
       CatFetchTargetComponent fetchTarget =
           store.getComponent(entityRef, CatFetchTargetComponent.getComponentType());
       if (fetchTarget != null) {

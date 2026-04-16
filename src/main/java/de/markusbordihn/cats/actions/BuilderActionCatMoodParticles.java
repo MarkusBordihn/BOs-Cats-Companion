@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.data.HappinessLevel;
@@ -135,7 +136,11 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
       elapsedByEntity.put(entityRef, 0.0);
 
-      if (role.getStateSupport().inState("Pet", "Default")) {
+      StateSupport stateSupport = role.getStateSupport();
+      if (stateSupport.inState("Pet", "Default")
+          || stateSupport.inState("Pet", "PrepareSleep")
+          || stateSupport.inState("Pet", "PrepareFollow")
+          || stateSupport.inState("Pet", "PreparePlay")) {
         return true;
       }
 

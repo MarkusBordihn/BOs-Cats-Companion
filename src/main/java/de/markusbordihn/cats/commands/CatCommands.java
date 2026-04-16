@@ -40,6 +40,7 @@ public final class CatCommands extends AbstractCommandCollection {
     register(new CatInfoCommand());
     register(new CatListCommand());
     register(new CatNameCommand());
+    register(new CatNeedsCommand());
     register(new CatOwnerCommand());
     register(new CatPlayCommand());
     register(new CatReloadCommand());

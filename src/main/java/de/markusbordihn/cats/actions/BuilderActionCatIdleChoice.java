@@ -22,7 +22,6 @@ package de.markusbordihn.cats.actions;
 import com.google.gson.JsonElement;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
@@ -39,7 +38,6 @@ import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
-import de.markusbordihn.cats.ui.CatActionHelper;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -160,38 +158,38 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
       }
 
       CatNeedType criticalNeed = catsManager.getCriticalNeed(entityRef, store);
+
       if (criticalNeed != CatNeedType.NONE) {
         StateSupport stateSupport = role.getStateSupport();
         String overrideState =
             switch (criticalNeed) {
               case REST -> {
                 if (stateSupport.inState("Pet", "GoingToBed")
-                    || stateSupport.inState("Pet", "Sleeping")) {
+                    || stateSupport.inState("Pet", "Sleeping")
+                    || stateSupport.inState("Pet", "PrepareSleep")) {
                   yield null;
                 }
-                World world =
-                    store.getExternalData() instanceof EntityStore entityStoreData
-                        ? entityStoreData.getWorld()
-                        : null;
-                yield (world != null && CatActionHelper.hasBedAvailable(entityRef, store, world))
-                    ? "GoingToBed"
-                    : "Sleeping";
+                yield "PrepareSleep";
               }
-              case SOCIAL -> stateSupport.inState("Pet", "Default") ? null : "Default";
+              case SOCIAL ->
+                  (stateSupport.inState("Pet", "Default")
+                          || stateSupport.inState("Pet", "PrepareFollow"))
+                      ? null
+                      : "PrepareFollow";
               case PLAY ->
                   (stateSupport.inState("Pet", "Playing")
-                          || stateSupport.inState("Pet", "Searching"))
+                          || stateSupport.inState("Pet", "Searching")
+                          || stateSupport.inState("Pet", "PreparePlay"))
                       ? null
-                      : "Playing";
+                      : "PreparePlay";
               case NONE -> null;
             };
         if (overrideState != null) {
           CatState catStateForOverride =
               switch (overrideState) {
-                case "Default" -> CatState.FOLLOWING;
-                case "GoingToBed" -> CatState.GOING_TO_BED;
-                case "Sleeping" -> CatState.SLEEPING;
-                case "Playing" -> CatState.PLAYING;
+                case "PrepareFollow" -> CatState.FOLLOWING;
+                case "PrepareSleep" -> CatState.GOING_TO_BED;
+                case "PreparePlay" -> CatState.PLAYING;
                 default -> null;
               };
           if (catStateForOverride != null) {

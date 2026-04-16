@@ -7,6 +7,16 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.12.0
+
+- Fixed CatNeedsManager to consider nearby companions for social needs.
+- Fixed untranslated UI elements and logging for better user experience.
+- Fixed missing rest boost for sleeping in cat bets.
+- Added cat behavior enhancements like PrepareSleep, PrepareFollow, and PreparePlay.
+- Added BuilderActionCatGoToBed to allow cats to find and go to beds.
+- Added CatNeedsCommand for debugging cat needs management.
+- Improved cat yarn ball interaction.
+
 ### 2.11.0
 
 - Fixed #2 tamed cats following any nearby player instead of only their owner.

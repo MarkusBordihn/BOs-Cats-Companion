@@ -42,9 +42,10 @@ public class PermissionManager {
     PermissionsModule perms = PermissionsModule.get();
     if (perms == null) {
       LOGGER.at(Level.WARNING).log(
-          "PermissionsModule not available — skipping default permission registration");
+          "PermissionsModule not available - skipping default permission registration");
       return;
     }
+
     LOGGER.at(Level.INFO).log(
         "Registering %d cat permission(s) in %s group", playerCommandNodes.size(), PLAYER_GROUP);
     perms.addGroupPermission(PLAYER_GROUP, playerCommandNodes);

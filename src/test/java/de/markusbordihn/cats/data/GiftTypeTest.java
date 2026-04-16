@@ -81,10 +81,11 @@ class GiftTypeTest {
     for (GiftType gift : GiftType.values()) {
       coveredPersonalities.add(gift.getAffinityPersonality());
     }
+
     for (PersonalityType type : PersonalityType.values()) {
       assertTrue(
           coveredPersonalities.contains(type),
-          type + " has no affinity GiftType — every personality should have a preferred gift");
+          type + " has no affinity GiftType - every personality should have a preferred gift");
     }
   }
 

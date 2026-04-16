@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 public enum HappinessSource {
   PETTING(5, PersonalityType.CUDDLY),
   PLAYING(8, PersonalityType.PLAYFUL),
+  FETCHING(6, PersonalityType.PLAYFUL),
   TREAT(10, PersonalityType.LAZY),
   FEEDING(3, null),
   SLEEPING(2, PersonalityType.LAZY),
@@ -41,13 +42,15 @@ public enum HappinessSource {
     if (catPersonality == null) {
       return baseDelta;
     }
+
     if (preferredPersonality != null && catPersonality == preferredPersonality) {
       return (int) (baseDelta * 1.5f);
     }
+
     float modifier =
         switch (this) {
           case PETTING -> catPersonality.getPetModifier();
-          case PLAYING -> catPersonality.getPlayModifier();
+          case PLAYING, FETCHING -> catPersonality.getPlayModifier();
           case TREAT, FEEDING, SLEEPING, SLEEPING_IN_BED -> catPersonality.getActivityModifier();
         };
     return Math.max(1, (int) (baseDelta * modifier));

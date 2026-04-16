@@ -239,7 +239,7 @@ public final class CatActionWheelPage
   public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
     if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
       LOGGER.at(Level.WARNING).log(
-          "[Cats] Action wheel for %s was dismissed within %dms of opening — "
+          "[Cats] Action wheel for %s was dismissed within %dms of opening - "
               + "likely replaced by another mod (PageManager conflict).",
           playerRef, PAGE_CONFLICT_THRESHOLD_MS);
     }

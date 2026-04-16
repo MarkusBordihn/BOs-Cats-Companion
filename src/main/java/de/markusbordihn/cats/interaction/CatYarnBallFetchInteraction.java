@@ -83,18 +83,21 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
         return player;
       }
     }
+
     UUID recentUuid = YarnBallThrowRegistry.getRecentThrower(10_000);
     if (recentUuid == null) {
       LOGGER.at(Level.WARNING).log(
           "CatYarnBallFetchInteraction: no owner ref and no recent throw registered");
       return null;
     }
+
     Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(recentUuid);
     if (playerRef == null || !playerRef.isValid()) {
       LOGGER.at(Level.WARNING).log(
           "CatYarnBallFetchInteraction: could not resolve player ref for UUID %s", recentUuid);
       return null;
     }
+
     return commandBuffer.getComponent(playerRef, Player.getComponentType());
   }
 
@@ -123,6 +126,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (YarnBallFetchRegistry.isFetching(ownerUuid)) {
       return;
     }
+
     YarnBallFetchRegistry.register(ownerUuid, catRef);
     commandBuffer.putComponent(
         catRef, fetchTargetType, new CatFetchTargetComponent(landingPosition, ownerUuid));
@@ -190,6 +194,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (stateComponent == null) {
       return false;
     }
+
     CatState state = stateComponent.getState();
     return state == CatState.FETCHING || state == CatState.ATTACKING;
   }
@@ -201,6 +206,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (nameplate != null && nameplate.getText() != null && !nameplate.getText().isEmpty()) {
       return nameplate.getText();
     }
+
     return null;
   }
 
@@ -228,9 +234,17 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (landingTransform == null) {
       return;
     }
-    Vector3d landingPosition = landingTransform.getPosition();
 
+    Vector3d landingPosition = landingTransform.getPosition();
     Store<EntityStore> store = commandBuffer.getStore();
+
+    LOGGER.at(Level.INFO).log(
+        "firstRun: projectile interaction triggered, landing=%.1f/%.1f/%.1f, ownerRef=%s",
+        landingPosition.x,
+        landingPosition.y,
+        landingPosition.z,
+        context.getOwningEntity() != null ? "present" : "null");
+
     Player player = resolveThrowingPlayer(context, commandBuffer, store);
     if (player == null) {
       LOGGER.at(Level.WARNING).log("firstRun: could not resolve throwing player");
@@ -252,6 +266,9 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     Vector3d playerPos = playerTransform != null ? playerTransform.getPosition() : landingPosition;
 
     Ref<EntityStore> catRef = findNearestFetchCat(ownerUuid, playerPos, store);
+    LOGGER.at(Level.INFO).log(
+        "firstRun: owner=%s, catFound=%s, playerPos=%.1f/%.1f/%.1f",
+        ownerUuid, catRef != null ? "yes" : "no", playerPos.x, playerPos.y, playerPos.z);
     if (catRef == null) {
       InventoryHelper.giveItem(player, Constants.CAT_YARN_BALL_ITEM);
       YarnBallGroundRegistry.register(ownerUuid, landingPosition);

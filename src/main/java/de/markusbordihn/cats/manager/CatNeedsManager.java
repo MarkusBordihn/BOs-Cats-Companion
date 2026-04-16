@@ -45,7 +45,10 @@ public class CatNeedsManager {
 
   private static final float SLEEP_REST_REDUCE_PER_MIN = 1.0f;
   private static final float BED_SLEEP_REST_REDUCE_PER_MIN = 1.5f;
+  private static final float SOCIAL_SATISFY_PER_MIN = 0.5f;
+  private static final float COMPANION_SOCIAL_SATISFY_PER_MIN = 0.3f;
   private static final double OWNER_PROXIMITY_RADIUS_SQ = 8.0 * 8.0;
+  private static final double COMPANION_PROXIMITY_RADIUS_SQ = 6.0 * 6.0;
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -77,6 +80,7 @@ public class CatNeedsManager {
     PersonalityType personality = catData.personalityType();
     boolean isSleeping = catData.state().isSleepingState();
     boolean ownerNearby = isOwnerNearby(catRef, catData, store);
+    boolean companionNearby = hasCompanionNearby(catRef, catUuid, store);
     float restDecay = REST_DECAY_PER_MIN * getPersonalityModifier(personality, CatNeedType.REST);
     float socialDecay =
         SOCIAL_DECAY_PER_MIN * getPersonalityModifier(personality, CatNeedType.SOCIAL);
@@ -95,12 +99,15 @@ public class CatNeedsManager {
       newRest = Math.clamp(newRest + restDecay * deltaMinutes, 0f, 100f);
     }
 
-    if (!ownerNearby) {
+    if (ownerNearby || companionNearby) {
+      float socialSatisfy = ownerNearby ? SOCIAL_SATISFY_PER_MIN : COMPANION_SOCIAL_SATISFY_PER_MIN;
+      socialSatisfy *= getPersonalityModifier(personality, CatNeedType.SOCIAL);
+      newSocial = Math.clamp(newSocial - socialSatisfy * deltaMinutes, 0f, 100f);
+    } else {
       newSocial = Math.clamp(newSocial + socialDecay * deltaMinutes, 0f, 100f);
     }
 
     newPlay = Math.clamp(newPlay + playDecay * deltaMinutes, 0f, 100f);
-
     boolean changed =
         Math.abs(newRest - catData.restNeed()) > 0.001f
             || Math.abs(newSocial - catData.socialNeed()) > 0.001f
@@ -178,6 +185,7 @@ public class CatNeedsManager {
     if (personality == null) {
       return 1.0f;
     }
+
     return switch (needType) {
       case REST -> personality == PersonalityType.LAZY ? 1.5f : 1.0f;
       case SOCIAL ->
@@ -218,6 +226,43 @@ public class CatNeedsManager {
     double dy = ownerPos.y - catPos.y;
     double dz = ownerPos.z - catPos.z;
     return (dx * dx + dy * dy + dz * dz) <= OWNER_PROXIMITY_RADIUS_SQ;
+  }
+
+  private boolean hasCompanionNearby(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull UUID catUuid, @Nonnull Store<EntityStore> store) {
+    TransformComponent catTransform =
+        store.getComponent(catRef, TransformComponent.getComponentType());
+    if (catTransform == null) {
+      return false;
+    }
+
+    Vector3d catPos = catTransform.getPosition();
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    for (CatDataEntry otherCat : resource.getAllCats()) {
+      if (otherCat.uuid().equals(catUuid) || !otherCat.isSpawned()) {
+        continue;
+      }
+
+      Ref<EntityStore> otherRef = store.getExternalData().getRefFromUUID(otherCat.uuid());
+      if (otherRef == null || !otherRef.isValid()) {
+        continue;
+      }
+
+      TransformComponent otherTransform =
+          store.getComponent(otherRef, TransformComponent.getComponentType());
+      if (otherTransform == null) {
+        continue;
+      }
+
+      Vector3d otherPos = otherTransform.getPosition();
+      double dx = otherPos.x - catPos.x;
+      double dy = otherPos.y - catPos.y;
+      double dz = otherPos.z - catPos.z;
+      if ((dx * dx + dy * dy + dz * dz) <= COMPANION_PROXIMITY_RADIUS_SQ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void syncNeedsComponent(

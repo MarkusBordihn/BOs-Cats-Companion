@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatFetchTargetComponent;
@@ -54,12 +55,9 @@ public final class CatActionHelper {
     if (npcEntity == null || npcEntity.getRole() == null) {
       return false;
     }
-    var stateSupport = npcEntity.getRole().getStateSupport();
-
+    StateSupport stateSupport = npcEntity.getRole().getStateSupport();
     CatsManager.getInstance().updateCatState(entityRef, CatState.FOLLOWING, store);
-    if (stateSupport.inState("Pet", "Default")) {
-      stateSupport.setState(entityRef, "Pet", "Playing", store);
-    }
+    stateSupport.setState(entityRef, "Pet", "Waiting", store);
     stateSupport.setState(entityRef, "Pet", "Default", store);
     return true;
   }
@@ -197,19 +195,23 @@ public final class CatActionHelper {
     if (catTransform == null) {
       return false;
     }
+
     List<CatBedInfo> beds = CatBed.findCatBeds(world, catTransform.getPosition());
     if (beds.isEmpty()) {
       return false;
     }
+
     CatBedInfo availableBed =
         CatBed.findNearestAvailableBed(beds, store, catTransform.getPosition());
     if (availableBed == null) {
       return false;
     }
+
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity == null || npcEntity.getRole() == null) {
       return false;
     }
+
     TransientPath path = new TransientPath();
     path.addWaypoint(
         new Vector3d(
@@ -239,10 +241,12 @@ public final class CatActionHelper {
     if (catTransform == null) {
       return false;
     }
+
     List<CatBedInfo> beds = CatBed.findCatBeds(world, catTransform.getPosition());
     if (beds.isEmpty()) {
       return false;
     }
+
     return CatBed.findNearestAvailableBed(beds, store, catTransform.getPosition()) != null;
   }
 
@@ -256,15 +260,18 @@ public final class CatActionHelper {
     if (targetTransform == null) {
       return null;
     }
+
     List<Ref<EntityStore>> nearbyCats =
         findNearbyCats(store, targetTransform.getPosition(), ownerUuid);
     if (nearbyCats.isEmpty()) {
       return null;
     }
+
     Ref<EntityStore> selectedCat = selectBestCat(store, nearbyCats, targetTransform.getPosition());
     if (selectedCat == null) {
       return null;
     }
+
     CatsManager.getInstance().updateCatState(selectedCat, CatState.ATTACKING, store);
     NPCEntity npcEntity = store.getComponent(selectedCat, NPCEntity.getComponentType());
     if (npcEntity != null && npcEntity.getRole() != null) {
@@ -292,6 +299,7 @@ public final class CatActionHelper {
         nearbyCats.add(entityRef);
       }
     }
+
     return nearbyCats;
   }
 
@@ -311,11 +319,13 @@ public final class CatActionHelper {
       if (state == CatState.WAITING || state == CatState.SLEEPING) {
         continue;
       }
+
       TransformComponent transform =
           store.getComponent(catRef, TransformComponent.getComponentType());
       if (transform == null) {
         continue;
       }
+
       double d = distance(transform.getPosition(), targetPos);
       if (state == CatState.FOLLOWING) {
         if (d < minFollowingDist) {

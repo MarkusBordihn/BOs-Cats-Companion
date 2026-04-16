@@ -78,6 +78,7 @@ public final class CatTamingSuccessPage
     if (name == null || name.isEmpty()) {
       return name;
     }
+
     return name.charAt(0) + name.substring(1).toLowerCase().replace('_', ' ');
   }
 
@@ -85,6 +86,7 @@ public final class CatTamingSuccessPage
     if (type == null || type.isEmpty()) {
       return "Cat";
     }
+
     return type.replaceFirst("^Cats?_", "")
         .replaceFirst("_Tamed$", "")
         .replaceAll("([A-Z])", " $1")
@@ -149,7 +151,7 @@ public final class CatTamingSuccessPage
   public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
     if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
       LOGGER.at(Level.WARNING).log(
-          "[Cats] Taming success screen for %s was dismissed within %dms of opening — "
+          "[Cats] Taming success screen for %s was dismissed within %dms of opening - "
               + "likely replaced by another mod (PageManager conflict).",
           playerRef, PAGE_CONFLICT_THRESHOLD_MS);
     }
@@ -159,11 +161,13 @@ public final class CatTamingSuccessPage
     if (this.primaryPersonality == null) {
       return "";
     }
+
     if (this.secondaryPersonality != null) {
       return formatEnum(this.primaryPersonality.name())
           + " / "
           + formatEnum(this.secondaryPersonality.name());
     }
+
     return formatEnum(this.primaryPersonality.name());
   }
 
