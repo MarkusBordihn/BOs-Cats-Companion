@@ -14,7 +14,7 @@
 > Always remove all old versions of this plugin from your mods folder before updating, to avoid
 > issues like double saving or server startup errors.
 
-## Overview
+## 📖 Overview
 
 Cats adds tameable cat companions to Hytale with natural world spawning, trust-based taming,
 personality-driven moods, and cozy home features like beds, carriers, toys, and treats.
@@ -25,11 +25,11 @@ still offering enough systems and polish to stand out as a Hytale New Worlds Con
 You can explore for wild cats, slowly earn their trust with fish, give them a name, open the
 Action Wheel with `F`, and build a little home routine around play, sleep, and companionship.
 
-## Introduction and Overview Video
+## 🎥 Introduction and Overview Video
 
 <span><iframe width="788" height="443" src="https://www.youtube.com/embed/RbwMXmpuRPM" frameborder="0" allowfullscreen="allowfullscreen"></iframe></span>
 
-## Quick Start
+## 🚀 Quick Start
 
 If you just want to jump in and start playing with cats, this is the fastest path:
 
@@ -47,7 +47,7 @@ If you just want to jump in and start playing with cats, this is the fastest pat
 * Each cat belongs to one player only once tamed.
 * In Creative Mode, enable `Allow NPC Detection` in the quick settings to interact more reliably.
 
-## Why It Stands Out
+## ✨ Why It Stands Out
 
 * Cats spawn naturally across multiple zones instead of feeling like menu-only companions.
 * Taming takes trust over time, which makes the first companion feel earned.
@@ -55,7 +55,7 @@ If you just want to jump in and start playing with cats, this is the fastest pat
 * The Action Wheel keeps most interactions in-world and easy to learn from the first minute.
 * Home items like the Cat Bed and Cat Carrier make cats useful for both adventure and decoration.
 
-## Cat Bed Showcase
+## 🛏️ Cat Bed Showcase
 
 The Cat Bed is more than decoration. It is both a sleeping spot and a management point for your
 cats.
@@ -69,11 +69,11 @@ This makes the bed useful even when a cat is currently despawned, already in the
 It also pairs naturally with `/cat bed`, which sends a nearby tamed cat to the nearest available
 bed.
 
-## Screenshots
+## 🖼️ Screenshots
 
 This section is structured to be reusable later for CurseForge with a small curated gallery.
 
-## Current Features
+## ✅ Current Features
 
 ### Core Companions
 
@@ -116,7 +116,7 @@ Additional options are available for testing, admin use, or controlled setups:
 * Manual spawning with `/npc spawn Cats_<Breed>`
 * Spawn eggs such as `Egg_Spawner_Cats_Calico`
 
-## Crafting and Care Items
+## 🧶 Crafting and Care Items
 
 ### Cat Carrier
 
@@ -166,7 +166,7 @@ Cat Treats give a bigger happiness boost than normal fish.
 * 1x Fish
 * 1x Fiber
 
-## Commands
+## ⌨️ Commands
 
 ### General Commands
 
@@ -193,7 +193,7 @@ Commands work by looking at your tamed cat or by providing its entity ID.
 * `/cat wait` - Stop following and wait in place
 * `/cat wander` - Allow free roaming
 
-## Configuration
+## ⚙️ Configuration
 
 Config files are created in `mods/Cats/` on first startup and can be edited while the server is
 running:
@@ -204,7 +204,7 @@ running:
 
 Apply changes with `/cat reload` without restarting the server.
 
-## Permissions
+## 🔐 Permissions
 
 The plugin supports both Hytale's permission system and LuckPerms.
 
@@ -213,7 +213,7 @@ Players can own up to 16 cats by default. Admins can adjust this with permission
 
 For detailed permission configuration, see [Permissions Documentation](PERMISSIONS.md).
 
-## Planned Features
+## 🚧 Planned Features
 
 * Cat breeding and kittens
 * Accessories such as collars and bells
@@ -221,7 +221,7 @@ For detailed permission configuration, see [Permissions Documentation](PERMISSIO
 * Additional cat variants
 * Cat progression and special abilities
 
-## Data Storage
+## 🗃️ Data Storage
 
 Cat data is automatically saved to `worlds/default/resources/CatsData.json`, including:
 
@@ -231,12 +231,12 @@ Cat data is automatically saved to `worlds/default/resources/CatsData.json`, inc
 
 Back up this file if you want to preserve your cats while moving worlds or testing updates.
 
-## Known Issues
+## 🐛 Known Issues
 
 * Some animation transitions are not yet smooth
 * Pathfinding still needs refinement
 
-## Related Plugins
+## 🔗 Related Plugins
 
 **Dogs Companion**
 
@@ -246,12 +246,12 @@ support, guarding, and active adventure play.
 
 [Download Dogs Companion](https://www.curseforge.com/hytale/mods/dogs-companion)
 
-## For Developers
+## 🛠️ For Developers
 
 Want to build or modify this plugin? Check out the [Development Guide](DEVELOPMENT.md) for setup
 instructions, build tasks, and contribution guidelines.
 
-## Forks, Variants, and Asset Usage
+## 📜 Forks, Variants, and Asset Usage
 
 Forks and variants of this project are welcome.
 
