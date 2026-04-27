@@ -231,8 +231,9 @@ public record CatDataEntry(
     return status == CatStatus.SPAWNED;
   }
 
-  public boolean isDead() {
-    return status == CatStatus.DEATH;
+  @Nonnull
+  public String displayName() {
+    return name != null && !name.isEmpty() ? name : catType.toString();
   }
 
   public CatDataEntry withUuid(@Nonnull UUID newUuid) {

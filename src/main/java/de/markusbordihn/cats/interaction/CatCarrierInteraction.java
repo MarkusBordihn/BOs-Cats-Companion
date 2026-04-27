@@ -48,6 +48,7 @@ import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.ui.CatActionWheelPage;
 import it.unimi.dsi.fastutil.Pair;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -101,6 +102,7 @@ public class CatCarrierInteraction {
       return true;
     }
 
+    CatActionWheelPage.closeIfOpen(player);
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
       player.sendMessage(
@@ -208,9 +210,28 @@ public class CatCarrierInteraction {
 
     CatDataEntry catData = catsManager.getCatData(storedCatUuid, store);
     if (catData == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       LOGGER.at(Level.WARNING).log("Cannot release cat: no data found for UUID %s", storedCatUuid);
+      CatDataEntry respawnedCat =
+          catsManager.getCatDataByOwner(playerUuid, store).stream()
+              .filter(
+                  entry ->
+                      entry.isSpawned() && storedName != null && storedName.equals(entry.name()))
+              .findFirst()
+              .orElse(null);
+      if (respawnedCat != null) {
+        String displayName = storedName;
+        updateHeldItem(player, heldItem, heldItem.withMetadata(null));
+        player.sendMessage(
+            Message.translation("cats.interactions.carrier.cat_already_in_world")
+                .param("catName", displayName)
+                .color(Constants.COLOR_WARNING));
+        LOGGER.at(Level.INFO).log(
+            "Carrier stale-UUID cleared for player %s: cat '%s' was already re-spawned with new UUID",
+            playerUuid, displayName);
+      } else {
+        player.sendMessage(
+            Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      }
       return true;
     }
 

@@ -1,0 +1,77 @@
+$Common = "../Common.ui";
+
+$Common.@PageOverlay {
+  LayoutMode: Middle;
+  $Common.@DecoratedContainer #CatBedSpawnRoot {
+    Anchor: (Width: 560, Height: 580);
+
+    #Title {
+      $Common.@Title #CatBedSpawnTitle {
+        @Text = "Cat Bed";
+      }
+    }
+
+    #Content {
+      LayoutMode: Top;
+      Label #CatBedSpawnSubtitle {
+        Anchor: (Height: 26, Bottom: 8);
+        Text: "Select a cat to assign to this bed.";
+        Style: (
+          FontSize: 14,
+          TextColor: #f5c0c0,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      Label #CatBedSpawnEmpty {
+        Anchor: (Height: 40, Bottom: 8);
+        Visible: false;
+        Text: "You don't have any cats yet.";
+        Style: (
+          FontSize: 14,
+          TextColor: #888888,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      Group #CatBedSpawnList {
+        FlexWeight: 1;
+        LayoutMode: TopScrolling;
+        ScrollbarStyle: $Common.@DefaultScrollbarStyle;
+      }
+
+      Label #CatBedSpawnCount {
+        Anchor: (Height: 24, Top: 4);
+        Text: "";
+        Style: (
+          FontSize: 13,
+          TextColor: #888888,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center
+        );
+      }
+
+      Group {
+        LayoutMode: Right;
+        Anchor: (Height: 44, Top: 4);
+
+        $Common.@SmallSecondaryTextButton #CatBedSpawnEmptyBedButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Empty Bed";
+          @Anchor = (Width: 130, Right: 240);
+          Visible: false;
+        }
+
+        $Common.@SmallSecondaryTextButton #CatBedSpawnCloseButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Close";
+          @Anchor = (Width: 130, Right: 15);
+        }
+      }
+    }
+
+  }
+}
+$Common.@BackButton {}

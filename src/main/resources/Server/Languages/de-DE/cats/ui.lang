@@ -1,69 +1,73 @@
-# Action Wheel
-wheel.status_header=Status:
-wheel.stop=STOP
-
-# Action Wheel Slot Labels
-wheel.slot.follow=Folgen
-wheel.slot.stop=Stopp
-wheel.slot.pet=Streicheln
-wheel.slot.play=Spielen
-wheel.slot.sleep=Schlafen
-wheel.slot.wakeup=Aufwecken
-wheel.slot.wander=Erkunden
-wheel.slot.return=Zurückkehren
-wheel.slot.bed=Zum Bett
-wheel.slot.bed_unavailable=Kein Bett verfügbar
-wheel.slot.leave_bed=Bett verlassen
-wheel.slot.rename=Umbenennen
-
-# Cat States
-state.following=Folgt
-state.sitting=Sitzt
-state.sleeping=Schläft
-state.playing=Spielt
-state.wandering=Erkundet
-state.going_to_bed=Geht zum Bett
-state.waiting=Wartet
-state.pouncing=Springt an
-state.fetching=Apportiert
-state.searching=Sucht
-
-# Happiness / Mood
-mood.miserable=Elend
-mood.sad=Traurig
-mood.neutral=Neutral
-mood.happy=Glücklich
+bed_spawn.already_spawned=Diese Katze ist bereits in der Welt.
+bed_spawn.call_button=Rufen
+bed_spawn.call_success={catName} ist auf dem Weg zum Bett!
+bed_spawn.close=Schließen
+bed_spawn.empty_button=Bett leeren
+bed_spawn.empty_success=Das Bett wurde geleert.
+bed_spawn.error=Ein Fehler ist aufgetreten.
+bed_spawn.no_bed_found=Kein Katzenbett in der Nähe gefunden.
+bed_spawn.no_cats=Du hast noch keine Katzen.
+bed_spawn.not_owner=Du kannst nur deine eigenen Katzen verwalten.
+bed_spawn.spawn_button=Spawnen
+bed_spawn.spawn_success={catName} ist auf dem Weg zum Bett!
+bed_spawn.subtitle=Wähle eine Katze für dieses Bett.
+bed_spawn.title=Katzenbett
+bed_spawn.wake_up_button=Aufwecken
 mood.ecstatic=Begeistert
-
-# Mood hints (contextual advice for extreme states)
+mood.happy=Glücklich
+mood.hint.ecstatic=Deine Katze ist absolut glücklich!
 mood.hint.miserable=Deine Katze ist elend - zeig ihr etwas Liebe!
 mood.hint.sad=Deine Katze wirkt traurig - streicheln oder Leckerli hilft.
-mood.hint.ecstatic=Deine Katze ist absolut glücklich!
-
-# Name Input
-name_input.title=Katze umbenennen
-name_input.subtitle=Namen eingeben und Übernehmen klicken.
-name_input.placeholder=Katzennamen eingeben
+mood.miserable=Elend
+mood.neutral=Neutral
+mood.sad=Traurig
 name_input.apply=Übernehmen
 name_input.cancel=Abbrechen
-
-# Taming Success
+name_input.placeholder=Katzennamen eingeben
+name_input.subtitle=Namen eingeben und Übernehmen klicken.
+name_input.title=Katze umbenennen
+panel.gifts=Geschenke:
+panel.needs.play=Spiel:
+panel.needs.rest=Ruhe:
+panel.needs.social=Sozial:
+panel.needs=Bedürfnisse:
+panel.personality.none=Unbekannt
+panel.personality=Persönlichkeit:
+panel.rename=Umbenennen
+panel.secondary=Sekundär:
+state.attacking=Springt an
+state.fetching=Apportiert
+state.following=Folgt
+state.going_to_bed=Geht zum Bett
+state.playing=Spielt
+state.searching=Sucht
+state.sitting=Sitzt
+state.sleeping=Schläft
+state.waiting=Wartet
+state.wandering=Erkundet
+status.despawned=Despawnt
+status.idle=Inaktiv
+status.spawned=Gespawnt
+status.unknown=Unbekannt
+taming_success.confirm=Bestätigen
 taming_success.congratulations=Glückwunsch!
-taming_success.title=Du hast eine Katze gezähmt!
 taming_success.name_label=Gib deiner Katze einen Namen:
 taming_success.placeholder=Katzenname
-taming_success.confirm=Bestätigen
 taming_success.tip1=Drücke F mit leerer Hand, um das Aktionsrad zu öffnen
 taming_success.tip2=Drücke F mit Futter in der Hand, um deine Katze zu heilen
 taming_success.tip3=Nutze /cat für Befehle wie sitzen, folgen, schlafen und mehr
-
-# Info Panel
-panel.personality=Persönlichkeit:
-panel.secondary=Sekundär:
-panel.gifts=Geschenke:
-panel.rename=Umbenennen
-panel.personality.none=Unbekannt
-panel.needs=Bedürfnisse:
-panel.needs.rest=Ruhe:
-panel.needs.social=Sozial:
-panel.needs.play=Spiel:
+taming_success.title=Du hast eine Katze gezähmt!
+wheel.slot.bed_unavailable=Kein Bett verfügbar
+wheel.slot.bed=Zum Bett
+wheel.slot.follow=Folgen
+wheel.slot.leave_bed=Bett verlassen
+wheel.slot.pet=Streicheln
+wheel.slot.play=Spielen
+wheel.slot.rename=Umbenennen
+wheel.slot.return=Zurückkehren
+wheel.slot.sleep=Schlafen
+wheel.slot.stop=Stopp
+wheel.slot.wakeup=Aufwecken
+wheel.slot.wander=Erkunden
+wheel.status_header=Status:
+wheel.stop=STOP

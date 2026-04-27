@@ -21,20 +21,30 @@ package de.markusbordihn.cats.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.systems.RoleChangeSystem;
 import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.data.CatState;
+import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.Optional;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
 final class CatReleaseCommand extends CatCommand {
+  private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private final EntityWrappedArg entityArg;
 
   public CatReleaseCommand() {
@@ -54,12 +64,10 @@ final class CatReleaseCommand extends CatCommand {
 
     Ref<EntityStore> entityRef = entityRefOpt.get();
 
-    // Check ownership before allowing release
     if (!checkOwnership(entityRef, store, context)) {
       return;
     }
 
-    // Get owner info
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
@@ -69,12 +77,42 @@ final class CatReleaseCommand extends CatCommand {
     }
 
     String catName = getCatDisplayName(entityRef, store);
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+    if (npcEntity == null || npcEntity.getRole() == null) {
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    Role currentRole = npcEntity.getRole();
+    CatType catType = CatType.fromRoleName(currentRole.getRoleName());
+    String wildRoleName = catType.getWildRoleName();
+    NPCPlugin npcPlugin = NPCPlugin.get();
+    int wildRoleIndex =
+        npcPlugin != null && !wildRoleName.isEmpty() ? npcPlugin.getIndex(wildRoleName) : -1;
+    if (wildRoleIndex < 0) {
+      LOGGER.at(Level.WARNING).log(
+          "Failed to release cat %s: no wild role found for current role %s",
+          catName, currentRole.getRoleName());
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    RoleChangeSystem.requestRoleChange(
+        entityRef, currentRole, wildRoleIndex, true, null, null, store);
+
     store.removeComponent(entityRef, CatOwnerComponent.getComponentType());
+    var bedTargetType = CatBedTargetComponent.getComponentType();
+    if (bedTargetType != null && store.getComponent(entityRef, bedTargetType) != null) {
+      store.removeComponent(entityRef, bedTargetType);
+    }
+    store.ensureAndGetComponent(entityRef, Nameplate.getComponentType()).setText("");
 
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager != null) {
-      catsManager.unregisterOwner(entityRef, store);
       catsManager.updateCatState(entityRef, CatState.WANDERING, store);
+      catsManager.removeCatData(entityRef, store);
     }
 
     context.sendMessage(

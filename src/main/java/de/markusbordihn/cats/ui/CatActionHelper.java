@@ -55,10 +55,10 @@ public final class CatActionHelper {
     if (npcEntity == null || npcEntity.getRole() == null) {
       return false;
     }
+
     StateSupport stateSupport = npcEntity.getRole().getStateSupport();
     CatsManager.getInstance().updateCatState(entityRef, CatState.FOLLOWING, store);
-    stateSupport.setState(entityRef, "Pet", "Waiting", store);
-    stateSupport.setState(entityRef, "Pet", "Default", store);
+    stateSupport.setState(entityRef, "Pet", "PrepareFollow", store);
     return true;
   }
 
@@ -286,6 +286,7 @@ public final class CatActionHelper {
           new Vector3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
+
     return selectedCat;
   }
 

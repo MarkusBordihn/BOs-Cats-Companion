@@ -46,30 +46,29 @@ final class CatSearchCommand extends CatCommand {
   protected void execute(
       @Nonnull CommandContext context, @Nonnull World world, @Nonnull Store<EntityStore> store) {
     Optional<Ref<EntityStore>> entityRefOpt = getEntityFromArgument(this.entityArg, store, context);
-    if (entityRefOpt.isPresent()) {
-      Ref<EntityStore> entityRef = entityRefOpt.get();
-
-      if (!checkOwnership(entityRef, store, context)) {
-        return;
-      }
-
-      // Update state (component + persistent data)
-      CatsManager.getInstance().updateCatState(entityRef, CatState.SEARCHING, store);
-
-      NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-      if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Searching", store);
-        context.sendMessage(
-            Message.translation("cats.commands.search.success")
-                .param("name", getCatDisplayName(entityRef, store))
-                .color(Constants.COLOR_ORANGE));
-      } else {
-        context.sendMessage(
-            Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
-      }
-    } else {
+    if (entityRefOpt.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
+      return;
+    }
+
+    Ref<EntityStore> entityRef = entityRefOpt.get();
+    if (!checkOwnership(entityRef, store, context)) {
+      return;
+    }
+
+    CatsManager.getInstance().updateCatState(entityRef, CatState.SEARCHING, store);
+
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+    if (npcEntity != null && npcEntity.getRole() != null) {
+      npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Searching", store);
+      context.sendMessage(
+          Message.translation("cats.commands.search.success")
+              .param("name", getCatDisplayName(entityRef, store))
+              .color(Constants.COLOR_ORANGE));
+    } else {
+      context.sendMessage(
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
     }
   }
 }

@@ -187,6 +187,17 @@ $Common.@PageOverlay {
     Label #CatsActionWheelLabel6 { Anchor: (Top: 398, Left: 322, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
     Label #CatsActionWheelLabel7 { Anchor: (Top: 233, Left: 391, Width: 170, Height: 44); Text: ""; Style: @SliceLabelStyle; Visible: false; }
 
+    Label #CatInfoPanelUuid {
+      Anchor: (Top: 232, Left: 950, Width: 282, Height: 14);
+      Text: "";
+      Style: (
+        FontSize: 11,
+        TextColor: #4a5a6a,
+        HorizontalAlignment: End,
+        VerticalAlignment: Center
+      );
+    }
+
     Group #CatInfoPanel {
       Anchor: (Top: 248, Left: 990, Width: 282, Height: 258);
       Background: (TexturePath: "../Common/ContainerPanelPatch.png", Border: 4);

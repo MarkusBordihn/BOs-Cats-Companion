@@ -50,8 +50,24 @@ public final class CatBed {
   public static final double BED_OCCUPIED_RADIUS = 1.0;
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
   private static final double BED_OCCUPIED_RADIUS_SQ = BED_OCCUPIED_RADIUS * BED_OCCUPIED_RADIUS;
+  private static final double[] NEAREST_BED_SEARCH_RADII = {
+    1.0, 2.0, 3.0, 5.0, 10.0, 15.0, 25.0, 50.0
+  };
 
   private CatBed() {}
+
+  @Nullable
+  public static Vector3d findNearestBedPosition(
+      @Nonnull World world, @Nonnull Vector3d searchCenter) {
+    for (double radius : NEAREST_BED_SEARCH_RADII) {
+      List<CatBedInfo> beds = findCatBeds(world, searchCenter, radius);
+      if (!beds.isEmpty()) {
+        return beds.get(0).getPosition();
+      }
+    }
+
+    return null;
+  }
 
   @Nonnull
   public static List<CatBedInfo> findCatBeds(
@@ -146,6 +162,7 @@ public final class CatBed {
         return bed;
       }
     }
+
     return null;
   }
 
@@ -180,7 +197,6 @@ public final class CatBed {
             }
 
             Vector3d catPosition = transformComp.getPosition();
-
             if (distanceSquared(catPosition, excludeCatPos) < 0.01) {
               continue;
             }

@@ -27,7 +27,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
-import de.markusbordihn.cats.interaction.InteractionStranger;
 import de.markusbordihn.cats.interaction.ItemInteractionStranger;
 import javax.annotation.Nonnull;
 
@@ -49,13 +48,13 @@ public class BuilderActionCatInteractionStranger extends BuilderActionCatInterac
   @Nonnull
   @Override
   public String getShortDescription() {
-    return "Logs stranger cat interaction events";
+    return "Handles stranger interactions with tamed cats";
   }
 
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Custom action that logs when a non-owner player interacts with a tamed cat NPC";
+    return "Routes held-item interactions for non-owners and ignores empty-hand interaction.";
   }
 
   public static class ActionCatInteractionStranger extends ActionCatInteractionBase {
@@ -94,9 +93,8 @@ public class BuilderActionCatInteractionStranger extends BuilderActionCatInterac
 
       if (heldItem != null && heldItem.isValid()) {
         return ItemInteractionStranger.handle(entityRef, role, store, player, heldItem);
-      } else {
-        return InteractionStranger.handle(entityRef, role, store, player);
       }
+      return false;
     }
   }
 }

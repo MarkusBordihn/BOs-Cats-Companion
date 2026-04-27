@@ -7,6 +7,15 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.13.0
+
+- Fixed following stuck in place when path finding fails by retriggering search state.
+- Fixed cats overlapping when multiple cats are try to follow or send to the same position.
+- Fixed cat duplication bug where cats falsely listed as despawned.
+- Added cat bed screen UI for better management (spawning, assignment, status, ...) of all cats.
+- Improved cat action wheel with live updates, better layout, styling, and interaction hints.
+- Smaller code cleanup and refactorings for better maintainability and performance.
+
 ### 2.12.0
 
 - Fixed CatNeedsManager to consider nearby companions for social needs.

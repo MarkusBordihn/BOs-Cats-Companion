@@ -1,0 +1,39 @@
+$Common = "../Common.ui";
+
+Group #CatBedSpawnRow {
+  LayoutMode: Right;
+  Anchor: (Height: 54, Bottom: 2);
+
+  AssetImage #CatBedSpawnRowIcon {
+    Anchor: (Width: 48, Height: 48);
+    AssetPath: "";
+  }
+
+  Label #CatBedSpawnRowName {
+    Anchor: (Width: 200, Height: 54);
+    Padding: (Left: 8);
+    Text: "";
+    Style: (
+      FontSize: 16,
+      TextColor: #ffffff,
+      VerticalAlignment: Center
+    );
+  }
+
+  Label #CatBedSpawnRowStatus {
+    Anchor: (Width: 100, Height: 54);
+    Text: "";
+    Style: (
+      FontSize: 15,
+      TextColor: #aaaaaa,
+      VerticalAlignment: Center,
+      HorizontalAlignment: Center
+    );
+  }
+
+  $Common.@SecondaryTextButton #CatBedSpawnRowButton {
+    @Sounds = $Common.@ButtonSounds;
+    @Text = "";
+    @Anchor = (Left: 10, Right: 10, Width: 130, Height: 38);
+  }
+}

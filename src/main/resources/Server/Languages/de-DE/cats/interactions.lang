@@ -1,55 +1,41 @@
-# Item Interactions
-item.unknown=Die Katze schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
-item.unknown.named={catName} schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
-wild.reject=*fauchen* Die wilde Katze traut dir damit nicht!
-
-# Taming
-taming.success=Du hast die Katze mit {item} gezähmt! Triff {catName}!
-taming.companion=Schnurr! Dein neuer Begleiter wird dir treu folgen
-taming.help=Nutze /cat name <name> um {catName} einen neuen Namen zu geben oder /cat für eine Liste verfügbarer Befehle
-taming.limit_reached=Du hast dein Katzenlimit erreicht ({current}/{limit})
-taming.error_no_uuid=Fehler: Konnte Katze nicht zähmen (keine UUID)
-taming.error_system=Fehler: Katzensystem nicht verfügbar
-taming.count=Du besitzt jetzt {current} von {limit} Katzen
-taming.progress=Die Katze hat das Futter genossen! Vertrauen: {current}/{required}
-taming.gaining_trust=Die Katze scheint interessiert, ist aber noch vorsichtig...
-taming.likes_food=Die Katze fängt an dich zu mögen!
-taming.almost_there=Die Katze ist fast bereit dir zu vertrauen!
-taming.too_soon=Die Katze ist noch satt! Warte noch {seconds} Sekunden bevor du wieder fütterst.
-
-# Cat Carrier
-carrier.captured={catName} (UUID: {catUuid}) ist in der Transportbox.
-carrier.released={catName} wurde freigelassen.
 carrier.already_occupied=Transportbox belegt: {catName} (UUID: {catUuid}). Rechtsklick auf den Boden zum Freilassen.
-carrier.not_tamed=Nur gezähmte Katzen können in die Transportbox.
-carrier.not_owner=Du kannst nur deine eigenen Katzen einpacken.
-carrier.release_failed=Freilassen aus der Transportbox fehlgeschlagen.
-carrier.error=Fehler mit der Katzentransportbox.
+carrier.captured={catName} (UUID: {catUuid}) ist in der Transportbox.
+carrier.cat_already_in_world={catName} ist bereits in der Welt! Nutze das Katzenbett um die Katze zu rufen oder zu spawnen. Die Transportbox wurde zurückgesetzt.
 carrier.empty=Transportbox leer. Bei gezähmter Katze benutzen.
-
-# Play Interactions
-play.cooldown=Deine Katze ist müde vom Spielen und braucht eine Pause.
-
-# Yarn Ball Throw
-yarn_ball.thrown={catName} hat den Wollknäuel bemerkt und holt ihn!
-yarn_ball.returned={catName} bringt stolz den Wollknäuel zurück!
-yarn_ball.no_cat_nearby=Keine deiner Katzen interessiert sich gerade für den Wollknäuel.
-
-# Owner Interactions
-owner.petting.cooldown=Deine Katze möchte gerade nicht gestreichelt werden.
-owner.gift={name} hat dir ein kleines Geschenk gebracht: {gift}!
-
-# Feeding
-feeding.healed=Deine Katze wurde geheilt! (+{amount} HP, jetzt {health}/{maxHealth})
+carrier.error=Fehler mit der Katzentransportbox.
+carrier.not_owner=Du kannst nur deine eigenen Katzen einpacken.
+carrier.not_tamed=Nur gezähmte Katzen können in die Transportbox.
+carrier.release_failed=Freilassen aus der Transportbox fehlgeschlagen.
+carrier.released={catName} wurde freigelassen.
 feeding.full_health=Deine Katze hat bereits volle Gesundheit!
-feeding.treat.healed=Deine Katze knabbert genüsslich das Leckerli! (+{amount} HP, jetzt {health}/{maxHealth})
-feeding.treat.full_health=Deine Katze ist eigentlich satt, aber das Leckerli riecht einfach zu verlockend, schnurr!
+feeding.healed=Deine Katze wurde geheilt! (+{amount} HP, jetzt {health}/{maxHealth})
 feeding.treat.cooldown=Deine Katze ist noch satt vom letzten Leckerli, warte noch einen Moment.
-
-# Hints
-hint.tame=Drücke [{key}], um zu zähmen
-hint.owner_wheel=Drücke [{key}], um das Aktionsrad zu öffnen
+feeding.treat.full_health=Deine Katze ist eigentlich satt, aber das Leckerli riecht einfach zu verlockend, schnurr!
+feeding.treat.healed=Deine Katze knabbert genüsslich das Leckerli! (+{amount} HP, jetzt {health}/{maxHealth})
+hint.carrier=Drücke [{key}], um die Katze einzupacken
 hint.owner_feed=Drücke [{key}], um deine Katze zu füttern
 hint.owner_play=Drücke [{key}], um mit deiner Katze zu spielen
-hint.carrier=Drücke [{key}], um die Katze einzupacken
+hint.owner_wheel=Drücke [{key}], um das Aktionsrad zu öffnen
 hint.stranger=Diese Katze gehört jemand anderem
+hint.tame=Drücke [{key}], um zu zähmen
+item.unknown.named={catName} schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
+item.unknown=Die Katze schnuppert neugierig, weiß aber nicht, was sie damit anfangen soll.
+owner.gift={name} hat dir ein kleines Geschenk gebracht: {gift}!
+owner.petting.cooldown=Deine Katze möchte gerade nicht gestreichelt werden.
+play.cooldown=Deine Katze ist müde vom Spielen und braucht eine Pause.
+taming.almost_there=Die Katze ist fast bereit dir zu vertrauen!
+taming.companion=Schnurr! Dein neuer Begleiter wird dir treu folgen
+taming.count=Du besitzt jetzt {current} von {limit} Katzen
+taming.error_no_uuid=Fehler: Konnte Katze nicht zähmen (keine UUID)
+taming.error_system=Fehler: Katzensystem nicht verfügbar
+taming.gaining_trust=Die Katze scheint interessiert, ist aber noch vorsichtig...
+taming.help=Nutze /cat name <name> um {catName} einen neuen Namen zu geben oder /cat für eine Liste verfügbarer Befehle
+taming.likes_food=Die Katze fängt an dich zu mögen!
+taming.limit_reached=Du hast dein Katzenlimit erreicht ({current}/{limit})
+taming.progress=Die Katze hat das Futter genossen! Vertrauen: {current}/{required}
+taming.success=Du hast die Katze mit {item} gezähmt! Triff {catName}!
+taming.too_soon=Die Katze ist noch satt! Warte noch {seconds} Sekunden bevor du wieder fütterst.
+wild.reject=*fauchen* Die wilde Katze traut dir damit nicht!
+yarn_ball.no_cat_nearby=Keine deiner Katzen interessiert sich gerade für den Wollknäuel.
+yarn_ball.returned={catName} bringt stolz den Wollknäuel zurück!
+yarn_ball.thrown={catName} hat den Wollknäuel bemerkt und holt ihn!

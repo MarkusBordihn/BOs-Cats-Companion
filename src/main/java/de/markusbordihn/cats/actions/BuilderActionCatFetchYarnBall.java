@@ -21,6 +21,7 @@ package de.markusbordihn.cats.actions;
 
 import com.google.gson.JsonElement;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -328,7 +329,11 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (ownerUuid != null) {
         YarnBallFetchRegistry.complete(ownerUuid);
       }
-      store.removeComponent(entityRef, CatFetchTargetComponent.getComponentType());
+      ComponentType<EntityStore, CatFetchTargetComponent> fetchType =
+          CatFetchTargetComponent.getComponentType();
+      if (fetchType != null && store.getComponent(entityRef, fetchType) != null) {
+        store.removeComponent(entityRef, fetchType);
+      }
       resetState(entityRef, role, store);
     }
 

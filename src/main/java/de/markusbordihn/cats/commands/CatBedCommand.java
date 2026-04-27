@@ -78,8 +78,6 @@ final class CatBedCommand extends CatCommand {
     }
 
     Vector3d catPos = catTransform.getPosition();
-
-    // Find all cat beds in range using CatBed helper
     List<CatBedInfo> beds = CatBed.findCatBeds(world, catPos);
     if (beds.isEmpty()) {
       String catName = getCatDisplayName(catRef, store);
@@ -96,7 +94,6 @@ final class CatBedCommand extends CatCommand {
 
     LOGGER.at(Level.INFO).log("Found %d cat bed(s) in range", beds.size());
 
-    // Find the nearest unoccupied bed using CatBed helper
     CatBedInfo availableBed = CatBed.findNearestAvailableBed(beds, store, catPos);
     if (availableBed == null) {
       String catName = getCatDisplayName(catRef, store);
@@ -108,7 +105,6 @@ final class CatBedCommand extends CatCommand {
       return;
     }
 
-    // Send cat to bed
     String catName = getCatDisplayName(catRef, store);
     Vector3d bedPos = availableBed.getPosition();
     double distanceToBed = CatBed.distance(catPos, bedPos);
@@ -122,16 +118,13 @@ final class CatBedCommand extends CatCommand {
       return;
     }
 
-    // Set path to bed
     TransientPath path = new TransientPath();
     path.addWaypoint(new Vector3d(bedPos.x, bedPos.y + 0.5, bedPos.z), new Vector3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(path);
 
-    // Store bed target position for timeout-based teleport
     store.putComponent(
         catRef, CatBedTargetComponent.getComponentType(), new CatBedTargetComponent(bedPos));
 
-    // Set cat to going to bed state
     store.putComponent(
         catRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.GOING_TO_BED));
     npcEntity.getRole().getStateSupport().setState(catRef, "Pet", "GoingToBed", store);

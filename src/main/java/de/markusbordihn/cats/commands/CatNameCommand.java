@@ -69,12 +69,10 @@ final class CatNameCommand extends CatCommand {
       return;
     }
 
-    // Set Nameplate for nametag
     Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
     String formerCatName = nameplate.getText();
     nameplate.setText(catName);
 
-    // Update CatsDataResource
     CatsManager.getInstance().updateCatName(entityRef, catName, store);
 
     context.sendMessage(

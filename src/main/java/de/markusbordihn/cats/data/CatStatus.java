@@ -20,13 +20,25 @@
 package de.markusbordihn.cats.data;
 
 import com.hypixel.hytale.codec.codecs.EnumCodec;
+import java.util.Locale;
+import javax.annotation.Nonnull;
 
 public enum CatStatus {
   UNKNOWN,
   IDLE,
   SPAWNED,
-  DESPAWNED,
-  DEATH;
+  DESPAWNED;
 
   public static final EnumCodec<CatStatus> CODEC = new EnumCodec<>(CatStatus.class);
+
+  @Nonnull private final String translationKey;
+
+  CatStatus() {
+    this.translationKey = "cats.ui.status." + name().toLowerCase(Locale.ROOT);
+  }
+
+  @Nonnull
+  public String getTranslationKey() {
+    return translationKey;
+  }
 }

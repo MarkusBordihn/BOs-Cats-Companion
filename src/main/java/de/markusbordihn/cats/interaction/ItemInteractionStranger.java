@@ -57,6 +57,6 @@ public class ItemInteractionStranger {
       return InteractionFeeding.handle(entityRef, role, store, player, heldItem, false);
     }
 
-    return InteractionStranger.handle(entityRef, role, store, player);
+    return false;
   }
 }

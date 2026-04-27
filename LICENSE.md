@@ -1,9 +1,15 @@
 # License
 
-**The MIT License applies only to the source code in this repository.
-Images, models, textures, designs, and all other non-code assets are explicitly
-excluded from the MIT License unless stated otherwise.
-All rights to those assets are reserved by the author.**
+**The MIT License applies only to the source code contained in this repository.  
+All non-code assets are explicitly excluded from the MIT License unless stated otherwise in a
+separate file or section.  
+This exclusion includes, but is not limited to, textures, models, animations, sounds, music, voice
+lines, icons, logos, user interface artwork, promotional images, screenshots, videos, written lore,
+story content, and other creative assets.  
+All rights to these non-code assets remain with their respective authors.**
+
+**Project names, logos, and branding are also excluded from the MIT License unless explicitly stated
+otherwise.**
 
 ## MIT License
 

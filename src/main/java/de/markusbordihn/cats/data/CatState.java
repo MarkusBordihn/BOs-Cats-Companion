@@ -20,6 +20,8 @@
 package de.markusbordihn.cats.data;
 
 import com.hypixel.hytale.codec.codecs.EnumCodec;
+import java.util.Locale;
+import javax.annotation.Nonnull;
 
 public enum CatState {
   ATTACKING,
@@ -34,6 +36,17 @@ public enum CatState {
   WANDERING;
 
   public static final EnumCodec<CatState> CODEC = new EnumCodec<>(CatState.class);
+
+  @Nonnull private final String translationKey;
+
+  CatState() {
+    this.translationKey = "cats.ui.state." + name().toLowerCase(Locale.ROOT);
+  }
+
+  @Nonnull
+  public String getTranslationKey() {
+    return translationKey;
+  }
 
   public boolean isSleepingState() {
     return this == SLEEPING || this == GOING_TO_BED;

@@ -27,8 +27,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.entities.player.pages.CustomUIPage;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -46,6 +48,8 @@ import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.interaction.InteractionOwner;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,6 +94,13 @@ public final class CatActionWheelPage
   private final boolean hasBed;
   private final CatState currentState;
   private long openedAt;
+  private volatile boolean closed = false;
+  private ScheduledFuture<?> refreshFuture;
+  private Store<EntityStore> cachedStore;
+  private float lastRestNeed = -1f;
+  private float lastSocialNeed = -1f;
+  private float lastPlayNeed = -1f;
+  private CatState lastRefreshedState;
 
   public CatActionWheelPage(
       @Nonnull PlayerRef playerRef,
@@ -133,10 +144,24 @@ public final class CatActionWheelPage
     if (needValue > 70) {
       return needValue + " (!)";
     }
+
     if (needValue > 50) {
       return needValue + " (~)";
     }
+
     return String.valueOf(needValue);
+  }
+
+  public static void closeIfOpen(@Nonnull Player player) {
+    CustomUIPage currentPage = player.getPageManager().getCustomPage();
+    if (currentPage instanceof CatActionWheelPage page) {
+      page.close();
+    }
+  }
+
+  @Nonnull
+  private static Message resolveStateText(@Nonnull CatState state) {
+    return Message.translation(state.getTranslationKey());
   }
 
   @Override
@@ -150,10 +175,17 @@ public final class CatActionWheelPage
     commandBuilder.set(UI_WHEEL + ".Visible", true);
     commandBuilder.set(UI_TITLE + ".Text", getCatDisplayName(store));
     commandBuilder.set(UI_SUBTITLE + ".Text", resolveMoodText(store));
+    CatsManager catsManagerForUuid = CatsManager.getInstance();
+    if (catsManagerForUuid != null) {
+      UUID catUuid = catsManagerForUuid.getUuid(this.catRef, store);
+      if (catUuid != null) {
+        commandBuilder.set("#CatInfoPanelUuid.Text", catUuid.toString());
+      }
+    }
     commandBuilder.set(UI_STOP_LABEL + ".Text", Message.translation("cats.ui.wheel.stop"));
     commandBuilder.set(
         UI_STATUS_HEADER + ".Text", Message.translation("cats.ui.wheel.status_header"));
-    commandBuilder.set(UI_CENTER_TEXT + ".Text", resolveStateText());
+    commandBuilder.set(UI_CENTER_TEXT + ".Text", resolveStateText(this.currentState));
 
     buildCommandButtons(commandBuilder, eventBuilder);
     buildInfoPanel(commandBuilder, eventBuilder, store);
@@ -162,6 +194,9 @@ public final class CatActionWheelPage
         UI_CENTER_BUTTON,
         EventData.of(KEY_CMD, "stop"),
         false);
+    this.cachedStore = store;
+    this.lastRefreshedState = this.currentState;
+    scheduleRefresh(this.world);
   }
 
   @Override
@@ -236,12 +271,76 @@ public final class CatActionWheelPage
   }
 
   @Override
+  public void close() {
+    cleanupRefresh();
+    super.close();
+  }
+
+  @Override
   public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
+    cleanupRefresh();
     if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
       LOGGER.at(Level.WARNING).log(
           "[Cats] Action wheel for %s was dismissed within %dms of opening - "
               + "likely replaced by another mod (PageManager conflict).",
           playerRef, PAGE_CONFLICT_THRESHOLD_MS);
+    }
+  }
+
+  private void scheduleRefresh(@Nonnull World world) {
+    this.refreshFuture =
+        HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(
+            () -> world.execute(this::refreshWheelState), 2, 2, TimeUnit.SECONDS);
+  }
+
+  private void refreshWheelState() {
+    if (this.closed || this.cachedStore == null) {
+      return;
+    }
+
+    CatsManager catsManager = CatsManager.getInstance();
+    if (catsManager == null) {
+      return;
+    }
+
+    CatDataEntry catData = catsManager.getCatData(this.catRef, this.cachedStore);
+    if (catData == null) {
+      return;
+    }
+
+    float restNeed = catData.restNeed();
+    float socialNeed = catData.socialNeed();
+    float playNeed = catData.playNeed();
+    CatStateComponent stateComponent =
+        this.cachedStore.getComponent(this.catRef, CatStateComponent.getComponentType());
+    CatState currentState =
+        stateComponent != null ? stateComponent.getState() : this.lastRefreshedState;
+    boolean needsUpdate =
+        restNeed != this.lastRestNeed
+            || socialNeed != this.lastSocialNeed
+            || playNeed != this.lastPlayNeed
+            || currentState != this.lastRefreshedState;
+    if (!needsUpdate) {
+      return;
+    }
+
+    this.lastRestNeed = restNeed;
+    this.lastSocialNeed = socialNeed;
+    this.lastPlayNeed = playNeed;
+    this.lastRefreshedState = currentState;
+    UICommandBuilder updateBuilder = new UICommandBuilder();
+    updateBuilder.set(UI_CENTER_TEXT + ".Text", resolveStateText(currentState));
+    updateBuilder.set(UI_PANEL_NEEDS_REST + ".Text", formatNeedValue(restNeed));
+    updateBuilder.set(UI_PANEL_NEEDS_SOCIAL + ".Text", formatNeedValue(socialNeed));
+    updateBuilder.set(UI_PANEL_NEEDS_PLAY + ".Text", formatNeedValue(playNeed));
+    this.sendUpdate(updateBuilder, false);
+  }
+
+  private void cleanupRefresh() {
+    this.closed = true;
+    if (this.refreshFuture != null) {
+      this.refreshFuture.cancel(false);
+      this.refreshFuture = null;
     }
   }
 
@@ -297,22 +396,6 @@ public final class CatActionWheelPage
               ? Message.translation("cats.ui.wheel.slot.leave_bed")
               : Message.translation("cats.ui.wheel.slot.bed");
       default -> Message.raw("");
-    };
-  }
-
-  @Nonnull
-  private Message resolveStateText() {
-    return switch (this.currentState) {
-      case ATTACKING -> Message.translation("cats.ui.state.pouncing");
-      case FETCHING -> Message.translation("cats.ui.state.fetching");
-      case FOLLOWING -> Message.translation("cats.ui.state.following");
-      case GOING_TO_BED -> Message.translation("cats.ui.state.going_to_bed");
-      case PLAYING -> Message.translation("cats.ui.state.playing");
-      case SEARCHING -> Message.translation("cats.ui.state.searching");
-      case SITTING -> Message.translation("cats.ui.state.sitting");
-      case SLEEPING -> Message.translation("cats.ui.state.sleeping");
-      case WAITING -> Message.translation("cats.ui.state.waiting");
-      case WANDERING -> Message.translation("cats.ui.state.wandering");
     };
   }
 
@@ -390,6 +473,7 @@ public final class CatActionWheelPage
     if (type == null) {
       return "-";
     }
+
     String raw = type.name().toLowerCase().replace('_', ' ');
     return Character.toUpperCase(raw.charAt(0)) + raw.substring(1);
   }
@@ -400,6 +484,7 @@ public final class CatActionWheelPage
     if (catsManager == null) {
       return "";
     }
+
     String name = catsManager.getCatDisplayName(this.catRef, store);
     return name != null ? name : "Cat";
   }

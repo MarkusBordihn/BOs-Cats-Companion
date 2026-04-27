@@ -9,6 +9,7 @@ $Common.@PageOverlay {
         @Text = "Rename Cat";
       }
     }
+
     #Content {
       LayoutMode: Top;
       Label #CatNameInputSubtitle {
@@ -21,6 +22,7 @@ $Common.@PageOverlay {
           VerticalAlignment: Center
         );
       }
+
       TextField #CatNameInputField {
         Style: $Common.@DefaultInputFieldStyle;
         PlaceholderStyle: $Common.@DefaultInputFieldPlaceholderStyle;
@@ -30,6 +32,7 @@ $Common.@PageOverlay {
         PlaceholderText: "Cat name";
         MaxLength: 32;
       }
+
       Group {
         LayoutMode: Right;
         $Common.@SmallSecondaryTextButton #CatNameCancelButton {
@@ -37,9 +40,11 @@ $Common.@PageOverlay {
           @Text = "Cancel";
           @Anchor = (MinWidth: 128);
         }
+
         Group #CatNameButtonSpacer {
           Anchor: (Width: 12);
         }
+
         $Common.@SmallTertiaryTextButton #CatNameApplyButton {
           @Sounds = $Common.@ButtonSounds;
           @Text = "Apply";

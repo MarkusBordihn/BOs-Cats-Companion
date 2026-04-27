@@ -159,23 +159,21 @@ public class InteractionTaming {
       return;
     }
 
-    // Get player entity ref from the interaction target (non-deprecated path)
     Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
     if (playerEntityRef == null || !playerEntityRef.isValid()) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
       return;
     }
 
-    // Get PlayerRef as an ECS component (replaces deprecated Player.getPlayerRef())
     PlayerRef playerRef = store.getComponent(playerEntityRef, PlayerRef.getComponentType());
     if (playerRef == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - PlayerRef component is null");
       return;
     }
 
-    UUID playerUUID = playerRef.getUuid();
+    UUID playerUuid = playerRef.getUuid();
     String username = playerRef.getUsername();
-    if (playerUUID == null || username == null) {
+    if (playerUuid == null || username == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - UUID or username not found");
       return;
     }
@@ -189,7 +187,7 @@ public class InteractionTaming {
       return;
     }
 
-    int currentCatCount = catsManager.getCatCountByOwner(playerUUID, store);
+    int currentCatCount = catsManager.getCatCountByOwner(playerUuid, store);
     int catLimit = getCatLimit(player);
     if (catLimit >= 0 && currentCatCount >= catLimit) {
       player.sendMessage(
@@ -212,9 +210,8 @@ public class InteractionTaming {
     }
 
     String catName = CatsNamesManager.getRandomName();
-    catsManager.assignOwner(entityRef, playerUUID, username, catName, "Taming", store);
+    catsManager.assignOwner(entityRef, playerUuid, username, catName, "Taming", store);
 
-    // Change role from Wild to Tamed
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity != null) {
       try {
@@ -239,7 +236,6 @@ public class InteractionTaming {
                 null,
                 store);
 
-            // Clear spawn configuration to prevent the engine's despawn system.
             npcEntity.setSpawnConfiguration(Integer.MIN_VALUE);
             npcEntity.updateSpawnTrackingState(false);
 
@@ -253,7 +249,6 @@ public class InteractionTaming {
       }
     }
 
-    // Open taming popup
     CatDataEntry catData = catsManager.getCatData(entityRef, store);
     CatTamingSuccessPage successPage =
         new CatTamingSuccessPage(
@@ -268,7 +263,6 @@ public class InteractionTaming {
             catData != null ? catData.happiness() : 40);
     player.getPageManager().openCustomPage(playerEntityRef, store, successPage);
 
-    // Send chat messages (as backup)
     player.sendMessage(
         Message.translation("cats.interactions.taming.success")
             .param("item", itemName)

@@ -33,6 +33,7 @@ import com.hypixel.hytale.server.npc.instructions.Sensor;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 
@@ -54,7 +55,7 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Returns true if the currently iterating player in InteractionInstruction matches the cat's owner UUID";
+    return "Returns true if the current InteractionInstruction player matches the cat owner UUID.";
   }
 
   @Nonnull
@@ -84,7 +85,6 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
         return false;
       }
 
-      // Get the currently iterated player from the InteractionInstruction
       Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
       if (playerRef == null) {
         return false;
@@ -106,8 +106,28 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
         return false;
       }
 
-      UUID playerUUID = playerRefComponent.getUuid();
-      return ownerComponent.getOwnerUUID().equals(playerUUID);
+      UUID playerUuid = playerRefComponent.getUuid();
+      if (playerUuid == null) {
+        return false;
+      }
+
+      UUID ownerUuid = ownerComponent.getOwnerUUID();
+      if (ownerUuid == null) {
+        String ownerName = ownerComponent.getOwnerName();
+        if (ownerName == null || !ownerName.equals(playerRefComponent.getUsername())) {
+          return false;
+        }
+
+        ownerComponent.setOwnerId(playerUuid);
+        store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
+        CatsManager catsManager = CatsManager.getInstance();
+        if (catsManager != null) {
+          catsManager.registerOwner(entityRef, playerUuid, store);
+        }
+        return true;
+      }
+
+      return ownerUuid.equals(playerUuid);
     }
 
     @Override

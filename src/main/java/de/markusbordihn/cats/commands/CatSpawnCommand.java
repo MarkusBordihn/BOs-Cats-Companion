@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -94,26 +95,24 @@ final class CatSpawnCommand extends CatCommand {
         boolean isInWorld = catRef != null;
         boolean isAlive = isInWorld && catsManager.isCatAliveInWorld(cat.uuid(), store);
 
-        if (isInWorld && isAlive && matchesFilter(cat, filterLower)) {
-          if (catRef.isValid()) {
-            TransformComponent catTransform =
-                store.getComponent(catRef, TransformComponent.getComponentType());
-            if (catTransform != null) {
-              Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
-              if (playerRef != null && playerRef.isValid()) {
-                TransformComponent playerTransform =
-                    store.getComponent(playerRef, TransformComponent.getComponentType());
-                if (playerTransform != null) {
-                  Vector3d playerPos = playerTransform.getPosition();
-                  catTransform.setPosition(playerPos);
+        if (isInWorld && isAlive && matchesFilter(cat, filterLower) && catRef.isValid()) {
+          TransformComponent catTransform =
+              store.getComponent(catRef, TransformComponent.getComponentType());
+          if (catTransform != null) {
+            Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
+            if (playerRef != null && playerRef.isValid()) {
+              TransformComponent playerTransform =
+                  store.getComponent(playerRef, TransformComponent.getComponentType());
+              if (playerTransform != null) {
+                Vector3d playerPos = playerTransform.getPosition();
+                catTransform.setPosition(playerPos);
 
-                  String catName = cat.name() != null ? cat.name() : "Cat";
-                  context.sendMessage(
-                      Message.translation("cats.commands.spawn.teleported")
-                          .param("name", catName)
-                          .color(Constants.COLOR_SUCCESS));
-                  return;
-                }
+                String catName = cat.name() != null ? cat.name() : "Cat";
+                context.sendMessage(
+                    Message.translation("cats.commands.spawn.teleported")
+                        .param("name", catName)
+                        .color(Constants.COLOR_SUCCESS));
+                return;
               }
             }
           }
@@ -235,7 +234,7 @@ final class CatSpawnCommand extends CatCommand {
       String roleName = catData.catType().getRoleName();
       int roleIndex = npcPlugin.getIndex(roleName);
       if (roleIndex < 0) {
-        LOGGER.at(Level.WARNING).log("Cannot spawn cat: Role '" + roleName + "' not found");
+        LOGGER.at(Level.WARNING).log("Cannot spawn cat: Role '%s' not found", roleName);
         return false;
       }
 
@@ -251,29 +250,21 @@ final class CatSpawnCommand extends CatCommand {
 
       Ref<EntityStore> catRef = spawnResult.left();
 
-      // Update UUID, if needed
       UUID newEntityUuid = catsManager.getUuid(catRef, store);
       if (newEntityUuid != null && !newEntityUuid.equals(catData.uuid())) {
         catsManager.updateCatUuid(catData.uuid(), newEntityUuid, store);
       }
 
-      // Set owner
       if (catData.ownerUuid() != null) {
         CatOwnerComponent ownerComponent =
             new CatOwnerComponent(catData.ownerUuid(), catData.ownerName());
         store.putComponent(catRef, CatOwnerComponent.getComponentType(), ownerComponent);
       }
 
-      // Set name in Nameplate
       if (catData.name() != null && !catData.name().isEmpty()) {
-        store
-            .ensureAndGetComponent(
-                catRef,
-                com.hypixel.hytale.server.core.entity.nameplate.Nameplate.getComponentType())
-            .setText(catData.name());
+        store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catData.name());
       }
 
-      // Set state
       if (catData.state() != null) {
         CatStateComponent stateComponent = new CatStateComponent(catData.state());
         store.putComponent(catRef, CatStateComponent.getComponentType(), stateComponent);
@@ -281,7 +272,7 @@ final class CatSpawnCommand extends CatCommand {
 
       return true;
     } catch (Exception e) {
-      LOGGER.at(Level.WARNING).withCause(e).log("Failed to spawn cat: " + catData.name());
+      LOGGER.at(Level.WARNING).withCause(e).log("Failed to spawn cat: %s", catData.name());
       return false;
     }
   }

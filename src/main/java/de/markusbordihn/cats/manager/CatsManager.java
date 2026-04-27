@@ -153,6 +153,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       catRefCache.put(entityUuid, resolved);
       return resolved;
     }
+
     return null;
   }
 
@@ -194,16 +195,15 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
   }
 
-  public void unregisterOwner(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+  public void removeCatData(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     UUID catUuid = getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
 
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
-    CatDataEntry catDataEntry = resource.getCat(catUuid);
-    if (catDataEntry != null) {
-      resource.updateCat(catUuid, catDataEntry.withOwner(null, null));
+    if (resource != null) {
+      resource.removeCat(catUuid);
     }
   }
 
@@ -354,6 +354,7 @@ public class CatsManager extends RefSystem<EntityStore> {
         return name;
       }
     }
+
     return null;
   }
 
@@ -408,6 +409,10 @@ public class CatsManager extends RefSystem<EntityStore> {
       if (catData != null) {
         resource.removeCat(oldUuid);
         resource.addCat(catData.withUuid(newUuid).withStatus(CatStatus.SPAWNED));
+        Ref<EntityStore> oldRef = catRefCache.remove(oldUuid);
+        if (oldRef != null) {
+          catRefCache.put(newUuid, oldRef);
+        }
       }
     }
   }
@@ -419,6 +424,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       Vector3d pos = transform.getPosition();
       return new Vector3i((int) pos.x, (int) pos.y, (int) pos.z);
     }
+
     return null;
   }
 
@@ -465,20 +471,11 @@ public class CatsManager extends RefSystem<EntityStore> {
     LOGGER.at(Level.INFO).log("Assigned personality %s/%s to cat %s", primary, secondary, catUuid);
   }
 
-  public void adjustHappiness(
-      @Nonnull Ref<EntityStore> catRef, int delta, @Nonnull Store<EntityStore> store) {
-    happinessManager.adjustHappiness(catRef, delta, store);
-  }
-
   public int boostHappiness(
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull HappinessSource source,
       @Nonnull Store<EntityStore> store) {
     return happinessManager.boostHappiness(catRef, source, store);
-  }
-
-  public int getHappiness(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return happinessManager.getHappiness(catRef, store);
   }
 
   @Nonnull
@@ -503,12 +500,6 @@ public class CatsManager extends RefSystem<EntityStore> {
   public CatNeedType getCriticalNeed(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     return needsManager.getCriticalNeed(catRef, store);
-  }
-
-  @Nonnull
-  public CatNeedType getHighestNeed(
-      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return needsManager.getHighestNeed(catRef, store);
   }
 
   @Nullable

@@ -32,8 +32,10 @@ import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import de.markusbordihn.cats.permission.PermissionManager;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -79,13 +81,27 @@ public abstract class CatCommand extends AbstractWorldCommand {
       return true;
     }
 
+    UUID executingPlayerUuid = getExecutingPlayerUuid(context);
     String executingPlayer = getExecutingPlayerName(context);
-    if (executingPlayer == null) {
+    if (executingPlayerUuid == null && executingPlayer == null) {
+      return true;
+    }
+
+    UUID ownerUuid = ownerComponent.getOwnerUUID();
+    if (ownerUuid != null && ownerUuid.equals(executingPlayerUuid)) {
       return true;
     }
 
     String ownerName = ownerComponent.getOwnerName();
-    if (ownerName != null && ownerName.equals(executingPlayer)) {
+    if (ownerUuid == null && ownerName != null && ownerName.equals(executingPlayer)) {
+      if (executingPlayerUuid != null) {
+        ownerComponent.setOwnerId(executingPlayerUuid);
+        store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
+        CatsManager catsManager = CatsManager.getInstance();
+        if (catsManager != null) {
+          catsManager.registerOwner(entityRef, executingPlayerUuid, store);
+        }
+      }
       return true;
     }
 
@@ -96,8 +112,8 @@ public abstract class CatCommand extends AbstractWorldCommand {
     }
 
     LOGGER.at(Level.WARNING).log(
-        "SECURITY: Player '%s' attempted to access cat owned by '%s' (Cat UUID: %s)",
-        executingPlayer, ownerName, catUuid);
+        "SECURITY: Player '%s' (%s) attempted to access cat owned by '%s' (%s) (Cat UUID: %s)",
+        executingPlayer, executingPlayerUuid, ownerName, ownerUuid, catUuid);
 
     String catName = getCatDisplayName(entityRef, store);
     context.sendMessage(
@@ -113,7 +129,17 @@ public abstract class CatCommand extends AbstractWorldCommand {
     if (!context.isPlayer()) {
       return null;
     }
+
     return context.sender().getDisplayName();
+  }
+
+  @Nullable
+  protected UUID getExecutingPlayerUuid(@Nonnull CommandContext context) {
+    if (!context.isPlayer()) {
+      return null;
+    }
+
+    return context.sender().getUuid();
   }
 
   @Nonnull

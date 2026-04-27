@@ -35,6 +35,7 @@ import com.hypixel.hytale.server.npc.sensorinfo.EntityPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.IPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 
 public abstract class BuilderActionCatInteractionBase extends BuilderActionBase {
@@ -75,7 +76,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       return ownerComponent != null && ownerComponent.hasOwner();
     }
 
-    protected java.util.UUID getPlayerUUID(Role role, Store<EntityStore> store) {
+    protected UUID getPlayerUUID(Role role, Store<EntityStore> store) {
       if (role == null || role.getStateSupport() == null) {
         return null;
       }
@@ -128,13 +129,8 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       return activeItem;
     }
 
-    protected String getHeldItemName(Player player) {
-      ItemStack item = getHeldItem(player);
-      return item != null ? item.getItemId() : null;
-    }
-
     protected boolean isOwner(
-        Ref<EntityStore> entityRef, java.util.UUID playerUuid, Store<EntityStore> store) {
+        Ref<EntityStore> entityRef, UUID playerUuid, Store<EntityStore> store) {
       if (playerUuid == null) {
         return false;
       }

@@ -25,6 +25,7 @@ import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.plugin.event.PluginSetupEvent;
@@ -57,6 +58,7 @@ import de.markusbordihn.cats.permission.PermissionManager;
 import de.markusbordihn.cats.spawn.CatSpawnConfigSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
+import de.markusbordihn.cats.ui.CatBedSpawnPage;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.logging.Level;
 
@@ -194,6 +196,8 @@ public class Cats extends JavaPlugin {
             CatSpawnConfigSystem::onWorldNPCSpawnsLoaded);
     getEventRegistry()
         .registerGlobal(PlayerInteractEvent.class, CatCarrierInteraction::onPlayerInteract);
+    OpenCustomUIInteraction.registerSimple(
+        this, CatBedSpawnPage.class, "CatBedSpawn", CatBedSpawnPage::new);
   }
 
   @Override

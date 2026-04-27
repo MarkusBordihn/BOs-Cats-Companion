@@ -7,6 +7,12 @@
   "Appearance": {
     "Compute": "Appearance"
   },
+  "ApplySeparation": true,
+  "SeparationDistance": 1,
+  "SeparationWeight": 0.7,
+  "SeparationDistanceTarget": 0.5,
+  "SeparationNearRadiusTarget": 1,
+  "SeparationFarRadiusTarget": 7,
   "MotionControllerList": [
     {
       "Type": "Walk",
@@ -990,210 +996,55 @@
                   ]
                 },
                 {
-                  "$Comment": "Active personality: high activityWeight cats follow faster with shorter pauses",
+                  "$Comment": "Follow owner with stable seek rules based on the Amigo companion pattern",
                   "Sensor": {
-                    "Type": "CatPersonalityWeight",
-                    "Weight": "activity",
-                    "Threshold": 0.65
+                    "Type": "CatsOwnerPlayer",
+                    "Range": 50,
+                    "LockOnTarget": true
                   },
                   "Instructions": [
                     {
                       "Sensor": {
-                        "Type": "CatsOwnerPlayer",
-                        "Range": 18,
-                        "LockOnTarget": true
+                        "Type": "Target",
+                        "TargetSlot": "LockedTarget",
+                        "Range": 12
                       },
-                      "Instructions": [
+                      "Actions": [
                         {
-                          "Sensor": {
-                            "Type": "Target",
-                            "TargetSlot": "LockedTarget",
-                            "Range": 18
-                          },
-                          "Actions": [
-                            {
-                              "Type": "PlayAnimation",
-                              "Animation": "Idle",
-                              "Slot": "Action"
-                            }
-                          ],
-                          "BodyMotion": {
-                            "Type": "Sequence",
-                            "Looped": true,
-                            "Motions": [
-                              {
-                                "Type": "Timer",
-                                "Time": [2, 4],
-                                "Motion": {
-                                  "Type": "Seek",
-                                  "SlowDownDistance": 5,
-                                  "StopDistance": 2,
-                                  "RelativeSpeed": 1.1
-                                }
-                              },
-                              {
-                                "Type": "Timer",
-                                "Time": [0.3, 1.0],
-                                "Motion": {
-                                  "Type": "Nothing"
-                                }
-                              }
-                            ]
-                          }
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
                         }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "Sensor": {
-                    "Type": "Any"
-                  },
-                  "Type": "Random",
-                  "ExecuteFor": [60, 120],
-                  "Instructions": [
-                    {
-                      "Weight": 40,
-                      "Sensor": {
-                        "Type": "CatsOwnerPlayer",
-                        "Range": 18,
-                        "LockOnTarget": true
-                      },
-                      "Instructions": [
-                        {
-                          "Sensor": {
-                            "Type": "Target",
-                            "TargetSlot": "LockedTarget",
-                            "Range": 18
-                          },
-                          "Actions": [
-                            {
-                              "Type": "PlayAnimation",
-                              "Animation": "Idle",
-                              "Slot": "Action"
-                            }
-                          ],
-                          "BodyMotion": {
-                            "Type": "Sequence",
-                            "Looped": true,
-                            "Motions": [
-                              {
-                                "Type": "Timer",
-                                "Time": [4, 6],
-                                "Motion": {
-                                  "Type": "Seek",
-                                  "SlowDownDistance": 5,
-                                  "StopDistance": 3,
-                                  "RelativeSpeed": 0.8
-                                }
-                              },
-                              {
-                                "Type": "Timer",
-                                "Time": [0.5, 1.5],
-                                "Motion": {
-                                  "Type": "Nothing"
-                                }
-                              }
-                            ]
-                          }
-                        }
-                      ]
+                      ],
+                      "BodyMotion": {
+                        "Type": "Seek",
+                        "SlowDownDistance": 9,
+                        "StopDistance": 5,
+                        "RelativeSpeed": 0.65,
+                        "RelaxedMoveConstraints": true
+                      }
                     },
                     {
-                      "Weight": 60,
                       "Sensor": {
-                        "Type": "CatsOwnerPlayer",
-                        "Range": 18,
-                        "LockOnTarget": true
+                        "Type": "Target",
+                        "TargetSlot": "LockedTarget"
                       },
-                      "Instructions": [
+                      "Actions": [
                         {
-                          "Sensor": {
-                            "Type": "Target",
-                            "TargetSlot": "LockedTarget",
-                            "Range": 18
-                          },
-                          "Actions": [
-                            {
-                              "Type": "PlayAnimation",
-                              "Animation": "Idle",
-                              "Slot": "Action"
-                            }
-                          ],
-                          "BodyMotion": {
-                            "Type": "Seek",
-                            "SlowDownDistance": 5,
-                            "StopDistance": 3,
-                            "RelativeSpeed": 0.8
-                          }
+                          "Type": "PlayAnimation",
+                          "Animation": "Idle",
+                          "Slot": "Action"
                         }
-                      ]
+                      ],
+                      "BodyMotion": {
+                        "Type": "Seek",
+                        "SlowDownDistance": 7,
+                        "StopDistance": 3,
+                        "RelativeSpeed": 1.0,
+                        "RelaxedMoveConstraints": true
+                      }
                     }
                   ]
-                },
-                {
-                  "$Comment": "Lazy personality: high restWeight cats follow slower with longer pauses",
-                  "Sensor": {
-                    "Type": "CatPersonalityWeight",
-                    "Weight": "rest",
-                    "Threshold": 0.65
-                  },
-                  "Instructions": [
-                    {
-                      "Sensor": {
-                        "Type": "CatsOwnerPlayer",
-                        "Range": 18,
-                        "LockOnTarget": true
-                      },
-                      "Instructions": [
-                        {
-                          "Sensor": {
-                            "Type": "Target",
-                            "TargetSlot": "LockedTarget",
-                            "Range": 18
-                          },
-                          "Actions": [
-                            {
-                              "Type": "PlayAnimation",
-                              "Animation": "Idle",
-                              "Slot": "Action"
-                            }
-                          ],
-                          "BodyMotion": {
-                            "Type": "Sequence",
-                            "Looped": true,
-                            "Motions": [
-                              {
-                                "Type": "Timer",
-                                "Time": [6, 10],
-                                "Motion": {
-                                  "Type": "Seek",
-                                  "SlowDownDistance": 5,
-                                  "StopDistance": 4,
-                                  "RelativeSpeed": 0.5
-                                }
-                              },
-                              {
-                                "Type": "Timer",
-                                "Time": [2, 4],
-                                "Motion": {
-                                  "Type": "Nothing"
-                                }
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "Sensor": {
-                    "Type": "Target"
-                  },
-                  "BodyMotion": {
-                    "Type": "Teleport"
-                  }
                 },
                 {
                   "$Comment": "Fallback: owner not found - wander briefly then retry follow",

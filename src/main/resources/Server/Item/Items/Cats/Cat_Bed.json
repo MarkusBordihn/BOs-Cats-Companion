@@ -33,10 +33,6 @@
       }
     ]
   },
-  "Interactions": {
-    "Primary": "Block_Primary",
-    "Secondary": "Block_Secondary"
-  },
   "BlockType": {
     "Material": "Solid",
     "DrawType": "Model",
@@ -68,6 +64,17 @@
     },
     "ParticleColor": "#8B4513",
     "BlockSoundSetId": "Wood",
+    "InteractionHint": "server.interactionHints.cats.cat_bed",
+    "Interactions": {
+      "Use": {
+        "Interactions": [
+          {
+            "Type": "OpenCustomUI",
+            "Page": {"Id": "CatBedSpawn"}
+          }
+        ]
+      }
+    },
     "BlockEntity": {}
   },
   "PlayerAnimationsId": "Block",

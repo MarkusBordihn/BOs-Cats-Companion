@@ -1,69 +1,73 @@
-# Action Wheel
-wheel.status_header=Status:
-wheel.stop=STOP
-
-# Action Wheel Slot Labels
-wheel.slot.follow=Follow
-wheel.slot.stop=Stop
-wheel.slot.pet=Pet
-wheel.slot.play=Play
-wheel.slot.sleep=Sleep
-wheel.slot.wakeup=Wake Up
-wheel.slot.wander=Wander
-wheel.slot.return=Return
-wheel.slot.bed=Go to Bed
-wheel.slot.bed_unavailable=No Bed Available
-wheel.slot.leave_bed=Leave Bed
-wheel.slot.rename=Rename
-
-# Cat States
-state.following=Following
-state.sitting=Sitting
-state.sleeping=Sleeping
-state.playing=Playing
-state.wandering=Wandering
-state.going_to_bed=Going to Bed
-state.waiting=Waiting
-state.pouncing=Pouncing
-state.fetching=Fetching
-state.searching=Searching
-
-# Happiness / Mood
-mood.miserable=Miserable
-mood.sad=Sad
-mood.neutral=Neutral
-mood.happy=Happy
+bed_spawn.already_spawned=This cat is already in the world.
+bed_spawn.call_button=Call
+bed_spawn.call_success={catName} is on the way to the bed!
+bed_spawn.close=Close
+bed_spawn.empty_button=Empty Bed
+bed_spawn.empty_success=The bed has been cleared.
+bed_spawn.error=An error occurred.
+bed_spawn.no_bed_found=No cat bed found nearby.
+bed_spawn.no_cats=You don't have any cats yet.
+bed_spawn.not_owner=You can only manage your own cats.
+bed_spawn.spawn_button=Spawn
+bed_spawn.spawn_success={catName} is on the way to the bed!
+bed_spawn.subtitle=Select a cat to assign to this bed.
+bed_spawn.title=Cat Bed
+bed_spawn.wake_up_button=Wake Up
 mood.ecstatic=Ecstatic
-
-# Mood hints (contextual advice for extreme states)
+mood.happy=Happy
+mood.hint.ecstatic=Your cat is absolutely thriving!
 mood.hint.miserable=Your cat is miserable - show it some love!
 mood.hint.sad=Your cat seems sad - try petting or a treat.
-mood.hint.ecstatic=Your cat is absolutely thriving!
-
-# Name Input
-name_input.title=Rename Cat
-name_input.subtitle=Enter a name and click Apply.
-name_input.placeholder=Enter cat name
+mood.miserable=Miserable
+mood.neutral=Neutral
+mood.sad=Sad
 name_input.apply=Apply
 name_input.cancel=Cancel
-
-# Taming Success
+name_input.placeholder=Enter cat name
+name_input.subtitle=Enter a name and click Apply.
+name_input.title=Rename Cat
+panel.gifts=Gifts:
+panel.needs.play=Play:
+panel.needs.rest=Rest:
+panel.needs.social=Social:
+panel.needs=Needs:
+panel.personality.none=Unknown
+panel.personality=Personality:
+panel.rename=Rename
+panel.secondary=Secondary:
+state.attacking=Pouncing
+state.fetching=Fetching
+state.following=Following
+state.going_to_bed=Going to Bed
+state.playing=Playing
+state.searching=Searching
+state.sitting=Sitting
+state.sleeping=Sleeping
+state.waiting=Waiting
+state.wandering=Wandering
+status.despawned=Despawned
+status.idle=Idle
+status.spawned=Spawned
+status.unknown=Unknown
+taming_success.confirm=Confirm
 taming_success.congratulations=Congratulations!
-taming_success.title=You tamed a cat!
 taming_success.name_label=Give your cat a name:
 taming_success.placeholder=Cat name
-taming_success.confirm=Confirm
 taming_success.tip1=Press F with an empty hand to open the action wheel
 taming_success.tip2=Press F while holding food to feed and heal your cat
 taming_success.tip3=Use /cat for commands like sit, follow, sleep and more
-
-# Info Panel
-panel.personality=Personality:
-panel.secondary=Secondary:
-panel.gifts=Gifts:
-panel.rename=Rename
-panel.personality.none=Unknown
-panel.needs=Needs:
-panel.needs.rest=Rest:
-panel.needs.social=Social:
-panel.needs.play=Play:
+taming_success.title=You tamed a cat!
+wheel.slot.bed_unavailable=No Bed Available
+wheel.slot.bed=Go to Bed
+wheel.slot.follow=Follow
+wheel.slot.leave_bed=Leave Bed
+wheel.slot.pet=Pet
+wheel.slot.play=Play
+wheel.slot.rename=Rename
+wheel.slot.return=Return
+wheel.slot.sleep=Sleep
+wheel.slot.stop=Stop
+wheel.slot.wakeup=Wake Up
+wheel.slot.wander=Wander
+wheel.status_header=Status:
+wheel.stop=STOP

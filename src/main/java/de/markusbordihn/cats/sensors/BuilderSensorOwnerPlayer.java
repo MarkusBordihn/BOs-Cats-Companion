@@ -32,9 +32,9 @@ import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
 import com.hypixel.hytale.server.npc.role.Role;
-import com.hypixel.hytale.server.npc.role.support.MarkedEntitySupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
+import de.markusbordihn.cats.manager.CatsManager;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
@@ -42,6 +42,7 @@ import javax.annotation.Nonnull;
 public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
 
   public static final String SENSOR_ID = "CatsOwnerPlayer";
+  private static final String OWNER_TARGET_SLOT = "LockedTarget";
 
   private final FloatHolder range = new FloatHolder();
   private final BooleanHolder lockOnTarget = new BooleanHolder();
@@ -135,12 +136,17 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
         return false;
       }
 
-      UUID ownerUUID = ownerComponent.getOwnerUUID();
-      if (ownerUUID == null) {
-        return false;
+      UUID ownerUuid = ownerComponent.getOwnerUUID();
+      String ownerName = ownerComponent.getOwnerName();
+      if (ownerUuid == null) {
+        ownerUuid = resolveLegacyOwnerUuid(entityRef, ownerComponent, ownerName, role, store);
+        if (ownerUuid == null) {
+          return false;
+        }
       }
 
       AtomicReference<Ref<EntityStore>> foundOwner = new AtomicReference<>(null);
+      UUID resolvedOwnerUuid = ownerUuid;
       role.getPositionCache()
           .processPlayersInRange(
               entityRef,
@@ -152,10 +158,12 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
               (sensorOwnerPlayer, playerRef, lambdaRole, playerStore) -> {
                 PlayerRef playerRefComponent =
                     playerStore.getComponent(playerRef, PlayerRef.getComponentType());
-                if (playerRefComponent != null && ownerUUID.equals(playerRefComponent.getUuid())) {
+                if (playerRefComponent != null
+                    && resolvedOwnerUuid.equals(playerRefComponent.getUuid())) {
                   foundOwner.set(playerRef);
                   return true;
                 }
+
                 return false;
               },
               this,
@@ -168,15 +176,67 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
       }
 
       if (this.lockOnTarget) {
-        role.getMarkedEntitySupport()
-            .setMarkedEntity(MarkedEntitySupport.DEFAULT_TARGET_SLOT, ownerRef);
+        role.getMarkedEntitySupport().setMarkedEntity(OWNER_TARGET_SLOT, ownerRef);
       }
+
       return true;
     }
 
     @Override
     public InfoProvider getSensorInfo() {
       return null;
+    }
+
+    private UUID resolveLegacyOwnerUuid(
+        @Nonnull Ref<EntityStore> entityRef,
+        @Nonnull CatOwnerComponent ownerComponent,
+        String ownerName,
+        @Nonnull Role role,
+        @Nonnull Store<EntityStore> store) {
+      if (ownerName == null || ownerName.isBlank()) {
+        return null;
+      }
+
+      AtomicReference<UUID> matchedOwnerUuid = new AtomicReference<>(null);
+      role.getPositionCache()
+          .processPlayersInRange(
+              entityRef,
+              0,
+              this.range,
+              false,
+              null,
+              role,
+              (sensorOwnerPlayer, playerRef, lambdaRole, playerStore) -> {
+                PlayerRef playerRefComponent =
+                    playerStore.getComponent(playerRef, PlayerRef.getComponentType());
+                if (playerRefComponent == null || playerRefComponent.getUuid() == null) {
+                  return false;
+                }
+
+                if (ownerName.equals(playerRefComponent.getUsername())) {
+                  matchedOwnerUuid.set(playerRefComponent.getUuid());
+                  return true;
+                }
+
+                return false;
+              },
+              this,
+              store,
+              store);
+
+      UUID matchedUuid = matchedOwnerUuid.get();
+      if (matchedUuid == null) {
+        return null;
+      }
+
+      ownerComponent.setOwnerId(matchedUuid);
+      store.putComponent(entityRef, CatOwnerComponent.getComponentType(), ownerComponent);
+
+      CatsManager catsManager = CatsManager.getInstance();
+      if (catsManager != null) {
+        catsManager.registerOwner(entityRef, matchedUuid, store);
+      }
+      return matchedUuid;
     }
   }
 }

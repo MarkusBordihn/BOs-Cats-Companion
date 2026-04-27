@@ -125,7 +125,10 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
         role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
       }
 
-      store.removeComponent(entityRef, CatBedTargetComponent.getComponentType());
+      var bedTargetType = CatBedTargetComponent.getComponentType();
+      if (bedTargetType != null && store.getComponent(entityRef, bedTargetType) != null) {
+        store.removeComponent(entityRef, bedTargetType);
+      }
       return true;
     }
   }
