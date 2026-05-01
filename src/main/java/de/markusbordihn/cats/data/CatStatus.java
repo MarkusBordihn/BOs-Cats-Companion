@@ -27,7 +27,8 @@ public enum CatStatus {
   UNKNOWN,
   IDLE,
   SPAWNED,
-  DESPAWNED;
+  DESPAWNED,
+  IN_CARRIER;
 
   public static final EnumCodec<CatStatus> CODEC = new EnumCodec<>(CatStatus.class);
 

@@ -1,4 +1,5 @@
 carrier.already_occupied=Transportbox belegt: {catName} (UUID: {catUuid}). Rechtsklick auf den Boden zum Freilassen.
+carrier.busy=Die Katze wird gerade noch verstaut. Bitte versuche das Freilassen gleich noch einmal.
 carrier.captured={catName} (UUID: {catUuid}) ist in der Transportbox.
 carrier.cat_already_in_world={catName} ist bereits in der Welt! Nutze das Katzenbett um die Katze zu rufen oder zu spawnen. Die Transportbox wurde zurückgesetzt.
 carrier.empty=Transportbox leer. Bei gezähmter Katze benutzen.

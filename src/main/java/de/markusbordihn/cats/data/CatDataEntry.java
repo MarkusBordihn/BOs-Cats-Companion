@@ -231,6 +231,10 @@ public record CatDataEntry(
     return status == CatStatus.SPAWNED;
   }
 
+  public boolean isInCarrier() {
+    return status == CatStatus.IN_CARRIER;
+  }
+
   @Nonnull
   public String displayName() {
     return name != null && !name.isEmpty() ? name : catType.toString();

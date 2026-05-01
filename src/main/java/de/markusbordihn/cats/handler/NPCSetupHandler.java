@@ -26,6 +26,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderFactory;
 import com.hypixel.hytale.server.npc.instructions.Action;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
 import de.markusbordihn.cats.actions.BuilderActionCatFetchYarnBall;
+import de.markusbordihn.cats.actions.BuilderActionCatGiftHint;
 import de.markusbordihn.cats.actions.BuilderActionCatGoToBed;
 import de.markusbordihn.cats.actions.BuilderActionCatIdleChoice;
 import de.markusbordihn.cats.actions.BuilderActionCatInteractionBase;
@@ -165,6 +166,14 @@ public class NPCSetupHandler {
     } catch (Exception e) {
       LOGGER.at(Level.SEVERE).log(
           "Failed to register action: %s", BuilderActionCatMoodParticles.BUILDER_ID, e);
+    }
+
+    try {
+      actionFactory.add(BuilderActionCatGiftHint.BUILDER_ID, BuilderActionCatGiftHint::new);
+      LOGGER.at(Level.INFO).log("Registered action: %s", BuilderActionCatGiftHint.BUILDER_ID);
+    } catch (Exception e) {
+      LOGGER.at(Level.SEVERE).log(
+          "Failed to register action: %s", BuilderActionCatGiftHint.BUILDER_ID, e);
     }
 
     try {

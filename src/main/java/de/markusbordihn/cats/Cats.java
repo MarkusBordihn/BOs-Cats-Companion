@@ -43,6 +43,7 @@ import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
 import de.markusbordihn.cats.component.CatTargetComponent;
+import de.markusbordihn.cats.component.CatYarnBallProjectileComponent;
 import de.markusbordihn.cats.config.GeneralConfig;
 import de.markusbordihn.cats.config.ProtectionConfig;
 import de.markusbordihn.cats.config.SpawnConfig;
@@ -50,6 +51,7 @@ import de.markusbordihn.cats.handler.DamageSetupHandler;
 import de.markusbordihn.cats.handler.NPCSetupHandler;
 import de.markusbordihn.cats.interaction.CatCarrierInteraction;
 import de.markusbordihn.cats.interaction.CatYarnBallFetchInteraction;
+import de.markusbordihn.cats.interaction.CatYarnBallSpawnInteraction;
 import de.markusbordihn.cats.interaction.CatYarnBallThrowInteraction;
 import de.markusbordihn.cats.interaction.UseCatCarrierInteraction;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -58,6 +60,7 @@ import de.markusbordihn.cats.permission.PermissionManager;
 import de.markusbordihn.cats.spawn.CatSpawnConfigSystem;
 import de.markusbordihn.cats.system.CatStateSyncSystem;
 import de.markusbordihn.cats.system.CatStateSystem;
+import de.markusbordihn.cats.system.CatYarnBallProjectileFallbackSystem;
 import de.markusbordihn.cats.ui.CatBedSpawnPage;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.logging.Level;
@@ -76,6 +79,8 @@ public class Cats extends JavaPlugin {
   public ComponentType<EntityStore, CatTamingProgressComponent> catTamingProgressComponentType;
   public ComponentType<EntityStore, CatMoodComponent> catMoodComponentType;
   public ComponentType<EntityStore, CatNeedsComponent> catNeedsComponentType;
+  public ComponentType<EntityStore, CatYarnBallProjectileComponent>
+      catYarnBallProjectileComponentType;
   public ResourceType<EntityStore, CatsDataResource> catsDataResourceType;
   private CatCommands catCommands;
 
@@ -134,6 +139,12 @@ public class Cats extends JavaPlugin {
         getEntityStoreRegistry()
             .registerComponent(
                 CatNeedsComponent.class, CatNeedsComponent.ID, CatNeedsComponent.CODEC);
+    catYarnBallProjectileComponentType =
+        getEntityStoreRegistry()
+            .registerComponent(
+                CatYarnBallProjectileComponent.class,
+                CatYarnBallProjectileComponent.ID,
+                CatYarnBallProjectileComponent.CODEC);
     catsDataResourceType =
         getEntityStoreRegistry()
             .registerResource(CatsDataResource.class, CatsDataResource.ID, CatsDataResource.CODEC);
@@ -142,6 +153,9 @@ public class Cats extends JavaPlugin {
     getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
     getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
+    getEntityStoreRegistry()
+        .registerSystem(
+            new CatYarnBallProjectileFallbackSystem(catYarnBallProjectileComponentType));
 
     LOGGER.at(Level.INFO).log("Registering cat damage filter system...");
     DamageSetupHandler damageSetupHandler = new DamageSetupHandler(getEntityStoreRegistry());
@@ -162,6 +176,12 @@ public class Cats extends JavaPlugin {
             CatYarnBallFetchInteraction.ID,
             CatYarnBallFetchInteraction.class,
             CatYarnBallFetchInteraction.CODEC);
+
+    this.getCodecRegistry(Interaction.CODEC)
+        .register(
+            CatYarnBallSpawnInteraction.ID,
+            CatYarnBallSpawnInteraction.class,
+            CatYarnBallSpawnInteraction.CODEC);
 
     this.getCodecRegistry(Interaction.CODEC)
         .register(

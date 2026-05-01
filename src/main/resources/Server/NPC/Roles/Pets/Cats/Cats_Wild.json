@@ -15,7 +15,7 @@
       "Description": "The wander radius of the NPC."
     },
     "ViewRange": {
-      "Value": 16,
+      "Value": 12,
       "Description": "The view distance of the NPC, in blocks."
     },
     "ViewSector": {
@@ -31,7 +31,7 @@
       "Description": "The range at which a target is guaranteed to be detected, in blocks. If set to zero, absolute detection will be disabled. The interval [ AbsoluteDetectionRange, AlertedActionRange ] defines the distance range within which an NPC can be befriended."
     },
     "AlertedRange": {
-      "Value": 18,
+      "Value": 15,
       "Description": "The range within which the target can be seen/sensed when the NPC is alerted to their presence, in blocks. Should be higher than sense ranges."
     },
     "AlertedActionRange": {
@@ -73,9 +73,8 @@
     },
     "FlockArray": {
       "Value": [
-        "Cats_Wild", "Cats_Calico_Wild", "Cats_Black_Wild", "Cats_GrayTabby_Wild",
-        "Cats_Tuxedo_Wild", "Cats_Siamese_Wild", "Cats_OrangeTabby_Wild",
-        "Cats_LonghairedRussianBlue_Wild", "Cats_Kitten_Wild", "Cats_Kitten_Calico_Wild"
+        "Cats_Wild", "Cats_OrangeTabby_Wild", "Cats_GrayTabby_Wild",
+        "Cats_Tuxedo_Wild", "Cats_Calico_Wild", "Cats_Kitten_Wild"
       ],
       "TypeHint": "String",
       "Description": "All wild cat variants that can form flocks together"
@@ -189,16 +188,13 @@
     {
       "Type": "Walk",
       "MaxWalkSpeed": {"Compute": "MaxSpeed"},
-      "Gravity": 15,
+      "Gravity": 10,
       "MaxFallSpeed": 15,
-      "JumpHeight": 0.1,
+      "JumpHeight": 0,
       "MaxRotationSpeed": {"Compute": "MaxRotationSpeed"},
       "Acceleration": 100,
       "RunThreshold": {"Compute": "RunThreshold"},
-      "DescentAnimationType": "Fall",
-      "DescentSteepness": 2.5,
-      "DescentBlending": 1,
-      "JumpDescentSteepness": 8,
+      "RunThresholdRange": 0.1,
       "MaxClimbHeight": {"Compute": "ClimbHeight"}
     }
   ],
@@ -396,8 +392,11 @@
               {
                 "Type": "Not",
                 "Sensor": {
-                  "Type": "State",
-                  "State": "Panic"
+                  "Type": "Or",
+                  "Sensors": [
+                    {"Type": "State", "State": "Panic"},
+                    {"Type": "State", "State": "ReturnHome"}
+                  ]
                 }
               }
             ]
@@ -419,6 +418,12 @@
             "State": "Idle"
           },
           "Instructions": [
+            {
+              "Continue": true,
+              "Sensor": {"Type": "Any", "Once": true},
+              "ActionsBlocking": true,
+              "Actions": [{"Type": "Timeout", "Delay": [0, 10]}]
+            },
             {
               "$Comment": "Follow player holding fish",
               "Sensor": {
@@ -499,7 +504,7 @@
             },
             {
               "Type": "Random",
-              "ExecuteFor": [20, 30],
+              "ExecuteFor": [5, 25],
               "Sensor": {
                 "Type": "Time",
                 "Period": {"Compute": "DayTimePeriod"},
@@ -539,7 +544,8 @@
                               "Type": "WanderInCircle",
                               "Radius": {"Compute": "WanderRadius"},
                               "MaxHeadingChange": 60,
-                              "RelativeSpeed": 0.18
+                              "RelativeSpeed": 0.18,
+                              "RelaxedMoveConstraints": false
                             }
                           },
                           {
@@ -656,6 +662,11 @@
                   "Instructions": [
                     {
                       "ActionsBlocking": true,
+                      "Actions": [{"Type": "Timeout", "Delay": [0.3, 0.5]}],
+                      "BodyMotion": {"Type": "Nothing"}
+                    },
+                    {
+                      "ActionsBlocking": true,
                       "Actions": [
                         {
                           "Type": "PlayAnimation",
@@ -667,9 +678,61 @@
                           "Delay": [5, 10]
                         }
                       ],
+                      "BodyMotion": {"Type": "Nothing"}
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Playful burst",
+                  "Weight": 4,
+                  "Instructions": [
+                    {
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Swing_Left",
+                          "Slot": "Action"
+                        },
+                        {"Type": "Timeout", "Delay": [0.5, 1]}
+                      ],
+                      "BodyMotion": {"Type": "Nothing"}
+                    },
+                    {
+                      "ActionsBlocking": true,
+                      "Actions": [{"Type": "Timeout", "Delay": [3, 5]}],
                       "BodyMotion": {
-                        "Type": "Nothing"
+                        "Type": "WanderInCircle",
+                        "Radius": 5,
+                        "MaxHeadingChange": 90,
+                        "RelativeSpeed": 0.7,
+                        "RelaxedMoveConstraints": false
                       }
+                    },
+                    {
+                      "ActionsBlocking": true,
+                      "Actions": [{"Type": "Timeout", "Delay": [1, 2]}],
+                      "BodyMotion": {"Type": "Nothing"}
+                    }
+                  ]
+                },
+                {
+                  "$Comment": "Alert watch",
+                  "Weight": 3,
+                  "Instructions": [
+                    {
+                      "ActionsBlocking": true,
+                      "Actions": [
+                        {
+                          "Type": "PlayAnimation",
+                          "Animation": "Alerted",
+                          "Slot": "Status"
+                        },
+                        {"Type": "Timeout", "Delay": [4, 7]},
+                        {"Type": "PlayAnimation", "Slot": "Status"},
+                        {"Type": "ResetInstructions"}
+                      ],
+                      "BodyMotion": {"Type": "Nothing"}
                     }
                   ]
                 },
@@ -1063,7 +1126,7 @@
                     ]
                   },
                   "Type": "Random",
-                  "ExecuteFor": [15, 20],
+                  "ExecuteFor": [8, 12],
                   "Instructions": [
                     {
                       "Weight": {"Compute": "WeightFollowItem"},
@@ -1415,9 +1478,20 @@
               }
             },
             {
+              "Sensor": {
+                "Type": "InWater"
+              },
+              "Actions": [
+                {
+                  "Type": "State",
+                  "State": "ReturnHome"
+                }
+              ]
+            },
+            {
               "BodyMotion": {
                 "Type": "WanderInCircle",
-                "Radius": 10,
+                "Radius": 8,
                 "MaxHeadingChange": 90,
                 "RelativeSpeed": 1,
                 "RelaxedMoveConstraints": true

@@ -21,7 +21,8 @@
       "RunThresholdRange": 0.1,
       "Gravity": 10,
       "MaxFallSpeed": 20,
-      "Acceleration": 12
+      "Acceleration": 12,
+      "MaxClimbHeight": 1
     }
   ],
   "MaxHealth": {
@@ -75,6 +76,16 @@
               },
               "Actions": [
                 {"Type": "CatMoodParticles"}
+              ]
+            },
+            {
+              "Continue": true,
+              "Sensor": {
+                "Type": "Not",
+                "Sensor": {"Type": "State", "State": ".Dying"}
+              },
+              "Actions": [
+                {"Type": "CatGiftHint"}
               ]
             },
             {
@@ -142,6 +153,23 @@
               "BodyMotion": {"Type": "Nothing"}
             },
             {
+              "Sensor": {"Type": "State", "State": ".GiftHint"},
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "SpawnParticles",
+                  "Offset": [0, 0.9, 0],
+                  "ParticleSystem": "Food_Eat",
+                  "Once": true
+                },
+                {
+                  "Type": "Timeout", "Delay": [1, 2],
+                  "Action": {"Type": "State", "State": ".Waiting"}
+                }
+              ],
+              "BodyMotion": {"Type": "Nothing"}
+            },
+            {
               "$Comment": "Night sleep",
               "Continue": true,
               "Sensor": {
@@ -188,6 +216,68 @@
               "Actions": [
                 {"Type": "State", "State": ".Sleeping"}
               ]
+            },
+            {
+              "$Comment": "Social groom - queue when near another cat",
+              "Continue": true,
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Or",
+                    "Sensors": [
+                      {"Type": "State", "State": ".Waiting"},
+                      {"Type": "State", "State": ".Sitting"},
+                      {"Type": "State", "State": ".Licking"}
+                    ]
+                  },
+                  {"Type": "Alarm", "Name": "SocialGroom_Pending", "State": "Unset"},
+                  {"Type": "Alarm", "Name": "SocialGroom_Cooldown", "State": "Unset"},
+                  {
+                    "Type": "Mob",
+                    "Range": 6,
+                    "ExcludeOwnType": false,
+                    "GetNPCs": true,
+                    "GetPlayers": false,
+                    "Filters": [{"Type": "NPCGroup", "IncludeGroups": ["Self"]}]
+                  }
+                ]
+              },
+              "Actions": [
+                {
+                  "Type": "SetAlarm", "Name": "SocialGroom_Pending",
+                  "DurationRange": ["PT5S", "PT15S"]
+                }
+              ]
+            },
+            {
+              "$Comment": "Social groom - execute when pending alarm fires",
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {
+                    "Type": "Or",
+                    "Sensors": [
+                      {"Type": "State", "State": ".Waiting"},
+                      {"Type": "State", "State": ".Sitting"},
+                      {"Type": "State", "State": ".Licking"}
+                    ]
+                  },
+                  {
+                    "Type": "Alarm", "Name": "SocialGroom_Pending", "State": "Passed", "Clear": true
+                  },
+                  {
+                    "Type": "Mob",
+                    "Range": 6,
+                    "ExcludeOwnType": false,
+                    "GetNPCs": true,
+                    "GetPlayers": false,
+                    "LockOnTarget": true,
+                    "Filters": [{"Type": "NPCGroup", "IncludeGroups": ["Self"]}]
+                  }
+                ]
+              },
+              "Actions": [{"Type": "State", "State": ".SocialGroom"}]
             },
             {
               "$Comment": "Greet owner",
@@ -273,6 +363,23 @@
                 {
                   "Type": "Nothing"
                 }
+              ]
+            },
+            {
+              "$Comment": "Escape water - seek owner to reach shore",
+              "Continue": true,
+              "Sensor": {
+                "Type": "And",
+                "Sensors": [
+                  {"Type": "InWater"},
+                  {
+                    "Type": "Not",
+                    "Sensor": {"Type": "State", "State": ".Dying"}
+                  }
+                ]
+              },
+              "Actions": [
+                {"Type": "State", "State": ".Default"}
               ]
             },
             {
@@ -999,7 +1106,7 @@
                   "$Comment": "Follow owner with stable seek rules based on the Amigo companion pattern",
                   "Sensor": {
                     "Type": "CatsOwnerPlayer",
-                    "Range": 50,
+                    "Range": 48,
                     "LockOnTarget": true
                   },
                   "Instructions": [
@@ -1145,6 +1252,63 @@
               }
             },
             {
+              "$Comment": "Social grooming with nearby cat",
+              "Sensor": {"Type": "State", "State": ".SocialGroom"},
+              "Instructions": [
+                {
+                  "Sensor": {"Type": "Target", "TargetSlot": "LockedTarget", "Range": 2},
+                  "ActionsBlocking": true,
+                  "Actions": [
+                    {"Type": "PlayAnimation", "Animation": "Lick", "Slot": "Action"},
+                    {
+                      "Type": "SpawnParticles",
+                      "Offset": [0, 0.7, 0],
+                      "ParticleSystem": "Hearts_Subtle",
+                      "Once": true
+                    },
+                    {
+                      "Type": "Timeout",
+                      "Delay": [5, 10],
+                      "Action": {
+                        "Type": "Sequence",
+                        "Actions": [
+                          {
+                            "Type": "SetAlarm", "Name": "SocialGroom_Cooldown",
+                            "DurationRange": ["PT30M", "PT2H"]
+                          },
+                          {"Type": "State", "State": ".Waiting"}
+                        ]
+                      }
+                    }
+                  ],
+                  "BodyMotion": {"Type": "Nothing"}
+                },
+                {
+                  "Sensor": {"Type": "Target", "TargetSlot": "LockedTarget", "Range": 8},
+                  "BodyMotion": {
+                    "Type": "Seek",
+                    "SlowDownDistance": 3,
+                    "StopDistance": 1.5,
+                    "RelativeSpeed": 0.35
+                  }
+                },
+                {
+                  "Actions": [
+                    {
+                      "Type": "Sequence",
+                      "Actions": [
+                        {
+                          "Type": "SetAlarm", "Name": "SocialGroom_Cooldown",
+                          "DurationRange": ["PT15M", "PT45M"]
+                        },
+                        {"Type": "State", "State": ".Waiting"}
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "$Comment": "State setter declarations for validation - never executed",
               "Sensor": {
                 "Type": "Flag",
@@ -1156,6 +1320,7 @@
                 {"Type": "State", "State": ".Dying"},
                 {"Type": "State", "State": ".Fleeing"},
                 {"Type": "State", "State": ".GoingToBed"},
+                {"Type": "State", "State": ".GiftHint"},
                 {"Type": "State", "State": ".Greeting"},
                 {"Type": "State", "State": ".Happy"},
                 {"Type": "State", "State": ".Licking"},
@@ -1170,6 +1335,7 @@
                 {"Type": "State", "State": ".Searching"},
                 {"Type": "State", "State": ".Sitting"},
                 {"Type": "State", "State": ".Sleeping"},
+                {"Type": "State", "State": ".SocialGroom"},
                 {"Type": "State", "State": ".Stretching"},
                 {"Type": "State", "State": ".Waiting"},
                 {"Type": "State", "State": ".Wandering"},
@@ -1355,7 +1521,25 @@
                 }
               ],
               "BodyMotion": {
-                "Type": "Path"
+                "Type": "Path",
+                "UsePathfinder": true
+              }
+            },
+            {
+              "$Comment": "At ball / pickup delay - keep the cat calm and prevent idle flavor animations",
+              "Sensor": {
+                "Type": "Any"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Idle",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
               }
             }
           ]
@@ -1380,7 +1564,7 @@
             {
               "Sensor": {
                 "Type": "CatsOwnerPlayer",
-                "Range": 50,
+                "Range": 48,
                 "LockOnTarget": true
               },
               "Instructions": [
@@ -1388,7 +1572,7 @@
                   "Sensor": {
                     "Type": "Target",
                     "TargetSlot": "LockedTarget",
-                    "Range": 50
+                    "Range": 48
                   },
                   "Actions": [
                     {
@@ -1400,11 +1584,29 @@
                   "BodyMotion": {
                     "Type": "Seek",
                     "SlowDownDistance": 3,
-                    "StopDistance": 1,
-                    "RelativeSpeed": 1.0
+                    "StopDistance": 1.5,
+                    "RelativeSpeed": 1.0,
+                    "UsePathfinder": true
                   }
                 }
               ]
+            },
+            {
+              "$Comment": "Owner not yet locked - stay idle instead of playing search or sit animations",
+              "Sensor": {
+                "Type": "Any"
+              },
+              "ActionsBlocking": true,
+              "Actions": [
+                {
+                  "Type": "PlayAnimation",
+                  "Animation": "Idle",
+                  "Slot": "Action"
+                }
+              ],
+              "BodyMotion": {
+                "Type": "Nothing"
+              }
             }
           ]
         },

@@ -79,9 +79,11 @@ final class CatListCommand extends CatCommand {
 
       boolean isInWorld = catsManager.getCatByUuid(catData.uuid(), store) != null;
       String statusIndicator =
-          !isInWorld
-              ? "[DESPAWNED]"
-              : catsManager.isCatAliveInWorld(catData.uuid(), store) ? "[ALIVE]" : "[DEAD]";
+          catData.isInCarrier()
+              ? "[IN CARRIER]"
+              : !isInWorld
+                  ? "[DESPAWNED]"
+                  : catsManager.isCatAliveInWorld(catData.uuid(), store) ? "[ALIVE]" : "[DEAD]";
       String positionStr =
           catData.position() != null
               ? String.format(

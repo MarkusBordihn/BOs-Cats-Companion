@@ -252,7 +252,7 @@ final class CatSpawnCommand extends CatCommand {
 
       UUID newEntityUuid = catsManager.getUuid(catRef, store);
       if (newEntityUuid != null && !newEntityUuid.equals(catData.uuid())) {
-        catsManager.updateCatUuid(catData.uuid(), newEntityUuid, store);
+        catsManager.updateCatUuid(catData.uuid(), newEntityUuid, catRef, store);
       }
 
       if (catData.ownerUuid() != null) {

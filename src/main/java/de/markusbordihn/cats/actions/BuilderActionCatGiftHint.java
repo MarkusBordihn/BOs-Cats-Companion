@@ -31,21 +31,18 @@ import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
-import de.markusbordihn.cats.data.CatDataEntry;
-import de.markusbordihn.cats.data.HappinessLevel;
-import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BuilderActionCatMoodParticles extends BuilderActionBase {
+public class BuilderActionCatGiftHint extends BuilderActionBase {
 
-  public static final String BUILDER_ID = "CatMoodParticles";
+  public static final String BUILDER_ID = "CatGiftHint";
 
-  private static final double MIN_PARTICLE_INTERVAL = 45.0;
-  private static final double MAX_PARTICLE_INTERVAL = 120.0;
+  private static final double MIN_HINT_INTERVAL = 30.0;
+  private static final double MAX_HINT_INTERVAL = 90.0;
 
   public String getBuilderId() {
     return BUILDER_ID;
@@ -59,68 +56,39 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
   @Nonnull
   @Override
-  public BuilderActionCatMoodParticles readConfig(JsonElement config) {
+  public BuilderActionCatGiftHint readConfig(@Nullable JsonElement config) {
     return this;
   }
 
   @Nonnull
   @Override
-  public ActionCatMoodParticles build(BuilderSupport support) {
-    return new ActionCatMoodParticles(this);
+  public ActionCatGiftHint build(BuilderSupport support) {
+    return new ActionCatGiftHint(this);
   }
 
   @Nonnull
   @Override
   public String getShortDescription() {
-    return "Periodically shows mood particles via transient sub-states";
+    return "Shows a particle hint when the cat has a gift ready for the owner";
   }
 
   @Nonnull
   @Override
   public String getLongDescription() {
-    return "Accumulates deltaTime per entity and every 45-120s sets a transient mood sub-state "
-        + "(MoodEcstatic/Happy/Sad/Miserable). JSON SpawnParticles blocks react to the state "
-        + "and reset it via Timeout. NEUTRAL mood shows no particles. Skipped during Default (following) state.";
+    return "Periodically checks gift eligibility and triggers the GiftHint sub-state "
+        + "to spawn Food_Eat particles, signalling the owner to interact with the cat.";
   }
 
-  public static class ActionCatMoodParticles extends ActionBase {
+  public static class ActionCatGiftHint extends ActionBase {
 
     private static final HashMap<Ref<EntityStore>, Double> elapsedByEntity = new HashMap<>();
 
-    public ActionCatMoodParticles(BuilderActionBase builder) {
+    public ActionCatGiftHint(@Nonnull BuilderActionBase builder) {
       super(builder);
     }
 
     public static void clearEntity(@Nonnull Ref<EntityStore> entityRef) {
       elapsedByEntity.remove(entityRef);
-    }
-
-    @Nullable
-    private static String toMoodSubState(
-        @Nonnull HappinessLevel happinessLevel, @Nullable PersonalityType personality) {
-      HappinessLevel effectiveLevel = happinessLevel;
-      if (personality == PersonalityType.PLAYFUL || personality == PersonalityType.MISCHIEVOUS) {
-        effectiveLevel =
-            switch (happinessLevel) {
-              case NEUTRAL -> HappinessLevel.HAPPY;
-              case HAPPY -> HappinessLevel.ECSTATIC;
-              default -> happinessLevel;
-            };
-      } else if (personality == PersonalityType.SHY || personality == PersonalityType.INDEPENDENT) {
-        effectiveLevel =
-            switch (happinessLevel) {
-              case ECSTATIC -> HappinessLevel.HAPPY;
-              case HAPPY -> HappinessLevel.NEUTRAL;
-              default -> happinessLevel;
-            };
-      }
-      return switch (effectiveLevel) {
-        case ECSTATIC -> "MoodEcstatic";
-        case HAPPY -> "MoodHappy";
-        case SAD -> "MoodSad";
-        case MISERABLE -> "MoodMiserable";
-        default -> null;
-      };
     }
 
     @Override
@@ -145,47 +113,38 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
               entityRef,
               (key, previous) ->
                   previous == null
-                      ? ThreadLocalRandom.current().nextDouble(0, MAX_PARTICLE_INTERVAL)
+                      ? ThreadLocalRandom.current().nextDouble(0, MAX_HINT_INTERVAL)
                       : previous + deltaTime);
 
-      if (elapsedSeconds < MIN_PARTICLE_INTERVAL) {
+      if (elapsedSeconds < MIN_HINT_INTERVAL) {
         return true;
       }
 
-      double particleThreshold =
-          ThreadLocalRandom.current().nextDouble(MIN_PARTICLE_INTERVAL, MAX_PARTICLE_INTERVAL);
-      if (elapsedSeconds < particleThreshold) {
+      double hintThreshold =
+          ThreadLocalRandom.current().nextDouble(MIN_HINT_INTERVAL, MAX_HINT_INTERVAL);
+      if (elapsedSeconds < hintThreshold) {
         return true;
       }
-
-      elapsedByEntity.put(entityRef, 0.0);
 
       StateSupport stateSupport = role.getStateSupport();
       if (stateSupport.inState("Pet", "Default")
           || stateSupport.inState("Pet", "PrepareSleep")
           || stateSupport.inState("Pet", "PrepareFollow")
-          || stateSupport.inState("Pet", "PreparePlay")) {
+          || stateSupport.inState("Pet", "PreparePlay")
+          || stateSupport.inState("Pet", "Sleeping")
+          || stateSupport.inState("Pet", "GoingToBed")
+          || stateSupport.inState("FetchingYarnBall", "Default")
+          || stateSupport.inState("ReturningBallToOwner", "Default")) {
         return true;
       }
 
-      CatMoodComponent moodComponent =
-          store.getComponent(entityRef, CatMoodComponent.getComponentType());
-      if (moodComponent == null) {
-        return true;
-      }
-
-      PersonalityType personality = null;
       CatsManager catsManager = CatsManager.getInstance();
-      if (catsManager != null) {
-        CatDataEntry catData = catsManager.getCatData(entityRef, store);
-        personality = catData != null ? catData.personalityType() : null;
+      if (catsManager == null || !catsManager.isGiftEligible(entityRef, store)) {
+        return true;
       }
 
-      String moodSubState = toMoodSubState(moodComponent.getLevel(), personality);
-      if (moodSubState != null) {
-        role.getStateSupport().setState(entityRef, "Pet", moodSubState, store);
-      }
-
+      elapsedByEntity.put(entityRef, 0.0);
+      stateSupport.setState(entityRef, "Pet", "GiftHint", store);
       return true;
     }
   }

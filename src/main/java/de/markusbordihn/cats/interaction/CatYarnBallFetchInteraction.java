@@ -24,6 +24,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3d;
@@ -38,9 +39,11 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHa
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatFetchTargetComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
+import de.markusbordihn.cats.component.CatYarnBallProjectileComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.inventory.InventoryHelper;
@@ -72,7 +75,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
   public CatYarnBallFetchInteraction() {}
 
   @Nullable
-  private static Player resolveThrowingPlayer(
+  static Player resolveThrowingPlayer(
       @Nonnull InteractionContext context,
       @Nonnull CommandBuffer<EntityStore> commandBuffer,
       @Nonnull Store<EntityStore> store) {
@@ -101,10 +104,21 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     return commandBuffer.getComponent(playerRef, Player.getComponentType());
   }
 
-  private static void startFetch(
+  @Nullable
+  private static Player getPlayer(@Nonnull UUID ownerUuid, @Nonnull Store<EntityStore> store) {
+    Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(ownerUuid);
+    if (playerRef == null || !playerRef.isValid()) {
+      return null;
+    }
+
+    return store.getComponent(playerRef, Player.getComponentType());
+  }
+
+  private static boolean startFetch(
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull Vector3d landingPosition,
       @Nonnull UUID ownerUuid,
+      @Nullable Ref<EntityStore> projectileRef,
       @Nonnull CommandBuffer<EntityStore> commandBuffer,
       @Nonnull Store<EntityStore> store) {
 
@@ -114,27 +128,105 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
         CatStateComponent.getComponentType();
     if (fetchTargetType == null || catStateType == null) {
       LOGGER.at(Level.WARNING).log("startFetch: component types not yet registered, skipping");
-      return;
+      return false;
     }
 
-    NPCEntity npcEntity = commandBuffer.getComponent(catRef, NPCEntity.getComponentType());
+    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
     if (npcEntity == null || npcEntity.getRole() == null) {
       LOGGER.at(Level.WARNING).log("startFetch: cat has no NPCEntity or Role");
-      return;
+      return false;
     }
 
     if (YarnBallFetchRegistry.isFetching(ownerUuid)) {
-      return;
+      return false;
     }
 
+    CatStateComponent currentState = store.getComponent(catRef, catStateType);
+    CatState previousState = currentState != null ? currentState.getState() : CatState.FOLLOWING;
+
+    CatFetchTargetComponent fetchTarget =
+        new CatFetchTargetComponent(landingPosition, ownerUuid, projectileRef);
+    fetchTarget.setPreviousState(previousState);
+
     YarnBallFetchRegistry.register(ownerUuid, catRef);
-    commandBuffer.putComponent(
-        catRef, fetchTargetType, new CatFetchTargetComponent(landingPosition, ownerUuid));
+    commandBuffer.putComponent(catRef, fetchTargetType, fetchTarget);
     commandBuffer.putComponent(catRef, catStateType, new CatStateComponent(CatState.FETCHING));
     npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
     TransientPath path = new TransientPath();
     path.addWaypoint(landingPosition, new Vector3f(0, 0, 0));
+    npcEntity.getPathManager().setTransientPath(null);
     npcEntity.getPathManager().setTransientPath(path);
+    return true;
+  }
+
+  public static boolean handleLanding(
+      @Nonnull UUID ownerUuid,
+      @Nonnull Ref<EntityStore> projectileRef,
+      @Nonnull Vector3d landingPosition,
+      @Nonnull CommandBuffer<EntityStore> commandBuffer,
+      @Nonnull Store<EntityStore> store) {
+    YarnBallThrowRegistry.complete(ownerUuid, projectileRef);
+
+    Player player = getPlayer(ownerUuid, store);
+    if (player == null) {
+      LOGGER.at(Level.WARNING).log(
+          "handleLanding: could not resolve throwing player %s", ownerUuid);
+      return false;
+    }
+
+    ComponentType<EntityStore, CatYarnBallProjectileComponent> projectileType =
+        CatYarnBallProjectileComponent.getComponentType();
+    if (projectileType != null) {
+      CatYarnBallProjectileComponent projectileComponent =
+          commandBuffer.getComponent(projectileRef, projectileType);
+      if (projectileComponent != null) {
+        CatYarnBallProjectileComponent updatedProjectile = projectileComponent.clone();
+        updatedProjectile.setFetchTriggered(true);
+        commandBuffer.putComponent(projectileRef, projectileType, updatedProjectile);
+      }
+    }
+
+    Ref<EntityStore> playerEntityRef = store.getExternalData().getRefFromUUID(ownerUuid);
+    TransformComponent playerTransform =
+        playerEntityRef != null
+            ? store.getComponent(playerEntityRef, TransformComponent.getComponentType())
+            : null;
+    Vector3d playerPos = playerTransform != null ? playerTransform.getPosition() : landingPosition;
+
+    Ref<EntityStore> catRef = findNearestFetchCat(ownerUuid, playerPos, store);
+    LOGGER.at(Level.INFO).log(
+        "handleLanding: owner=%s, catFound=%s, playerPos=%.1f/%.1f/%.1f",
+        ownerUuid, catRef != null ? "yes" : "no", playerPos.x, playerPos.y, playerPos.z);
+    if (catRef == null) {
+      InventoryHelper.giveItem(player, Constants.CAT_YARN_BALL_ITEM);
+      YarnBallGroundRegistry.register(ownerUuid, landingPosition);
+      if (projectileRef.isValid()) {
+        commandBuffer.removeEntity(projectileRef, RemoveReason.REMOVE);
+      }
+      player.sendMessage(
+          Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
+              .color(Constants.COLOR_SOFT_ORANGE));
+      return false;
+    }
+
+    if (!startFetch(catRef, landingPosition, ownerUuid, projectileRef, commandBuffer, store)) {
+      InventoryHelper.giveItem(player, Constants.CAT_YARN_BALL_ITEM);
+      if (projectileRef.isValid()) {
+        commandBuffer.removeEntity(projectileRef, RemoveReason.REMOVE);
+      }
+      return false;
+    }
+
+    YarnBallGroundRegistry.clear(ownerUuid);
+
+    String catName = getCatName(catRef, store);
+    Message thrownMessage =
+        Message.translation("cats.interactions.yarn_ball.thrown").color(Constants.COLOR_PINK);
+    if (catName != null) {
+      thrownMessage = thrownMessage.param("catName", catName);
+    }
+    player.sendMessage(thrownMessage);
+    return true;
   }
 
   @Nullable
@@ -196,7 +288,19 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     }
 
     CatState state = stateComponent.getState();
-    return state == CatState.FETCHING || state == CatState.ATTACKING;
+    if (state == CatState.FETCHING || state == CatState.ATTACKING || state.isSleepingState()) {
+      return true;
+    }
+
+    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
+    if (npcEntity != null && npcEntity.getRole() != null) {
+      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
+      return stateSupport.inState("Pet", "PrepareSleep")
+          || stateSupport.inState("Pet", "Sleeping")
+          || stateSupport.inState("Pet", "GoingToBed");
+    }
+
+    return false;
   }
 
   @Nullable
@@ -256,37 +360,6 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       return;
     }
 
-    YarnBallThrowRegistry.complete(ownerUuid);
-
-    Ref<EntityStore> playerEntityRef = store.getExternalData().getRefFromUUID(ownerUuid);
-    TransformComponent playerTransform =
-        playerEntityRef != null
-            ? store.getComponent(playerEntityRef, TransformComponent.getComponentType())
-            : null;
-    Vector3d playerPos = playerTransform != null ? playerTransform.getPosition() : landingPosition;
-
-    Ref<EntityStore> catRef = findNearestFetchCat(ownerUuid, playerPos, store);
-    LOGGER.at(Level.INFO).log(
-        "firstRun: owner=%s, catFound=%s, playerPos=%.1f/%.1f/%.1f",
-        ownerUuid, catRef != null ? "yes" : "no", playerPos.x, playerPos.y, playerPos.z);
-    if (catRef == null) {
-      InventoryHelper.giveItem(player, Constants.CAT_YARN_BALL_ITEM);
-      YarnBallGroundRegistry.register(ownerUuid, landingPosition);
-      player.sendMessage(
-          Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
-              .color(Constants.COLOR_SOFT_ORANGE));
-      return;
-    }
-
-    startFetch(catRef, landingPosition, ownerUuid, commandBuffer, store);
-    YarnBallGroundRegistry.clear(ownerUuid);
-
-    String catName = getCatName(catRef, store);
-    Message thrownMessage =
-        Message.translation("cats.interactions.yarn_ball.thrown").color(Constants.COLOR_PINK);
-    if (catName != null) {
-      thrownMessage = thrownMessage.param("catName", catName);
-    }
-    player.sendMessage(thrownMessage);
+    handleLanding(ownerUuid, projectileRef, landingPosition, commandBuffer, store);
   }
 }

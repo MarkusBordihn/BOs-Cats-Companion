@@ -70,6 +70,7 @@ public final class CatBedSpawnPage
   private static final String ACTION_CLOSE = "close";
   private static final String ACTION_EMPTY = "empty";
   private static final String ACTION_SPAWN = "spawn";
+  private static final String ACTION_RECOVER = "recover";
   private static final String ACTION_CALL = "call";
   private static final String ACTION_WAKEUP = "wakeup";
   private static final String ACTION_SEPARATOR = ":";
@@ -108,6 +109,7 @@ public final class CatBedSpawnPage
     return switch (catData.status()) {
       case SPAWNED -> Constants.COLOR_SUCCESS;
       case DESPAWNED -> Constants.COLOR_WARNING;
+      case IN_CARRIER -> Constants.COLOR_ORANGE;
       default -> Constants.COLOR_GRAY;
     };
   }
@@ -189,6 +191,7 @@ public final class CatBedSpawnPage
       for (int i = 0; i < playerCats.size(); i++) {
         CatDataEntry catData = playerCats.get(i);
         boolean isSpawned = catData.isSpawned();
+        boolean isInCarrier = catData.isInCarrier();
         boolean isInBed = false;
         CatState catState = null;
         if (isSpawned && catsManager != null) {
@@ -209,7 +212,10 @@ public final class CatBedSpawnPage
           anyInBed = true;
         }
 
-        String actionCmd = isSpawned ? (isInBed ? ACTION_WAKEUP : ACTION_CALL) : ACTION_SPAWN;
+        String actionCmd =
+            isSpawned
+                ? (isInBed ? ACTION_WAKEUP : ACTION_CALL)
+                : isInCarrier ? ACTION_RECOVER : ACTION_SPAWN;
         String rowSelector = "#CatBedSpawnRows[" + i + "]";
         commandBuilder.append("#CatBedSpawnRows", Constants.UI_BED_SPAWN_ROW);
         commandBuilder.set(
@@ -227,7 +233,9 @@ public final class CatBedSpawnPage
                     ? (isInBed
                         ? "cats.ui.bed_spawn.wake_up_button"
                         : "cats.ui.bed_spawn.call_button")
-                    : "cats.ui.bed_spawn.spawn_button"));
+                    : isInCarrier
+                        ? "cats.ui.bed_spawn.recover_button"
+                        : "cats.ui.bed_spawn.spawn_button"));
         eventBuilder.addEventBinding(
             CustomUIEventBindingType.Activating,
             rowSelector + " #CatBedSpawnRowButton",
@@ -320,6 +328,16 @@ public final class CatBedSpawnPage
 
     String action = data.command.substring(0, separatorIndex);
     switch (action) {
+      case ACTION_RECOVER -> {
+        CatCarrierRecoveryConfirmPage confirmPage =
+            new CatCarrierRecoveryConfirmPage(
+                this.playerRef,
+                catData.displayName(),
+                null,
+                () -> handleSpawnCat(catData, store, player));
+        player.getPageManager().openCustomPage(ref, store, confirmPage);
+        return;
+      }
       case ACTION_CALL -> handleCallCat(catData, catUuid, catsManager, store, player);
       case ACTION_SPAWN -> handleSpawnCat(catData, store, player);
       case ACTION_WAKEUP -> handleWakeUpCat(catUuid, catsManager, store, player);
@@ -486,7 +504,7 @@ public final class CatBedSpawnPage
       if (catsManager != null) {
         UUID newEntityUuid = catsManager.getUuid(catRef, store);
         if (newEntityUuid != null && !newEntityUuid.equals(catData.uuid())) {
-          catsManager.updateCatUuid(catData.uuid(), newEntityUuid, store);
+          catsManager.updateCatUuid(catData.uuid(), newEntityUuid, catRef, store);
         }
       }
 
@@ -514,7 +532,10 @@ public final class CatBedSpawnPage
 
       String displayName = catData.displayName();
       player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.spawn_success")
+          Message.translation(
+                  catData.isInCarrier()
+                      ? "cats.ui.bed_spawn.recover_success"
+                      : "cats.ui.bed_spawn.spawn_success")
               .param("catName", displayName)
               .color(Constants.COLOR_SUCCESS));
       LOGGER.at(Level.INFO).log(

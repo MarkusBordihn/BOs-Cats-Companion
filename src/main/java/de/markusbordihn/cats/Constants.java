@@ -68,6 +68,7 @@ public final class Constants {
   public static final String UI_ACTION_WHEEL = UI_PATH + "CatsActionWheel.ui";
   public static final String UI_BED_SPAWN = UI_PATH + "CatBedSpawn.ui";
   public static final String UI_BED_SPAWN_ROW = UI_PATH + "CatBedSpawnRow.ui";
+  public static final String UI_CARRIER_RECOVERY_CONFIRM = UI_PATH + "CatCarrierRecoveryConfirm.ui";
   public static final String UI_NAME_INPUT = UI_PATH + "CatNameInput.ui";
   public static final String UI_TAMING_SUCCESS = UI_PATH + "CatTamingSuccess.ui";
 

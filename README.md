@@ -25,9 +25,11 @@ still offering enough systems and polish to stand out as a Hytale New Worlds Con
 You can explore for wild cats, slowly earn their trust with fish, give them a name, open the
 Action Wheel with `F`, and build a little home routine around play, sleep, and companionship.
 
+![Several tamed cats resting in cat beds inside a cozy player-built room.](examples/ingame/cat_bed.png)
+
 ## 🎥 Introduction and Overview Video
 
-<span><iframe width="788" height="443" src="https://www.youtube.com/embed/RbwMXmpuRPM" frameborder="0" allowfullscreen="allowfullscreen"></iframe></span>
+<span><iframe width="788" height="443" src="https://www.youtube.com/embed/I6DkmDzukmU" frameborder="0" allowfullscreen="allowfullscreen"></iframe></span>
 
 ## 🚀 Quick Start
 
@@ -47,6 +49,11 @@ If you just want to jump in and start playing with cats, this is the fastest pat
 * Each cat belongs to one player only once tamed.
 * In Creative Mode, enable `Allow NPC Detection` in the quick settings to interact more reliably.
 
+The taming flow also ends with a custom screen that shows mood, personality, and lets you set a
+real name for your new companion right away.
+
+![Cat Tamed screen showing personality, mood, and name input after taming.](examples/ingame/cat_taming_screen.png)
+
 ## ✨ Why It Stands Out
 
 * Cats spawn naturally across multiple zones instead of feeling like menu-only companions.
@@ -54,6 +61,11 @@ If you just want to jump in and start playing with cats, this is the fastest pat
 * Personality, mood, gifts, and needs give your cats a little life beyond simple follow behavior.
 * The Action Wheel keeps most interactions in-world and easy to learn from the first minute.
 * Home items like the Cat Bed and Cat Carrier make cats useful for both adventure and decoration.
+
+The Action Wheel is also where the companion systems come together: you can see live state,
+personality, gift count, and the current Rest, Social, and Play needs without leaving the world.
+
+![Action Wheel showing cat commands, personality, gifts, and needs.](examples/ingame/cat_action_wheel.png)
 
 ## 🛏️ Cat Bed Showcase
 
@@ -69,9 +81,12 @@ This makes the bed useful even when a cat is currently despawned, already in the
 It also pairs naturally with `/cat bed`, which sends a nearby tamed cat to the nearest available
 bed.
 
-## 🖼️ Screenshots
+### Cat Bed Screen
 
-This section is structured to be reusable later for CurseForge with a small curated gallery.
+The Cat Bed screen is one of the most useful management tools in the mod, especially once you
+start owning multiple cats with different states.
+
+![Cat Bed management screen with cat states such as despawned, sleeping, waiting, and going to bed.](examples/ingame/cat_bed_menu.png)
 
 ## ✅ Current Features
 
@@ -81,24 +96,28 @@ This section is structured to be reusable later for CurseForge with a small cura
   Siamese, Tuxedo, and Kitten (experimental)
 * Natural spawning across Zones 1-4 with environment-specific distributions
 * Single-owner tamed cats with automatic unique names
+* Light social and group behavior when multiple cats are nearby
 * Matching sounds, animations, and multiple behavior states
 
 ### Taming, Mood, and Personality
 
 * Trust-based taming through repeated fish feeding
+* Taming success screen with instant naming plus mood and personality preview
 * Personality system that influences how happiness is gained
 * Five mood levels from Miserable to Ecstatic with slow decay over time
+* Need-driven routine with Rest, Social, and Play affecting autonomous behavior over time
 * Happy cats can occasionally bring gifts when petted
+* Action Wheel and `/cat info` show personality, gifts, and current needs
 * Fish and Cat Treats can heal cats and improve happiness
 
 ### Interaction and Daily Use
 
-* Action Wheel UI on `F` with an empty hand
+* Action Wheel UI on `F` with an empty hand, live status, and a companion info panel
 * Behaviors such as follow, sit, wait, wander, sleep, play, search, and go to bed
 * Rename flow directly in the custom UI
 * Cat Carrier for transporting your tamed cats
-* Cat Yarn Ball for playful interactions
-* Cat Bed UI for bed assignment, calling, spawning, and waking up cats
+* Cat Yarn Ball for playful interactions and fetch-style play after throwing it
+* Cat Bed UI for bed assignment, calling, spawning, waking up, and status overview
 
 ### Persistence and Server Support
 
@@ -130,7 +149,8 @@ Use the Cat Carrier to pick up and transport your tamed cats.
 * 1x Red Wool
 
 Use the carrier on your tamed cat with `F` to pick it up. The icon changes when the carrier is
-occupied. Use it again on the ground to release the cat at a new location.
+occupied, so you can see at a glance that a cat is stored inside. Use it again on the ground to
+release the cat at a new location.
 
 ### Cat Bed
 
@@ -144,22 +164,23 @@ screen.
 * 3x Fiber
 
 Place the bed and interact with it to open the **Cat Bed** screen. You can also use `/cat bed` to
-send a nearby tamed cat to the nearest available bed.
+send a nearby tamed cat to the nearest available bed and manage despawned, sleeping, or waiting
+cats from one place.
 
 ### Cat Yarn Ball
 
-The Cat Yarn Ball is a simple toy for playful interaction.
+The Cat Yarn Ball is a toy for playful interaction and short fetch sessions with your tamed cats.
 
 **Crafting Recipe (Farming Bench):**
 
 * 2x Fiber
 
-Interact with your tamed cat while holding the yarn ball to trigger playful behavior and happy
-feedback.
+Use it directly on your cat for playful interaction, or throw it so nearby tamed cats can chase it
+and bring it back.
 
 ### Cat Treats
 
-Cat Treats give a bigger happiness boost than normal fish.
+Cat Treats give a bigger happiness boost than normal fish and can also help with healing.
 
 **Crafting Recipe (Farming Bench):**
 

@@ -19,32 +19,63 @@
 
 package de.markusbordihn.cats.interaction;
 
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class YarnBallThrowRegistry {
 
-  private static final ConcurrentHashMap<UUID, Long> pendingThrows = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<UUID, Entry> pendingThrows = new ConcurrentHashMap<>();
 
   private YarnBallThrowRegistry() {}
 
   public static void register(UUID playerUuid) {
-    pendingThrows.put(playerUuid, System.currentTimeMillis());
+    pendingThrows.put(playerUuid, new Entry(System.currentTimeMillis(), null));
+  }
+
+  public static void registerProjectile(
+      @Nonnull UUID playerUuid, @Nonnull Ref<EntityStore> projectileRef) {
+    pendingThrows.compute(
+        playerUuid,
+        (uuid, entry) ->
+            new Entry(entry != null ? entry.timestamp : System.currentTimeMillis(), projectileRef));
   }
 
   public static void complete(UUID playerUuid) {
     pendingThrows.remove(playerUuid);
   }
 
+  public static void complete(@Nonnull UUID playerUuid, @Nonnull Ref<EntityStore> projectileRef) {
+    pendingThrows.computeIfPresent(
+        playerUuid,
+        (uuid, entry) -> isSameProjectile(entry.projectileRef, projectileRef) ? null : entry);
+  }
+
   @Nullable
   public static UUID getRecentThrower(long maxAgeMs) {
     long now = System.currentTimeMillis();
     for (var entry : pendingThrows.entrySet()) {
-      if (now - entry.getValue() <= maxAgeMs) {
+      if (now - entry.getValue().timestamp <= maxAgeMs) {
         return entry.getKey();
       }
+      pendingThrows.remove(entry.getKey(), entry.getValue());
     }
     return null;
   }
+
+  public static boolean isCurrentProjectile(
+      @Nonnull UUID playerUuid, @Nonnull Ref<EntityStore> projectileRef) {
+    Entry entry = pendingThrows.get(playerUuid);
+    return entry != null && isSameProjectile(entry.projectileRef, projectileRef);
+  }
+
+  private static boolean isSameProjectile(
+      @Nullable Ref<EntityStore> left, @Nonnull Ref<EntityStore> right) {
+    return left == right || (left != null && left.equals(right));
+  }
+
+  private record Entry(long timestamp, @Nullable Ref<EntityStore> projectileRef) {}
 }

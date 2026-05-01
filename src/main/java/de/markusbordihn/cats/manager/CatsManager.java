@@ -38,6 +38,7 @@ import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import de.markusbordihn.cats.actions.BuilderActionCatMoodParticles;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
@@ -130,6 +131,7 @@ public class CatsManager extends RefSystem<EntityStore> {
     UUID entityUuid = getUuid(ref, store);
     if (entityUuid != null) {
       catRefCache.remove(entityUuid);
+      BuilderActionCatMoodParticles.ActionCatMoodParticles.clearEntity(ref);
       CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
       CatDataEntry catData = resource.getCat(entityUuid);
       if (catData != null
@@ -144,8 +146,11 @@ public class CatsManager extends RefSystem<EntityStore> {
   public Ref<EntityStore> getCatByUuid(
       @Nonnull UUID entityUuid, @Nonnull Store<EntityStore> store) {
     Ref<EntityStore> cached = catRefCache.get(entityUuid);
-    if (cached != null && cached.isValid()) {
-      return cached;
+    if (cached != null) {
+      if (cached.isValid()) {
+        return cached;
+      }
+      catRefCache.remove(entityUuid);
     }
 
     Ref<EntityStore> resolved = store.getExternalData().getRefFromUUID(entityUuid);
@@ -401,17 +406,48 @@ public class CatsManager extends RefSystem<EntityStore> {
     }
   }
 
+  public void storeCatInCarrier(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return;
+    }
+
+    Vector3i position = getPosition(catRef, store);
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource != null) {
+      CatDataEntry catData = resource.getCat(catUuid);
+      if (catData != null) {
+        resource.updateCat(
+            catUuid, catData.withStatus(CatStatus.IN_CARRIER).withPosition(position));
+      }
+    }
+  }
+
   public void updateCatUuid(
       @Nonnull UUID oldUuid, @Nonnull UUID newUuid, @Nonnull Store<EntityStore> store) {
+    updateCatUuid(oldUuid, newUuid, null, store);
+  }
+
+  public void updateCatUuid(
+      @Nonnull UUID oldUuid,
+      @Nonnull UUID newUuid,
+      @Nullable Ref<EntityStore> newRef,
+      @Nonnull Store<EntityStore> store) {
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
       CatDataEntry catData = resource.getCat(oldUuid);
       if (catData != null) {
         resource.removeCat(oldUuid);
         resource.addCat(catData.withUuid(newUuid).withStatus(CatStatus.SPAWNED));
-        Ref<EntityStore> oldRef = catRefCache.remove(oldUuid);
-        if (oldRef != null) {
-          catRefCache.put(newUuid, oldRef);
+        catRefCache.remove(oldUuid);
+        if (newRef != null && newRef.isValid()) {
+          catRefCache.put(newUuid, newRef);
+        } else {
+          Ref<EntityStore> resolved = store.getExternalData().getRefFromUUID(newUuid);
+          if (resolved != null && resolved.isValid()) {
+            catRefCache.put(newUuid, resolved);
+          }
         }
       }
     }
@@ -500,6 +536,27 @@ public class CatsManager extends RefSystem<EntityStore> {
   public CatNeedType getCriticalNeed(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
     return needsManager.getCriticalNeed(catRef, store);
+  }
+
+  public boolean isGiftEligible(
+      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
+    UUID catUuid = getUuid(catRef, store);
+    if (catUuid == null) {
+      return false;
+    }
+
+    CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
+    if (resource == null) {
+      return false;
+    }
+
+    CatDataEntry catData = resource.getCat(catUuid);
+    if (catData == null || !catData.hasOwner()) {
+      return false;
+    }
+
+    long now = System.currentTimeMillis();
+    return catData.lastGiftTime() <= 0 || (now - catData.lastGiftTime()) >= GIFT_COOLDOWN_MS;
   }
 
   @Nullable

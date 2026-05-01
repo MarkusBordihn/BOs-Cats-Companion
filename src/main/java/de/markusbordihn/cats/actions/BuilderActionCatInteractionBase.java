@@ -71,6 +71,9 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
     }
 
     protected boolean isCatTamed(Ref<EntityStore> entityRef, Store<EntityStore> store) {
+      if (entityRef == null || !entityRef.isValid()) {
+        return false;
+      }
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       return ownerComponent != null && ownerComponent.hasOwner();
@@ -131,7 +134,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
 
     protected boolean isOwner(
         Ref<EntityStore> entityRef, UUID playerUuid, Store<EntityStore> store) {
-      if (playerUuid == null) {
+      if (playerUuid == null || entityRef == null || !entityRef.isValid()) {
         return false;
       }
       CatOwnerComponent ownerComponent =

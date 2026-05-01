@@ -19,7 +19,8 @@ AI tools are used primarily for:
   registrations, configuration structures, simple data mappings, or similar repetitive tasks)
 - Generating early non-visual conceptual references for ideas, planning, or implementation notes
 
-AI-generated visual outputs are **not used as final assets in current releases of this project or in contest submissions**.
+AI-generated visual outputs are
+**not used as final assets in current releases of this project or in contest submissions**.
 AI is not used to generate, create, modify, or derive final pixel art, 3D models,
 textures, icons, logos, project avatars, promotional graphics, screenshots, or other
 graphical elements included in current releases of this project or in contest submissions.

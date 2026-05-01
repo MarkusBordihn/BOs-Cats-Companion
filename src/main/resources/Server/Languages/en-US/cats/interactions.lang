@@ -1,4 +1,5 @@
 carrier.already_occupied=The carrier contains {catName} (UUID: {catUuid}). Right-click on the ground to release.
+carrier.busy=The cat is still being packed away. Please try releasing it again in a moment.
 carrier.captured={catName} (UUID: {catUuid}) has been safely placed into the carrier!
 carrier.cat_already_in_world={catName} has already escaped the carrier and is in the world! Use the cat bed to call or spawn them. The carrier has been cleared.
 carrier.empty=The carrier is empty. Use it on your tamed cat to pick it up.

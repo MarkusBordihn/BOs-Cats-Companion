@@ -7,6 +7,17 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.14.0
+
+- Fixed wild cats getting stuck in sitting pose.
+- Fixed smaller memory leaks and performance issues in cat tracking and behavior systems.
+- Fixed model texture with half transparent pixels.
+- Fixed cat yarn ball interaction not working when the ball is on the ground.
+- Added cat group behavior to allow cats to follow and interact with each other when nearby.
+- Added new "IN_CARRIER" state for cats being transported in a carrier item.
+- Added cat gift hints for cat owners.
+- Added cat carrier confirmation page and despawn state for edge cases.
+
 ### 2.13.0
 
 - Fixed following stuck in place when path finding fails by retriggering search state.

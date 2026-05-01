@@ -29,6 +29,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Cats;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatStatus;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,8 +100,8 @@ public class CatsDataResource implements Resource<EntityStore> {
   }
 
   @Nonnull
-  public Set<CatDataEntry> getAllCats() {
-    return cats.values().stream().collect(Collectors.toUnmodifiableSet());
+  public Collection<CatDataEntry> getAllCats() {
+    return Collections.unmodifiableCollection(cats.values());
   }
 
   @Nonnull

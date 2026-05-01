@@ -149,12 +149,13 @@ public class CatCarrierInteraction {
           "Failed to set CapturedNPCMetadata on carrier, capture will proceed without icon swap");
     }
 
-    catsManager.despawnCat(entityRef, store);
+    catsManager.storeCatInCarrier(entityRef, store);
 
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity != null) {
       npcEntity.setDespawning(true);
       npcEntity.setDespawnRemainingSeconds(0.0f);
+      npcEntity.updateSpawnTrackingState(false);
     }
 
     updateHeldItem(player, heldItem, updatedItem);
@@ -239,6 +240,18 @@ public class CatCarrierInteraction {
       player.sendMessage(
           Message.translation("cats.interactions.carrier.not_owner").color(Constants.COLOR_ERROR));
       return true;
+    }
+
+    if (catData.isInCarrier()) {
+      Ref<EntityStore> existingCatRef = catsManager.getCatByUuid(storedCatUuid, store);
+      if (existingCatRef != null && existingCatRef.isValid()) {
+        player.sendMessage(
+            Message.translation("cats.interactions.carrier.busy").color(Constants.COLOR_WARNING));
+        LOGGER.at(Level.WARNING).log(
+            "Release requested for cat %s while the previous entity ref is still valid; retry later",
+            storedCatUuid);
+        return true;
+      }
     }
 
     Vector3d spawnPos = resolveSpawnPosition(store, player, playerUuid, targetPos);
@@ -344,7 +357,7 @@ public class CatCarrierInteraction {
 
       UUID newEntityUuid = catsManager.getUuid(catRef, store);
       if (newEntityUuid != null && !newEntityUuid.equals(catData.uuid())) {
-        catsManager.updateCatUuid(catData.uuid(), newEntityUuid, store);
+        catsManager.updateCatUuid(catData.uuid(), newEntityUuid, catRef, store);
       }
 
       if (catData.ownerUuid() != null) {

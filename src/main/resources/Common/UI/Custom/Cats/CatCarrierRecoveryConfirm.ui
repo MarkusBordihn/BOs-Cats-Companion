@@ -1,0 +1,64 @@
+$Common = "../Common.ui";
+
+$Common.@PageOverlay {
+  LayoutMode: Middle;
+  $Common.@DecoratedContainer #CatCarrierRecoveryConfirmRoot {
+    Anchor: (Width: 500, Height: 255);
+
+    #Title {
+      $Common.@Title #CatCarrierRecoveryConfirmTitle {
+        @Text = "Recover Cat";
+      }
+    }
+
+    #Content {
+      LayoutMode: Top;
+
+      Label #CatCarrierRecoveryConfirmSubtitle {
+        Anchor: (Height: 40, Bottom: 14);
+        Text: "Recover this cat from a lost carrier?";
+        Style: (
+          FontSize: 16,
+          TextColor: #f5c0c0,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center,
+          Wrap: true
+        );
+      }
+
+      Label #CatCarrierRecoveryConfirmWarning {
+        Anchor: (Height: 52, Bottom: 20);
+        Text: "This can have side effects if the carrier item still exists.";
+        Style: (
+          FontSize: 14,
+          TextColor: #ffcc66,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center,
+          Wrap: true
+        );
+      }
+
+      Group {
+        LayoutMode: Right;
+
+        $Common.@SmallSecondaryTextButton #CatCarrierRecoveryConfirmCancelButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Cancel";
+          @Anchor = (MinWidth: 128);
+        }
+
+        Group #CatCarrierRecoveryConfirmSpacer {
+          Anchor: (Width: 12);
+        }
+
+        $Common.@SmallTertiaryTextButton #CatCarrierRecoveryConfirmApplyButton {
+          @Sounds = $Common.@ButtonSounds;
+          @Text = "Recover";
+          @Anchor = (Right: 10, MinWidth: 160);
+        }
+      }
+    }
+  }
+}
+
+$Common.@BackButton {}

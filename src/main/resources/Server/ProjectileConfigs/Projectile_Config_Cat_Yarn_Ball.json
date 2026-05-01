@@ -24,18 +24,29 @@
     "Z": 0.0
   },
   "Interactions": {
+    "ProjectileSpawn": {
+      "Cooldown": {"Cooldown": 0},
+      "Interactions": [
+        {"Type": "Cat_Yarn_Ball_Projectile_Spawn_Register"}
+      ]
+    },
     "ProjectileMiss": {
       "Cooldown": {"Cooldown": 0},
       "Interactions": [
-        {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"},
-        {"Type": "RemoveEntity", "Entity": "User"}
+        {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"}
       ]
     },
     "ProjectileHit": {
       "Cooldown": {"Cooldown": 0},
       "Interactions": [
         {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"},
-        {"Type": "RemoveEntity", "Entity": "User"}
+        {"Type": "RemoveEntity"}
+      ]
+    },
+    "ProjectileBounce": {
+      "Cooldown": {"Cooldown": 0},
+      "Interactions": [
+        {"Type": "Cat_Yarn_Ball_Fetch_From_Projectile"}
       ]
     }
   }
