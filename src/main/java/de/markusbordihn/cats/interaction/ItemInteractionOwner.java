@@ -60,14 +60,18 @@ public class ItemInteractionOwner {
       String catName = nameplate != null ? nameplate.getText() : null;
 
       if (catName != null && !catName.isEmpty()) {
-        player.sendMessage(
-            Message.translation("cats.interactions.item.unknown.named")
-                .param("catName", catName)
-                .color(Constants.COLOR_SOFT_ORANGE));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.item.unknown.named")
+                    .param("catName", catName)
+                    .color(Constants.COLOR_SOFT_ORANGE));
       } else {
-        player.sendMessage(
-            Message.translation("cats.interactions.item.unknown")
-                .color(Constants.COLOR_SOFT_ORANGE));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.item.unknown")
+                    .color(Constants.COLOR_SOFT_ORANGE));
       }
     }
 

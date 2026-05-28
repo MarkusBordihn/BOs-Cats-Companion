@@ -497,7 +497,7 @@
               "BodyMotion": {
                 "Type": "Wander",
                 "RelativeSpeed": 0.4,
-                "WanderDistance": 2
+                "MaxHeadingChange": 2
               }
             },
             {
@@ -1176,7 +1176,7 @@
                   "BodyMotion": {
                     "Type": "Wander",
                     "RelativeSpeed": 0.4,
-                    "WanderDistance": 3
+                    "MaxHeadingChange": 2
                   }
                 }
               ]
@@ -1521,8 +1521,7 @@
                 }
               ],
               "BodyMotion": {
-                "Type": "Path",
-                "UsePathfinder": true
+                "Type": "Path"
               }
             },
             {

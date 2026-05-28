@@ -23,8 +23,7 @@ import com.hypixel.hytale.builtin.path.path.TransientPath;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
@@ -44,6 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
+import org.joml.Vector3d;
 
 final class CatPounceCommand extends CatCommand {
 
@@ -116,7 +116,8 @@ final class CatPounceCommand extends CatCommand {
       npcEntity.getRole().getMarkedEntitySupport().setMarkedEntity("LockedTarget", targetRef);
 
       TransientPath path = new TransientPath();
-      path.addWaypoint(new Vector3d(targetPos.x, targetPos.y, targetPos.z), new Vector3f(0, 0, 0));
+      path.addWaypoint(
+          new Vector3d(targetPos.x, targetPos.y, targetPos.z), new Rotation3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
 

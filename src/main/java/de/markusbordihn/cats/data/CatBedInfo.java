@@ -19,7 +19,7 @@
 
 package de.markusbordihn.cats.data;
 
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 
 public record CatBedInfo(Vector3d position, double distance) {
 

@@ -22,8 +22,7 @@ package de.markusbordihn.cats.commands;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
@@ -45,6 +44,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
+import org.joml.Vector3d;
 
 final class CatSpawnCommand extends CatCommand {
 
@@ -238,7 +238,7 @@ final class CatSpawnCommand extends CatCommand {
         return false;
       }
 
-      Vector3f rotation = new Vector3f();
+      Rotation3f rotation = new Rotation3f();
       Pair<Ref<EntityStore>, NPCEntity> spawnResult =
           npcPlugin.spawnEntity(store, roleIndex, position, rotation, null, null, null);
 

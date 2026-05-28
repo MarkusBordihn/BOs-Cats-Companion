@@ -23,8 +23,7 @@ import com.google.gson.JsonElement;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -45,6 +44,7 @@ import de.markusbordihn.cats.manager.CatsManager;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public class BuilderActionCatGoToBed extends BuilderActionBase {
 
@@ -134,7 +134,7 @@ public class BuilderActionCatGoToBed extends BuilderActionBase {
                   availableBed.getPosition().x,
                   availableBed.getPosition().y + 0.5,
                   availableBed.getPosition().z),
-              new Vector3f(0, 0, 0));
+              new Rotation3f(0, 0, 0));
           npcEntity.getPathManager().setTransientPath(path);
         }
         store.putComponent(

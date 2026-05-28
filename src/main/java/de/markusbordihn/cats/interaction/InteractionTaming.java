@@ -69,16 +69,18 @@ public class InteractionTaming {
     if (!progressComponent.canFeedNow(FEEDING_COOLDOWN_MS)) {
       role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
       if (player != null) {
-        player.sendMessage(
-            Message.translation("cats.interactions.taming.too_soon")
-                .param(
-                    "seconds",
-                    String.valueOf(
-                        (progressComponent.getLastFedTimestamp()
-                                + FEEDING_COOLDOWN_MS
-                                - System.currentTimeMillis())
-                            / 1000))
-                .color(Constants.COLOR_WARNING));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.taming.too_soon")
+                    .param(
+                        "seconds",
+                        String.valueOf(
+                            (progressComponent.getLastFedTimestamp()
+                                    + FEEDING_COOLDOWN_MS
+                                    - System.currentTimeMillis())
+                                / 1000))
+                    .color(Constants.COLOR_WARNING));
       }
       return true;
     }
@@ -120,23 +122,31 @@ public class InteractionTaming {
     role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
 
     if (player != null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.taming.progress")
-              .param("current", String.valueOf(currentProgress))
-              .param("required", String.valueOf(requiredProgress))
-              .color(Constants.COLOR_INFO));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.taming.progress")
+                  .param("current", String.valueOf(currentProgress))
+                  .param("required", String.valueOf(requiredProgress))
+                  .color(Constants.COLOR_INFO));
       if (currentProgress == 1) {
-        player.sendMessage(
-            Message.translation("cats.interactions.taming.gaining_trust")
-                .color(Constants.COLOR_SUCCESS));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.taming.gaining_trust")
+                    .color(Constants.COLOR_SUCCESS));
       } else if (currentProgress >= requiredProgress - 1) {
-        player.sendMessage(
-            Message.translation("cats.interactions.taming.almost_there")
-                .color(Constants.COLOR_SUCCESS));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.taming.almost_there")
+                    .color(Constants.COLOR_SUCCESS));
       } else {
-        player.sendMessage(
-            Message.translation("cats.interactions.taming.likes_food")
-                .color(Constants.COLOR_SUCCESS));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.taming.likes_food")
+                    .color(Constants.COLOR_SUCCESS));
       }
     }
 
@@ -181,20 +191,24 @@ public class InteractionTaming {
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - CatsManager is null");
-      player.sendMessage(
-          Message.translation("cats.interactions.taming.error_system")
-              .color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.taming.error_system")
+                  .color(Constants.COLOR_ERROR));
       return;
     }
 
     int currentCatCount = catsManager.getCatCountByOwner(playerUuid, store);
     int catLimit = getCatLimit(player);
     if (catLimit >= 0 && currentCatCount >= catLimit) {
-      player.sendMessage(
-          Message.translation("cats.interactions.taming.limit_reached")
-              .param("current", String.valueOf(currentCatCount))
-              .param("limit", String.valueOf(catLimit))
-              .color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.taming.limit_reached")
+                  .param("current", String.valueOf(currentCatCount))
+                  .param("limit", String.valueOf(catLimit))
+                  .color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -203,9 +217,11 @@ public class InteractionTaming {
     UUID catUuid = catUuidComponent != null ? catUuidComponent.getUuid() : null;
     if (catUuid == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - cat UUID not found");
-      player.sendMessage(
-          Message.translation("cats.interactions.taming.error_no_uuid")
-              .color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.taming.error_no_uuid")
+                  .color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -263,24 +279,33 @@ public class InteractionTaming {
             catData != null ? catData.happiness() : 40);
     player.getPageManager().openCustomPage(playerEntityRef, store, successPage);
 
-    player.sendMessage(
-        Message.translation("cats.interactions.taming.success")
-            .param("item", itemName)
-            .param("catName", catName)
-            .color(Constants.COLOR_SUCCESS));
-    player.sendMessage(
-        Message.translation("cats.interactions.taming.companion").color(Constants.COLOR_WARNING));
-    player.sendMessage(
-        Message.translation("cats.interactions.taming.help")
-            .param("catName", catName)
-            .color(Constants.COLOR_INFO));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.interactions.taming.success")
+                .param("item", itemName)
+                .param("catName", catName)
+                .color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.interactions.taming.companion")
+                .color(Constants.COLOR_WARNING));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.interactions.taming.help")
+                .param("catName", catName)
+                .color(Constants.COLOR_INFO));
 
     if (catLimit >= 0) {
-      player.sendMessage(
-          Message.translation("cats.interactions.taming.count")
-              .param("current", String.valueOf(currentCatCount + 1))
-              .param("limit", String.valueOf(catLimit))
-              .color(Constants.COLOR_GRAY));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.taming.count")
+                  .param("current", String.valueOf(currentCatCount + 1))
+                  .param("limit", String.valueOf(catLimit))
+                  .color(Constants.COLOR_GRAY));
     }
 
     LOGGER.at(Level.INFO).log(

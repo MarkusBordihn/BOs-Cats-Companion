@@ -130,7 +130,7 @@ public abstract class CatCommand extends AbstractWorldCommand {
       return null;
     }
 
-    return context.sender().getDisplayName();
+    return context.sender().getUsername();
   }
 
   @Nullable

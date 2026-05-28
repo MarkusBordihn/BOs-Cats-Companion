@@ -25,8 +25,7 @@ import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -51,6 +50,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
 
@@ -107,7 +107,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
     private static void setTransientPath(@Nonnull NPCEntity npcEntity, @Nonnull Vector3d target) {
       npcEntity.getPathManager().setTransientPath(null);
       TransientPath path = new TransientPath();
-      path.addWaypoint(target, new Vector3f(0, 0, 0));
+      path.addWaypoint(target, new Rotation3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
 

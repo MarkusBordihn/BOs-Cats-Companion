@@ -24,9 +24,7 @@ import com.hypixel.hytale.codec.codecs.simple.StringCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
@@ -54,6 +52,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 public class CatCarrierInteraction {
 
@@ -78,42 +78,53 @@ public class CatCarrierInteraction {
     UUID storedCatUuid = heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC);
     if (storedCatUuid != null) {
       String storedName = heldItem.getFromMetadataOrNull(META_CAT_NAME, STRING_CODEC);
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.already_occupied")
-              .param("catName", storedName != null ? storedName : "a cat")
-              .param("catUuid", storedCatUuid.toString())
-              .color(Constants.COLOR_WARNING));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.already_occupied")
+                  .param("catName", storedName != null ? storedName : "a cat")
+                  .param("catUuid", storedCatUuid.toString())
+                  .color(Constants.COLOR_WARNING));
       return true;
     }
 
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.not_tamed")
-              .color(Constants.COLOR_WARNING));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.not_tamed")
+                  .color(Constants.COLOR_WARNING));
       return true;
     }
 
     UUID playerUuid = player.getUuid();
     if (playerUuid == null || !playerUuid.equals(ownerComponent.getOwnerUUID())) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.not_owner").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.not_owner")
+                  .color(Constants.COLOR_ERROR));
       return true;
     }
 
     CatActionWheelPage.closeIfOpen(player);
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     UUID catUuid = catsManager.getUuid(entityRef, store);
     if (catUuid == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
@@ -161,11 +172,13 @@ public class CatCarrierInteraction {
     updateHeldItem(player, heldItem, updatedItem);
 
     String displayName = catName != null && !catName.isEmpty() ? catName : "Cat";
-    player.sendMessage(
-        Message.translation("cats.interactions.carrier.captured")
-            .param("catName", displayName)
-            .param("catUuid", catUuid.toString())
-            .color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.interactions.carrier.captured")
+                .param("catName", displayName)
+                .param("catUuid", catUuid.toString())
+                .color(Constants.COLOR_SUCCESS));
 
     LOGGER.at(Level.INFO).log(
         "Player %s captured cat %s (UUID: %s) into carrier",
@@ -197,15 +210,19 @@ public class CatCarrierInteraction {
 
     UUID playerUuid = player.getUuid();
     if (playerUuid == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
@@ -222,31 +239,42 @@ public class CatCarrierInteraction {
       if (respawnedCat != null) {
         String displayName = storedName;
         updateHeldItem(player, heldItem, heldItem.withMetadata(null));
-        player.sendMessage(
-            Message.translation("cats.interactions.carrier.cat_already_in_world")
-                .param("catName", displayName)
-                .color(Constants.COLOR_WARNING));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.carrier.cat_already_in_world")
+                    .param("catName", displayName)
+                    .color(Constants.COLOR_WARNING));
         LOGGER.at(Level.INFO).log(
             "Carrier stale-UUID cleared for player %s: cat '%s' was already re-spawned with new UUID",
             playerUuid, displayName);
       } else {
-        player.sendMessage(
-            Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.carrier.error")
+                    .color(Constants.COLOR_ERROR));
       }
       return true;
     }
 
     if (catData.ownerUuid() != null && !playerUuid.equals(catData.ownerUuid())) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.not_owner").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.not_owner")
+                  .color(Constants.COLOR_ERROR));
       return true;
     }
 
     if (catData.isInCarrier()) {
       Ref<EntityStore> existingCatRef = catsManager.getCatByUuid(storedCatUuid, store);
       if (existingCatRef != null && existingCatRef.isValid()) {
-        player.sendMessage(
-            Message.translation("cats.interactions.carrier.busy").color(Constants.COLOR_WARNING));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.interactions.carrier.busy")
+                    .color(Constants.COLOR_WARNING));
         LOGGER.at(Level.WARNING).log(
             "Release requested for cat %s while the previous entity ref is still valid; retry later",
             storedCatUuid);
@@ -256,15 +284,19 @@ public class CatCarrierInteraction {
 
     Vector3d spawnPos = resolveSpawnPosition(store, player, playerUuid, targetPos);
     if (spawnPos == null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     if (!spawnCatFromData(catData, spawnPos, store)) {
-      player.sendMessage(
-          Message.translation("cats.interactions.carrier.release_failed")
-              .color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.carrier.release_failed")
+                  .color(Constants.COLOR_ERROR));
       return true;
     }
 
@@ -272,10 +304,12 @@ public class CatCarrierInteraction {
     updateHeldItem(player, heldItem, emptyCarrier);
 
     String displayName = storedName != null && !storedName.isEmpty() ? storedName : "Cat";
-    player.sendMessage(
-        Message.translation("cats.interactions.carrier.released")
-            .param("catName", displayName)
-            .color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.interactions.carrier.released")
+                .param("catName", displayName)
+                .color(Constants.COLOR_SUCCESS));
 
     LOGGER.at(Level.INFO).log(
         "Player %s released cat %s from carrier at (%s)", player.getUuid(), displayName, spawnPos);
@@ -297,7 +331,7 @@ public class CatCarrierInteraction {
       @Nonnull UUID playerUuid,
       @Nullable Vector3d targetPos) {
     if (targetPos != null) {
-      return new Vector3d(targetPos.getX() + 0.5, targetPos.getY() + 1.0, targetPos.getZ() + 0.5);
+      return new Vector3d(targetPos.x + 0.5, targetPos.y + 1.0, targetPos.z + 0.5);
     }
 
     Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
@@ -311,7 +345,8 @@ public class CatCarrierInteraction {
       return null;
     }
 
-    return playerTransform.getPosition().add(Math.random() * 4 - 2, 0, Math.random() * 4 - 2);
+    return new Vector3d(playerTransform.getPosition())
+        .add(Math.random() * 4 - 2, 0, Math.random() * 4 - 2);
   }
 
   private static boolean spawnCatFromData(
@@ -338,7 +373,7 @@ public class CatCarrierInteraction {
         return false;
       }
 
-      Vector3f rotation = new Vector3f();
+      Rotation3f rotation = new Rotation3f();
       Pair<Ref<EntityStore>, NPCEntity> spawnResult =
           npcPlugin.spawnEntity(store, roleIndex, position, rotation, null, null, null);
 
@@ -437,7 +472,7 @@ public class CatCarrierInteraction {
     Vector3d targetPos = null;
     Vector3i targetBlock = event.getTargetBlock();
     if (targetBlock != null) {
-      targetPos = new Vector3d(targetBlock.getX(), targetBlock.getY(), targetBlock.getZ());
+      targetPos = new Vector3d(targetBlock.x, targetBlock.y, targetBlock.z);
     }
 
     boolean consumed = handleRelease(store, player, heldItem, targetPos);

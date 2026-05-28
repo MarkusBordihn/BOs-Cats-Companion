@@ -19,9 +19,12 @@
 
 package de.markusbordihn.cats.interaction;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
@@ -54,7 +57,13 @@ public final class ItemReturnFeedbackHandler {
     if (catName != null && !catName.isEmpty()) {
       message = message.param("catName", catName);
     }
-    player.sendMessage(message);
+    Ref<EntityStore> playerEntityRef = player.getReference();
+    if (playerEntityRef != null && playerEntityRef.isValid()) {
+      playerEntityRef
+          .getStore()
+          .getComponent(playerEntityRef, PlayerRef.getComponentType())
+          .sendMessage(message);
+    }
 
     LOGGER.at(Level.FINE).log("Delivered item %s with message key %s", itemId, translationKey);
   }

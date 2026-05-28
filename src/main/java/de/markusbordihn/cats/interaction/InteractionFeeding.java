@@ -71,9 +71,11 @@ public class InteractionFeeding {
       Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
       if (treatAlarm.isSet() && !treatAlarm.hasPassed(worldTime.getGameTime())) {
         if (player != null) {
-          player.sendMessage(
-              Message.translation("cats.interactions.feeding.treat.cooldown")
-                  .color(Constants.COLOR_INFO));
+          player
+              .getPlayerRef()
+              .sendMessage(
+                  Message.translation("cats.interactions.feeding.treat.cooldown")
+                      .color(Constants.COLOR_INFO));
         }
         return true;
       }
@@ -146,7 +148,7 @@ public class InteractionFeeding {
             isTreat
                 ? "cats.interactions.feeding.treat.full_health"
                 : "cats.interactions.feeding.full_health";
-        player.sendMessage(Message.translation(msgKey).color(Constants.COLOR_INFO));
+        player.getPlayerRef().sendMessage(Message.translation(msgKey).color(Constants.COLOR_INFO));
       }
       return;
     }
@@ -161,12 +163,14 @@ public class InteractionFeeding {
     if (player != null) {
       String msgKey =
           isTreat ? "cats.interactions.feeding.treat.healed" : "cats.interactions.feeding.healed";
-      player.sendMessage(
-          Message.translation(msgKey)
-              .param("amount", String.valueOf((int) healedAmount))
-              .param("health", String.valueOf((int) newHealth))
-              .param("maxHealth", String.valueOf((int) maxHealth))
-              .color(Constants.COLOR_SUCCESS));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation(msgKey)
+                  .param("amount", String.valueOf((int) healedAmount))
+                  .param("health", String.valueOf((int) newHealth))
+                  .param("maxHealth", String.valueOf((int) maxHealth))
+                  .color(Constants.COLOR_SUCCESS));
     }
   }
 }

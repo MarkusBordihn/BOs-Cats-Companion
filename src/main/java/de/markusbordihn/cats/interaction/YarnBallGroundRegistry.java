@@ -19,10 +19,10 @@
 
 package de.markusbordihn.cats.interaction;
 
-import com.hypixel.hytale.math.vector.Vector3d;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public final class YarnBallGroundRegistry {
 

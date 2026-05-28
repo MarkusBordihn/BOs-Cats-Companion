@@ -22,8 +22,7 @@ package de.markusbordihn.cats.ui;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -42,6 +41,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public final class CatActionHelper {
 
@@ -101,7 +101,7 @@ public final class CatActionHelper {
 
     if (origin != null) {
       TransientPath path = new TransientPath();
-      path.addWaypoint(new Vector3d(origin.x + 3.0, origin.y, origin.z), new Vector3f(0, 0, 0));
+      path.addWaypoint(new Vector3d(origin.x + 3.0, origin.y, origin.z), new Rotation3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
     return true;
@@ -169,7 +169,7 @@ public final class CatActionHelper {
     store.putComponent(catRef, stateType, new CatStateComponent(CatState.FETCHING));
     npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
     TransientPath path = new TransientPath();
-    path.addWaypoint(ballPos, new Vector3f(0, 0, 0));
+    path.addWaypoint(ballPos, new Rotation3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(path);
     return true;
   }
@@ -218,7 +218,7 @@ public final class CatActionHelper {
             availableBed.getPosition().x,
             availableBed.getPosition().y + 0.5,
             availableBed.getPosition().z),
-        new Vector3f(0, 0, 0));
+        new Rotation3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(path);
     store.putComponent(
         entityRef,
@@ -283,7 +283,7 @@ public final class CatActionHelper {
               targetTransform.getPosition().x,
               targetTransform.getPosition().y,
               targetTransform.getPosition().z),
-          new Vector3f(0, 0, 0));
+          new Rotation3f(0, 0, 0));
       npcEntity.getPathManager().setTransientPath(path);
     }
 

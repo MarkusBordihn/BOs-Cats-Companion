@@ -27,8 +27,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -54,6 +53,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
 
@@ -153,7 +153,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     commandBuffer.putComponent(catRef, catStateType, new CatStateComponent(CatState.FETCHING));
     npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
     TransientPath path = new TransientPath();
-    path.addWaypoint(landingPosition, new Vector3f(0, 0, 0));
+    path.addWaypoint(landingPosition, new Rotation3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(null);
     npcEntity.getPathManager().setTransientPath(path);
     return true;
@@ -203,9 +203,11 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       if (projectileRef.isValid()) {
         commandBuffer.removeEntity(projectileRef, RemoveReason.REMOVE);
       }
-      player.sendMessage(
-          Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
-              .color(Constants.COLOR_SOFT_ORANGE));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
+                  .color(Constants.COLOR_SOFT_ORANGE));
       return false;
     }
 
@@ -225,7 +227,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (catName != null) {
       thrownMessage = thrownMessage.param("catName", catName);
     }
-    player.sendMessage(thrownMessage);
+    player.getPlayerRef().sendMessage(thrownMessage);
     return true;
   }
 

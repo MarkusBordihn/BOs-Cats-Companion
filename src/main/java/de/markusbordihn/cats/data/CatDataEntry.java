@@ -25,12 +25,13 @@ import com.hypixel.hytale.codec.codecs.UUIDBinaryCodec;
 import com.hypixel.hytale.codec.codecs.simple.StringCodec;
 import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
-import com.hypixel.hytale.math.vector.Vector3i;
+import com.hypixel.hytale.math.vector.Vector3iUtil;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
+import org.joml.Vector3i;
 
 public record CatDataEntry(
     @Nonnull UUID uuid,
@@ -93,7 +94,7 @@ public record CatDataEntry(
                   : null,
               CatState.CODEC.decode(bsonDocument.get(STATE_TAG), info),
               bsonDocument.containsKey(POSITION_TAG)
-                  ? Vector3i.CODEC.decode(bsonDocument.get(POSITION_TAG), info)
+                  ? Vector3iUtil.CODEC.decode(bsonDocument.get(POSITION_TAG), info)
                   : null,
               CatStatus.CODEC.decode(bsonDocument.get(STATUS_TAG), info),
               bsonDocument.containsKey(PERSONALITY_TAG)
@@ -143,7 +144,7 @@ public record CatDataEntry(
           if (entry.name != null) bsonDocument.put(NAME_TAG, STRING_CODEC.encode(entry.name, info));
           bsonDocument.put(STATE_TAG, CatState.CODEC.encode(entry.state, info));
           if (entry.position != null)
-            bsonDocument.put(POSITION_TAG, Vector3i.CODEC.encode(entry.position, info));
+            bsonDocument.put(POSITION_TAG, Vector3iUtil.CODEC.encode(entry.position, info));
           bsonDocument.put(STATUS_TAG, CatStatus.CODEC.encode(entry.status, info));
           if (entry.personalityType != null)
             bsonDocument.put(

@@ -25,8 +25,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
@@ -59,6 +58,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.joml.Vector3d;
 
 public final class CatBedSpawnPage
     extends InteractiveCustomUIPage<CatBedSpawnPage.BedSpawnEventData> {
@@ -275,8 +275,9 @@ public final class CatBedSpawnPage
 
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       this.close();
       return;
     }
@@ -304,24 +305,28 @@ public final class CatBedSpawnPage
     }
 
     if (this.bedPosition == null) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       this.close();
       return;
     }
 
     CatDataEntry catData = catsManager.getCatData(catUuid, store);
     if (catData == null) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       this.close();
       return;
     }
 
     UUID playerUuid = player.getUuid();
     if (playerUuid == null || !playerUuid.equals(catData.ownerUuid())) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.not_owner").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.ui.bed_spawn.not_owner").color(Constants.COLOR_ERROR));
       this.close();
       return;
     }
@@ -355,8 +360,9 @@ public final class CatBedSpawnPage
       @Nonnull Player player) {
     Ref<EntityStore> catRef = catsManager.getCatByUuid(catUuid, store);
     if (catRef == null || !catRef.isValid()) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -369,16 +375,18 @@ public final class CatBedSpawnPage
         TransformComponent.getComponentType(),
         new TransformComponent(
             teleportPosition,
-            currentTransform != null ? currentTransform.getRotation() : new Vector3f(0, 0, 0)));
+            currentTransform != null ? currentTransform.getRotation() : new Rotation3f(0, 0, 0)));
 
     World world = store.getExternalData().getWorld();
     CatActionHelper.goToBed(catRef, store, world);
 
     String displayName = catData.displayName();
-    player.sendMessage(
-        Message.translation("cats.ui.bed_spawn.call_success")
-            .param("catName", displayName)
-            .color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.ui.bed_spawn.call_success")
+                .param("catName", displayName)
+                .color(Constants.COLOR_SUCCESS));
     LOGGER.at(Level.INFO).log(
         "Player %s called cat %s to bed at (%s)", player.getUuid(), displayName, this.bedPosition);
   }
@@ -390,14 +398,17 @@ public final class CatBedSpawnPage
       @Nonnull Player player) {
     Ref<EntityStore> catRef = catsManager.getCatByUuid(catUuid, store);
     if (catRef == null || !catRef.isValid()) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       return;
     }
 
     CatActionHelper.leaveBed(catRef, store);
-    player.sendMessage(
-        Message.translation("cats.ui.bed_spawn.empty_success").color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.ui.bed_spawn.empty_success").color(Constants.COLOR_SUCCESS));
   }
 
   private void handleEmptyBed(
@@ -438,16 +449,21 @@ public final class CatBedSpawnPage
         CatActionHelper.leaveBed(catRef, store);
       }
     }
-    player.sendMessage(
-        Message.translation("cats.ui.bed_spawn.empty_success").color(Constants.COLOR_SUCCESS));
+    player
+        .getPlayerRef()
+        .sendMessage(
+            Message.translation("cats.ui.bed_spawn.empty_success").color(Constants.COLOR_SUCCESS));
   }
 
   private void handleSpawnCat(
       @Nonnull CatDataEntry catData, @Nonnull Store<EntityStore> store, @Nonnull Player player) {
     CatsManager catsManager = CatsManager.getInstance();
     if (catData.isSpawned()) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.already_spawned").color(Constants.COLOR_WARNING));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation("cats.ui.bed_spawn.already_spawned")
+                  .color(Constants.COLOR_WARNING));
       return;
     }
 
@@ -464,16 +480,18 @@ public final class CatBedSpawnPage
     }
 
     if (catData.catType() == CatType.UNKNOWN || catData.catType().getTamedRoleName().isEmpty()) {
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       return;
     }
 
     NPCPlugin npcPlugin = NPCPlugin.get();
     if (npcPlugin == null) {
       LOGGER.at(Level.WARNING).log("Cannot spawn cat from bed: NPCPlugin is not available");
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -481,8 +499,9 @@ public final class CatBedSpawnPage
     int roleIndex = npcPlugin.getIndex(roleName);
     if (roleIndex < 0) {
       LOGGER.at(Level.WARNING).log("Cannot spawn cat from bed: Role '%s' not found", roleName);
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
       return;
     }
 
@@ -491,12 +510,15 @@ public final class CatBedSpawnPage
 
     try {
       Pair<Ref<EntityStore>, NPCEntity> spawnResult =
-          npcPlugin.spawnEntity(store, roleIndex, spawnPosition, new Vector3f(), null, null, null);
+          npcPlugin.spawnEntity(
+              store, roleIndex, spawnPosition, new Rotation3f(), null, null, null);
 
       if (spawnResult == null || spawnResult.left() == null || !spawnResult.left().isValid()) {
         LOGGER.at(Level.WARNING).log("Failed to spawn cat from bed: spawnEntity returned invalid");
-        player.sendMessage(
-            Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+        player
+            .getPlayerRef()
+            .sendMessage(
+                Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
         return;
       }
 
@@ -531,20 +553,23 @@ public final class CatBedSpawnPage
       }
 
       String displayName = catData.displayName();
-      player.sendMessage(
-          Message.translation(
-                  catData.isInCarrier()
-                      ? "cats.ui.bed_spawn.recover_success"
-                      : "cats.ui.bed_spawn.spawn_success")
-              .param("catName", displayName)
-              .color(Constants.COLOR_SUCCESS));
+      player
+          .getPlayerRef()
+          .sendMessage(
+              Message.translation(
+                      catData.isInCarrier()
+                          ? "cats.ui.bed_spawn.recover_success"
+                          : "cats.ui.bed_spawn.spawn_success")
+                  .param("catName", displayName)
+                  .color(Constants.COLOR_SUCCESS));
       LOGGER.at(Level.INFO).log(
           "Player %s spawned cat %s into bed at (%s)",
           player.getUuid(), displayName, this.bedPosition);
     } catch (Exception e) {
       LOGGER.at(Level.WARNING).withCause(e).log("Failed to spawn cat from bed");
-      player.sendMessage(
-          Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
+      player
+          .getPlayerRef()
+          .sendMessage(Message.translation("cats.ui.bed_spawn.error").color(Constants.COLOR_ERROR));
     }
   }
 

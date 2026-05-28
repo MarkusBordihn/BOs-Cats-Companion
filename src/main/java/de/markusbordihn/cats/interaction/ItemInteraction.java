@@ -25,6 +25,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
@@ -80,9 +81,11 @@ public class ItemInteraction {
     // Trigger Rejection animation state (angry particles, returns to Wild after 1 second)
     role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
 
-    if (player != null) {
-      player.sendMessage(
-          Message.translation("cats.interactions.wild.reject").color(Constants.COLOR_RED_SOFT));
+    if (player != null && player.getReference() != null) {
+      store
+          .getComponent(player.getReference(), PlayerRef.getComponentType())
+          .sendMessage(
+              Message.translation("cats.interactions.wild.reject").color(Constants.COLOR_RED_SOFT));
     }
   }
 }
