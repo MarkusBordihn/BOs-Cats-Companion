@@ -16,6 +16,9 @@ base {
 
 def hytaleHomePath = project.findProperty('hytaleHome')
 def hytaleServerJarPath = project.findProperty('hytaleServerJar')
+def rawHytaleBuildVersion = project.hytale_build.toString()
+def hytaleBuildVersion = rawHytaleBuildVersion.replaceFirst(/^\^/, '')
+def hytaleManifestServerVersion = rawHytaleBuildVersion.startsWith('^') ? rawHytaleBuildVersion : "^${hytaleBuildVersion}"
 def hasLocalServer = hytaleServerJarPath && file(hytaleServerJarPath).exists()
 if (!hasLocalServer) {
   logger.lifecycle("Local Hytale server not found; using compileOnly for CI builds.")
@@ -54,9 +57,9 @@ dependencies {
     testCompileOnly(files(hytaleServerJarPath))
     testRuntimeOnly(files(hytaleServerJarPath))
   } else {
-    compileOnly("com.hypixel.hytale:Server:$hytale_build")
-    testCompileOnly("com.hypixel.hytale:Server:$hytale_build")
-    testRuntimeOnly("com.hypixel.hytale:Server:$hytale_build")
+    compileOnly("com.hypixel.hytale:Server:$hytaleBuildVersion")
+    testCompileOnly("com.hypixel.hytale:Server:$hytaleBuildVersion")
+    testRuntimeOnly("com.hypixel.hytale:Server:$hytaleBuildVersion")
   }
 }
 
@@ -79,9 +82,9 @@ tasks.register('updatePluginManifest') {
     }
     def manifest = new JsonSlurper().parseText(manifestFile.text)
     manifest.Version = project.version
-    manifest.ServerVersion = project.hytale_build
+    manifest.ServerVersion = hytaleManifestServerVersion
     manifestFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(manifest))
-    logger.lifecycle("Updated manifest.json: Version=${project.version}, ServerVersion=${project.hytale_build}")
+    logger.lifecycle("Updated manifest.json: Version=${project.version}, ServerVersion=${hytaleManifestServerVersion}")
   }
 }
 
