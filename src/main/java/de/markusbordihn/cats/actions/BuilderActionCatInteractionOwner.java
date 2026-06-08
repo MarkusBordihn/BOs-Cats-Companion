@@ -89,8 +89,10 @@ public class BuilderActionCatInteractionOwner extends BuilderActionCatInteractio
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      Player player = getPlayerFromInfoProvider(role, infoProvider, store);
-      ItemStack heldItem = getHeldItem(player);
+      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(role, infoProvider);
+      Player player =
+          playerRef != null ? store.getComponent(playerRef, Player.getComponentType()) : null;
+      ItemStack heldItem = getHeldItem(playerRef, store);
 
       if (heldItem != null && heldItem.isValid()) {
         return ItemInteractionOwner.handle(entityRef, role, store, player, heldItem);

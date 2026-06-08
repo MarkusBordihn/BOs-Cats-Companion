@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -92,12 +92,11 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       return playerRefComponent != null ? playerRefComponent.getUuid() : null;
     }
 
-    protected Player getPlayerFromInfoProvider(
-        Role role, InfoProvider infoProvider, Store<EntityStore> store) {
+    protected Ref<EntityStore> getPlayerRefFromInfoProvider(Role role, InfoProvider infoProvider) {
       if (role != null && role.getStateSupport() != null) {
         Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
         if (playerRef != null && playerRef.isValid()) {
-          return store.getComponent(playerRef, Player.getComponentType());
+          return playerRef;
         }
       }
 
@@ -106,7 +105,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
         if (posProvider instanceof EntityPositionProvider) {
           Ref<EntityStore> playerRef = posProvider.getTarget();
           if (playerRef != null && playerRef.isValid()) {
-            return store.getComponent(playerRef, Player.getComponentType());
+            return playerRef;
           }
         }
       }
@@ -114,17 +113,18 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       return null;
     }
 
-    protected ItemStack getHeldItem(Player player) {
-      if (player == null) {
+    protected Player getPlayerFromInfoProvider(
+        Role role, InfoProvider infoProvider, Store<EntityStore> store) {
+      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(role, infoProvider);
+      return playerRef != null ? store.getComponent(playerRef, Player.getComponentType()) : null;
+    }
+
+    protected ItemStack getHeldItem(Ref<EntityStore> playerRef, Store<EntityStore> store) {
+      if (playerRef == null || !playerRef.isValid()) {
         return null;
       }
 
-      Inventory inventory = player.getInventory();
-      if (inventory == null) {
-        return null;
-      }
-
-      ItemStack activeItem = inventory.getActiveHotbarItem();
+      ItemStack activeItem = InventoryComponent.getItemInHand(store, playerRef);
       if (activeItem == null || activeItem.isEmpty()) {
         return null;
       }

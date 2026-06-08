@@ -7,6 +7,10 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 2.17.0
+
+- Migrated to Hytale 0.5.4 with updated APIs and systems.
+
 ### 2.16.0
 
 - Migrated to Hytale 0.5.2 with updated APIs and systems.

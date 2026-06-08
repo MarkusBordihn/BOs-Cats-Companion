@@ -22,7 +22,7 @@ package de.markusbordihn.cats.sensors;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
@@ -66,12 +66,7 @@ public abstract class BuilderSensorIsHoldingItemBase extends BuilderSensorBase {
         return false;
       }
 
-      Inventory inventory = player.getInventory();
-      if (inventory == null) {
-        return false;
-      }
-
-      ItemStack activeItem = inventory.getActiveHotbarItem();
+      ItemStack activeItem = InventoryComponent.getItemInHand(store, playerRef);
       if (activeItem == null || activeItem.isEmpty()) {
         return matchesEmptyHand();
       }
