@@ -15,6 +15,12 @@
       "SpawnBlockSet": "Soil",
       "Id": "Cats_Black_Wild",
       "Flock": "One_Or_Two"
+    },
+    {
+      "Weight": 2,
+      "SpawnBlockSet": "Soil",
+      "Id": "Cats_Bengal_Wild",
+      "Flock": "One_Or_Two"
     }
   ],
   "DayTimeRange": [

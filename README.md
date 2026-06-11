@@ -92,7 +92,7 @@ start owning multiple cats with different states.
 
 ### Core Companions
 
-* Eight cat variants: Black Cat, Calico, Gray Tabby, Longhaired Russian Blue, Orange Tabby,
+* Nine cat variants: Bengal, Black Cat, Calico, Gray Tabby, Longhaired Russian Blue, Orange Tabby,
   Siamese, Tuxedo, and Kitten (experimental)
 * Natural spawning across Zones 1-4 with environment-specific distributions
 * Single-owner tamed cats with automatic unique names

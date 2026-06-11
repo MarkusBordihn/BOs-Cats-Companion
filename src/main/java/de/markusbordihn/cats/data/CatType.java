@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 public enum CatType {
   UNKNOWN("", ""),
   GENERIC_CAT("Cats_Tamed", "Cats_Wild"),
+  BENGAL("Cats_Bengal_Tamed", "Cats_Bengal_Wild"),
   BLACK("Cats_Black_Tamed", "Cats_Black_Wild"),
   CALICO("Cats_Calico_Tamed", "Cats_Calico_Wild"),
   GRAY_TABBY("Cats_GrayTabby_Tamed", "Cats_GrayTabby_Wild"),
@@ -52,11 +53,13 @@ public enum CatType {
     if (roleName == null || roleName.isEmpty()) {
       return UNKNOWN;
     }
+
     for (CatType type : values()) {
       if (type.tamedRoleName.equals(roleName) || type.wildRoleName.equals(roleName)) {
         return type;
       }
     }
+
     return UNKNOWN;
   }
 
@@ -64,6 +67,7 @@ public enum CatType {
     if (type == null || type.isEmpty()) {
       return UNKNOWN;
     }
+
     try {
       return CatType.valueOf(type.toUpperCase(Locale.ROOT).replace(" ", "_"));
     } catch (IllegalArgumentException e) {
@@ -97,6 +101,7 @@ public enum CatType {
     if (this == UNKNOWN) {
       return "Unknown";
     }
+
     String name = name().toLowerCase(Locale.ROOT).replace("_", " ");
     return Character.toUpperCase(name.charAt(0)) + name.substring(1);
   }
