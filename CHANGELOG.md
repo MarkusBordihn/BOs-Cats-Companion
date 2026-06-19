@@ -7,6 +7,10 @@ For the full changelog, please go to the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 3.1.0
+
+- Migrated to Hytale 0.5.6
+
 ### 3.0.0
 
 - Added Bengal cat variant.
