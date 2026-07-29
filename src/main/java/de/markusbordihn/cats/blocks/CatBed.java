@@ -21,29 +21,21 @@ package de.markusbordihn.cats.blocks;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBedInfo;
 import de.markusbordihn.cats.data.CatState;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap.Entry;
+import de.markusbordihn.cats.world.NearbyBlockEntities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.joml.Vector3d;
-import org.joml.Vector3i;
 
 public final class CatBed {
   public static final double DEFAULT_SEARCH_RADIUS = 50.0;
@@ -73,77 +65,26 @@ public final class CatBed {
   public static List<CatBedInfo> findCatBeds(
       @Nonnull World world, @Nonnull Vector3d searchCenter, double searchRadius) {
     List<CatBedInfo> beds = new ArrayList<>();
-    double searchRadiusSq = searchRadius * searchRadius;
-    int centerChunkX = (int) Math.floor(searchCenter.x) >> ChunkUtil.BITS;
-    int centerChunkZ = (int) Math.floor(searchCenter.z) >> ChunkUtil.BITS;
-    int chunkRadius = (int) Math.ceil(searchRadius / ChunkUtil.SIZE) + 1;
-    LOGGER.at(Level.FINE).log(
-        "Scanning chunks around (%d, %d) with radius %d chunks",
-        centerChunkX, centerChunkZ, chunkRadius);
-
-    for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
-      for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
-        int chunkX = centerChunkX + dx;
-        int chunkZ = centerChunkZ + dz;
-        long chunkIndex =
-            ChunkUtil.indexChunkFromBlock(chunkX << ChunkUtil.BITS, chunkZ << ChunkUtil.BITS);
-
-        Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkReference(chunkIndex);
-        if (chunkRef == null) {
-          continue;
-        }
-
-        Store<ChunkStore> chunkStore = chunkRef.getStore();
-        WorldChunk worldChunk = chunkStore.getComponent(chunkRef, WorldChunk.getComponentType());
-        if (worldChunk == null) {
-          continue;
-        }
-
-        BlockComponentChunk blockComponentChunk =
-            chunkStore.getComponent(chunkRef, BlockComponentChunk.getComponentType());
-        if (blockComponentChunk == null) {
-          continue;
-        }
-
-        Int2ReferenceMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
-        if (entityRefs == null || entityRefs.isEmpty()) {
-          continue;
-        }
-
-        for (Entry<Ref<ChunkStore>> entry : entityRefs.int2ReferenceEntrySet()) {
-          int blockIndex = entry.getIntKey();
-          int localX = ChunkUtil.xFromIndex(blockIndex);
-          int localY = blockIndex / (ChunkUtil.SIZE * ChunkUtil.SIZE);
-          int localZ = ChunkUtil.zFromColumn(blockIndex % ChunkUtil.SIZE_COLUMNS);
-          int worldX = (chunkX << ChunkUtil.BITS) + localX;
-          int worldZ = (chunkZ << ChunkUtil.BITS) + localZ;
-
-          BlockType blockType = worldChunk.getBlockType(new Vector3i(worldX, localY, worldZ));
-          if (blockType == null) {
-            continue;
+    NearbyBlockEntities.forEachWithinRadius(
+        world,
+        searchCenter,
+        searchRadius,
+        (blockTypeId, blockPosition, distanceSquared) -> {
+          if (!blockTypeId.contains("Cat_Bed")) {
+            return true;
           }
 
-          String blockTypeId = blockType.getId();
-          if (blockTypeId == null || !blockTypeId.contains("Cat_Bed")) {
-            continue;
-          }
-
-          Vector3d bedPos = new Vector3d(worldX + 0.5, localY, worldZ + 0.5);
-          double distSq = distanceSquared(searchCenter, bedPos);
-          if (distSq <= searchRadiusSq) {
-            double dist = Math.sqrt(distSq);
-            LOGGER.at(Level.FINE).log(
-                "Found cat bed '%s' at (%.1f, %.1f, %.1f) distance %.1f blocks",
-                blockTypeId, bedPos.x, bedPos.y, bedPos.z, dist);
-            beds.add(new CatBedInfo(bedPos, dist));
-          }
-        }
-      }
-    }
+          double distance = Math.sqrt(distanceSquared);
+          LOGGER.at(Level.FINE).log(
+              "Found cat bed '%s' at (%.1f, %.1f, %.1f) distance %.1f blocks",
+              blockTypeId, blockPosition.x, blockPosition.y, blockPosition.z, distance);
+          beds.add(new CatBedInfo(blockPosition, distance));
+          return true;
+        });
 
     LOGGER.at(Level.FINE).log("Found %d cat beds in range", beds.size());
 
-    beds.sort((a, b) -> Double.compare(a.distance(), b.distance()));
+    beds.sort((first, second) -> Double.compare(first.distance(), second.distance()));
     return beds;
   }
 
@@ -157,8 +98,13 @@ public final class CatBed {
       @Nonnull List<CatBedInfo> beds,
       @Nonnull Store<EntityStore> store,
       @Nonnull Vector3d currentCatPos) {
+    if (beds.isEmpty()) {
+      return null;
+    }
+
+    List<Vector3d> restingCatPositions = collectRestingCatPositions(store, currentCatPos);
     for (CatBedInfo bed : beds) {
-      if (!isBedOccupied(bed.position(), store, currentCatPos)) {
+      if (!isBedOccupied(bed.position(), restingCatPositions)) {
         return bed;
       }
     }
@@ -166,49 +112,52 @@ public final class CatBed {
     return null;
   }
 
-  public static boolean isBedOccupied(
-      @Nonnull Vector3d bedPos,
-      @Nonnull Store<EntityStore> store,
-      @Nonnull Vector3d excludeCatPos) {
-    final boolean[] occupied = {false};
+  @Nonnull
+  private static List<Vector3d> collectRestingCatPositions(
+      @Nonnull Store<EntityStore> store, @Nonnull Vector3d excludeCatPos) {
+    List<Vector3d> positions = new ArrayList<>();
 
     store.forEachChunk(
         (ArchetypeChunk<EntityStore> chunk, CommandBuffer<EntityStore> buffer) -> {
-          if (occupied[0]) {
-            return;
-          }
-
           for (int i = 0; i < chunk.size(); i++) {
-            CatStateComponent stateComp =
+            CatStateComponent stateComponent =
                 chunk.getComponent(i, CatStateComponent.getComponentType());
-            if (stateComp == null) {
+            if (stateComponent == null) {
               continue;
             }
 
-            CatState state = stateComp.getState();
+            CatState state = stateComponent.getState();
             if (state == CatState.WANDERING || state == CatState.FOLLOWING) {
               continue;
             }
 
-            TransformComponent transformComp =
+            TransformComponent transformComponent =
                 chunk.getComponent(i, TransformComponent.getComponentType());
-            if (transformComp == null) {
+            if (transformComponent == null) {
               continue;
             }
 
-            Vector3d catPosition = transformComp.getPosition();
+            Vector3d catPosition = transformComponent.getPosition();
             if (distanceSquared(catPosition, excludeCatPos) < 0.01) {
               continue;
             }
 
-            if (distanceSquared(catPosition, bedPos) <= BED_OCCUPIED_RADIUS_SQ) {
-              occupied[0] = true;
-              return;
-            }
+            positions.add(new Vector3d(catPosition));
           }
         });
 
-    return occupied[0];
+    return positions;
+  }
+
+  private static boolean isBedOccupied(
+      @Nonnull Vector3d bedPos, @Nonnull List<Vector3d> restingCatPositions) {
+    for (Vector3d catPosition : restingCatPositions) {
+      if (distanceSquared(catPosition, bedPos) <= BED_OCCUPIED_RADIUS_SQ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public static double distanceSquared(@Nonnull Vector3d a, @Nonnull Vector3d b) {

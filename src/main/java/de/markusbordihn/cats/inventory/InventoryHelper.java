@@ -19,11 +19,14 @@
 
 package de.markusbordihn.cats.inventory;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.logging.Level;
+import javax.annotation.Nullable;
 
 public class InventoryHelper {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -35,14 +38,14 @@ public class InventoryHelper {
       return;
     }
 
-    Inventory inventory = player.getInventory();
-    if (inventory == null) {
-      LOGGER.at(Level.WARNING).log("Cannot consume item: player inventory is null");
+    InventoryComponent.Hotbar hotbar = getHotbar(player);
+    if (hotbar == null) {
+      LOGGER.at(Level.WARNING).log("Cannot consume item: player hotbar is unavailable");
       return;
     }
 
-    byte activeSlot = inventory.getActiveHotbarSlot();
-    inventory.getHotbar().removeItemStackFromSlot(activeSlot, 1);
+    short activeSlot = hotbar.getActiveSlot();
+    hotbar.getInventory().removeItemStackFromSlot(activeSlot, 1);
     LOGGER.at(Level.FINE).log(
         "Consumed 1x %s from player inventory at slot %d", itemName, activeSlot);
   }
@@ -52,9 +55,9 @@ public class InventoryHelper {
       return false;
     }
 
-    Inventory inventory = player.getInventory();
-    if (inventory == null) {
-      LOGGER.at(Level.WARNING).log("Cannot give item: player inventory is null");
+    InventoryComponent.Hotbar hotbar = getHotbar(player);
+    if (hotbar == null) {
+      LOGGER.at(Level.WARNING).log("Cannot give item: player hotbar is unavailable");
       return false;
     }
 
@@ -64,8 +67,20 @@ public class InventoryHelper {
       return false;
     }
 
-    inventory.getHotbar().addItemStack(giftStack);
+    hotbar.getInventory().addItemStack(giftStack);
     LOGGER.at(Level.FINE).log("Gave 1x %s to player", itemId);
     return true;
+  }
+
+  @Nullable
+  private static InventoryComponent.Hotbar getHotbar(Player player) {
+    Ref<EntityStore> playerEntityRef = player.getReference();
+    if (playerEntityRef == null || !playerEntityRef.isValid()) {
+      return null;
+    }
+
+    return playerEntityRef
+        .getStore()
+        .getComponent(playerEntityRef, InventoryComponent.Hotbar.getComponentType());
   }
 }

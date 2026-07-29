@@ -25,7 +25,6 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -61,13 +60,12 @@ public class CatYarnBallSpawnInteraction extends SimpleInstantInteraction {
     }
 
     Store<EntityStore> store = commandBuffer.getStore();
-    Player player =
-        CatYarnBallFetchInteraction.resolveThrowingPlayer(context, commandBuffer, store);
-    if (player == null || player.getUuid() == null) {
+    UUID ownerUuid =
+        CatYarnBallFetchInteraction.resolveThrowingPlayerUuid(context, commandBuffer, store);
+    if (ownerUuid == null) {
       return;
     }
 
-    UUID ownerUuid = player.getUuid();
     YarnBallThrowRegistry.registerProjectile(ownerUuid, projectileRef);
     commandBuffer.putComponent(
         projectileRef,

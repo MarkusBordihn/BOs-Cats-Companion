@@ -19,33 +19,33 @@
 
 package de.markusbordihn.cats.interaction;
 
+import com.hypixel.hytale.builtin.adventure.farming.FarmingUtil;
 import com.hypixel.hytale.codec.codecs.UUIDBinaryCodec;
 import com.hypixel.hytale.codec.codecs.simple.StringCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Rotation3f;
-import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.asset.type.model.config.ModelAsset;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
-import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.modules.entity.component.PersistentModel;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.metadata.CapturedNPCMetadata;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.storage.AlarmStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.player.PlayerFeedback;
 import de.markusbordihn.cats.ui.CatActionWheelPage;
 import it.unimi.dsi.fastutil.Pair;
 import java.util.UUID;
@@ -53,7 +53,6 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.joml.Vector3d;
-import org.joml.Vector3i;
 
 public class CatCarrierInteraction {
 
@@ -75,83 +74,80 @@ public class CatCarrierInteraction {
       @Nonnull Player player,
       @Nonnull ItemStack heldItem) {
 
+    Ref<EntityStore> playerEntityRef = player.getReference();
+    PlayerRef playerRef =
+        playerEntityRef != null
+            ? store.getComponent(playerEntityRef, PlayerRef.getComponentType())
+            : null;
+
     UUID storedCatUuid = heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC);
     if (storedCatUuid != null) {
       String storedName = heldItem.getFromMetadataOrNull(META_CAT_NAME, STRING_CODEC);
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.already_occupied")
-                  .param("catName", storedName != null ? storedName : "a cat")
-                  .param("catUuid", storedCatUuid.toString())
-                  .color(Constants.COLOR_WARNING));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.already_occupied")
+              .param("catName", storedName != null ? storedName : "a cat")
+              .param("catUuid", storedCatUuid.toString())
+              .color(Constants.COLOR_WARNING));
       return true;
     }
 
     CatOwnerComponent ownerComponent =
         store.getComponent(entityRef, CatOwnerComponent.getComponentType());
     if (ownerComponent == null || !ownerComponent.hasOwner()) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.not_tamed")
-                  .color(Constants.COLOR_WARNING));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.not_tamed")
+              .color(Constants.COLOR_WARNING));
       return true;
     }
 
-    UUID playerUuid = player.getUuid();
+    UUID playerUuid = playerRef != null ? playerRef.getUuid() : null;
     if (playerUuid == null || !playerUuid.equals(ownerComponent.getOwnerUUID())) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.not_owner")
-                  .color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.not_owner").color(Constants.COLOR_ERROR));
       return true;
     }
 
     CatActionWheelPage.closeIfOpen(player);
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     UUID catUuid = catsManager.getUuid(entityRef, store);
     if (catUuid == null) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     Nameplate nameplate = store.getComponent(entityRef, Nameplate.getComponentType());
     String catName = nameplate != null ? nameplate.getText() : null;
+    String displayName = catName != null && !catName.isEmpty() ? catName : "Cat";
 
     ItemStack updatedItem = heldItem.withMetadata(META_CAT_UUID, UUID_CODEC, catUuid);
     if (catName != null && !catName.isEmpty()) {
       updatedItem = updatedItem.withMetadata(META_CAT_NAME, STRING_CODEC, catName);
     }
 
+    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
+
     try {
-      CapturedNPCMetadata capturedMeta = new CapturedNPCMetadata();
+      CapturedNPCMetadata capturedMeta =
+          FarmingUtil.generateCapturedNPCMetadata(store, entityRef, displayName);
+      if (capturedMeta == null) {
+        capturedMeta = new CapturedNPCMetadata();
+        capturedMeta.setNpcNameKey(displayName);
+      }
       capturedMeta.setFullItemIcon(FULL_CARRIER_ICON);
-
-      String displayNameForMeta = catName != null && !catName.isEmpty() ? catName : "Cat";
-      capturedMeta.setNpcNameKey(displayNameForMeta);
-
-      PersistentModel persistentModel =
-          store.getComponent(entityRef, PersistentModel.getComponentType());
-      if (persistentModel != null && persistentModel.getModelReference() != null) {
-        ModelAsset modelAsset =
-            ModelAsset.getAssetMap()
-                .getAsset(persistentModel.getModelReference().getModelAssetId());
-        if (modelAsset != null && modelAsset.getIcon() != null) {
-          capturedMeta.setIconPath(modelAsset.getIcon());
-        }
+      if (npcEntity != null) {
+        capturedMeta.setAlarmStore(npcEntity.getAlarmStore());
       }
 
       updatedItem = updatedItem.withMetadata(CapturedNPCMetadata.KEYED_CODEC, capturedMeta);
@@ -162,27 +158,23 @@ public class CatCarrierInteraction {
 
     catsManager.storeCatInCarrier(entityRef, store);
 
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
     if (npcEntity != null) {
       npcEntity.setDespawning(true);
       npcEntity.setDespawnRemainingSeconds(0.0f);
       npcEntity.updateSpawnTrackingState(false);
     }
 
-    updateHeldItem(player, heldItem, updatedItem);
+    updateHeldItem(store, playerEntityRef, heldItem, updatedItem);
 
-    String displayName = catName != null && !catName.isEmpty() ? catName : "Cat";
-    player
-        .getPlayerRef()
-        .sendMessage(
-            Message.translation("cats.interactions.carrier.captured")
-                .param("catName", displayName)
-                .param("catUuid", catUuid.toString())
-                .color(Constants.COLOR_SUCCESS));
+    PlayerFeedback.sendMessage(
+        playerRef,
+        Message.translation("cats.interactions.carrier.captured")
+            .param("catName", displayName)
+            .param("catUuid", catUuid.toString())
+            .color(Constants.COLOR_SUCCESS));
 
     LOGGER.at(Level.INFO).log(
-        "Player %s captured cat %s (UUID: %s) into carrier",
-        player.getUuid(), displayName, catUuid);
+        "Player %s captured cat %s (UUID: %s) into carrier", playerUuid, displayName, catUuid);
 
     return true;
   }
@@ -198,6 +190,12 @@ public class CatCarrierInteraction {
       @Nonnull ItemStack heldItem,
       @Nullable Vector3d targetPos) {
 
+    Ref<EntityStore> playerEntityRef = player.getReference();
+    PlayerRef playerRef =
+        playerEntityRef != null
+            ? store.getComponent(playerEntityRef, PlayerRef.getComponentType())
+            : null;
+
     UUID storedCatUuid = heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC);
     if (storedCatUuid == null) {
       LOGGER.at(Level.FINE).log("handleRelease: carrier is empty (no CatUUID metadata)");
@@ -208,21 +206,19 @@ public class CatCarrierInteraction {
     LOGGER.at(Level.INFO).log(
         "handleRelease: releasing cat %s (UUID: %s)", storedName, storedCatUuid);
 
-    UUID playerUuid = player.getUuid();
+    UUID playerUuid = playerRef != null ? playerRef.getUuid() : null;
     if (playerUuid == null) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager == null) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
@@ -237,44 +233,36 @@ public class CatCarrierInteraction {
               .findFirst()
               .orElse(null);
       if (respawnedCat != null) {
-        String displayName = storedName;
-        updateHeldItem(player, heldItem, heldItem.withMetadata(null));
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.carrier.cat_already_in_world")
-                    .param("catName", displayName)
-                    .color(Constants.COLOR_WARNING));
+        updateHeldItem(store, playerEntityRef, heldItem, heldItem.withMetadata(null));
+        PlayerFeedback.sendMessage(
+            playerRef,
+            Message.translation("cats.interactions.carrier.cat_already_in_world")
+                .param("catName", storedName)
+                .color(Constants.COLOR_WARNING));
         LOGGER.at(Level.INFO).log(
             "Carrier stale-UUID cleared for player %s: cat '%s' was already re-spawned with new UUID",
-            playerUuid, displayName);
+            playerUuid, storedName);
       } else {
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.carrier.error")
-                    .color(Constants.COLOR_ERROR));
+        PlayerFeedback.sendMessage(
+            playerRef,
+            Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       }
       return true;
     }
 
     if (catData.ownerUuid() != null && !playerUuid.equals(catData.ownerUuid())) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.not_owner")
-                  .color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.not_owner").color(Constants.COLOR_ERROR));
       return true;
     }
 
     if (catData.isInCarrier()) {
       Ref<EntityStore> existingCatRef = catsManager.getCatByUuid(storedCatUuid, store);
       if (existingCatRef != null && existingCatRef.isValid()) {
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.carrier.busy")
-                    .color(Constants.COLOR_WARNING));
+        PlayerFeedback.sendMessage(
+            playerRef,
+            Message.translation("cats.interactions.carrier.busy").color(Constants.COLOR_WARNING));
         LOGGER.at(Level.WARNING).log(
             "Release requested for cat %s while the previous entity ref is still valid; retry later",
             storedCatUuid);
@@ -282,37 +270,37 @@ public class CatCarrierInteraction {
       }
     }
 
-    Vector3d spawnPos = resolveSpawnPosition(store, player, playerUuid, targetPos);
+    Vector3d spawnPos = resolveSpawnPosition(store, playerEntityRef, targetPos);
     if (spawnPos == null) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.error").color(Constants.COLOR_ERROR));
       return true;
     }
 
-    if (!spawnCatFromData(catData, spawnPos, store)) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.carrier.release_failed")
-                  .color(Constants.COLOR_ERROR));
+    CapturedNPCMetadata capturedMeta =
+        heldItem.getFromMetadataOrNull(CapturedNPCMetadata.KEY, CapturedNPCMetadata.CODEC);
+    AlarmStore alarmStore = capturedMeta != null ? capturedMeta.getAlarmStore() : null;
+
+    if (!spawnCatFromData(catData, spawnPos, store, alarmStore)) {
+      PlayerFeedback.sendMessage(
+          playerRef,
+          Message.translation("cats.interactions.carrier.release_failed")
+              .color(Constants.COLOR_ERROR));
       return true;
     }
 
-    ItemStack emptyCarrier = heldItem.withMetadata(null);
-    updateHeldItem(player, heldItem, emptyCarrier);
+    updateHeldItem(store, playerEntityRef, heldItem, heldItem.withMetadata(null));
 
     String displayName = storedName != null && !storedName.isEmpty() ? storedName : "Cat";
-    player
-        .getPlayerRef()
-        .sendMessage(
-            Message.translation("cats.interactions.carrier.released")
-                .param("catName", displayName)
-                .color(Constants.COLOR_SUCCESS));
+    PlayerFeedback.sendMessage(
+        playerRef,
+        Message.translation("cats.interactions.carrier.released")
+            .param("catName", displayName)
+            .color(Constants.COLOR_SUCCESS));
 
     LOGGER.at(Level.INFO).log(
-        "Player %s released cat %s from carrier at (%s)", player.getUuid(), displayName, spawnPos);
+        "Player %s released cat %s from carrier at (%s)", playerUuid, displayName, spawnPos);
 
     return true;
   }
@@ -327,20 +315,18 @@ public class CatCarrierInteraction {
   @Nullable
   private static Vector3d resolveSpawnPosition(
       @Nonnull Store<EntityStore> store,
-      @Nonnull Player player,
-      @Nonnull UUID playerUuid,
+      @Nullable Ref<EntityStore> playerEntityRef,
       @Nullable Vector3d targetPos) {
     if (targetPos != null) {
       return new Vector3d(targetPos.x + 0.5, targetPos.y + 1.0, targetPos.z + 0.5);
     }
 
-    Ref<EntityStore> playerRef = store.getExternalData().getRefFromUUID(playerUuid);
-    if (playerRef == null || !playerRef.isValid()) {
+    if (playerEntityRef == null || !playerEntityRef.isValid()) {
       return null;
     }
 
     TransformComponent playerTransform =
-        store.getComponent(playerRef, TransformComponent.getComponentType());
+        store.getComponent(playerEntityRef, TransformComponent.getComponentType());
     if (playerTransform == null) {
       return null;
     }
@@ -352,7 +338,8 @@ public class CatCarrierInteraction {
   private static boolean spawnCatFromData(
       @Nonnull CatDataEntry catData,
       @Nonnull Vector3d position,
-      @Nonnull Store<EntityStore> store) {
+      @Nonnull Store<EntityStore> store,
+      @Nullable AlarmStore alarmStore) {
 
     if (catData.catType() == CatType.UNKNOWN || catData.catType().getTamedRoleName().isEmpty()) {
       return false;
@@ -375,7 +362,16 @@ public class CatCarrierInteraction {
 
       Rotation3f rotation = new Rotation3f();
       Pair<Ref<EntityStore>, NPCEntity> spawnResult =
-          npcPlugin.spawnEntity(store, roleIndex, position, rotation, null, null, null);
+          npcPlugin.spawnEntity(
+              store,
+              roleIndex,
+              position,
+              rotation,
+              null,
+              alarmStore == null
+                  ? null
+                  : (spawnedNpc, holder, spawnStore) -> spawnedNpc.setAlarmStore(alarmStore),
+              null);
 
       if (spawnResult == null || spawnResult.left() == null || !spawnResult.left().isValid()) {
         LOGGER.at(Level.WARNING).log(
@@ -425,59 +421,28 @@ public class CatCarrierInteraction {
   }
 
   private static void updateHeldItem(
-      @Nonnull Player player, @Nonnull ItemStack oldItem, @Nonnull ItemStack newItem) {
-    Inventory inventory = player.getInventory();
-    if (inventory == null) {
-      LOGGER.at(Level.WARNING).log("Cannot update held item: player inventory is null");
+      @Nonnull Store<EntityStore> store,
+      @Nullable Ref<EntityStore> playerEntityRef,
+      @Nonnull ItemStack oldItem,
+      @Nonnull ItemStack newItem) {
+    InventoryComponent.Hotbar hotbar =
+        playerEntityRef != null
+            ? store.getComponent(playerEntityRef, InventoryComponent.Hotbar.getComponentType())
+            : null;
+    if (hotbar == null) {
+      LOGGER.at(Level.WARNING).log("Cannot update held item: player hotbar is unavailable");
       return;
     }
 
-    byte activeSlot = inventory.getActiveHotbarSlot();
+    short activeSlot = hotbar.getActiveSlot();
     try {
-      inventory.getHotbar().replaceItemStackInSlot(activeSlot, oldItem, newItem);
+      hotbar.getInventory().replaceItemStackInSlot(activeSlot, oldItem, newItem);
       LOGGER.at(Level.INFO).log("Updated carrier in hotbar slot %d", activeSlot);
     } catch (Exception e) {
       LOGGER.at(Level.WARNING).withCause(e).log(
           "replaceItemStackInSlot failed, falling back to remove+add");
-      inventory.getHotbar().removeItemStackFromSlot(activeSlot, 1);
-      inventory.getHotbar().addItemStackToSlot(activeSlot, newItem);
-    }
-  }
-
-  public static void onPlayerInteract(PlayerInteractEvent event) {
-    if (event.isCancelled()) {
-      return;
-    }
-
-    ItemStack heldItem = event.getItemInHand();
-    if (heldItem == null || !Constants.CAT_CARRIER_ITEM.equals(heldItem.getItemId())) {
-      return;
-    }
-
-    if (!hasStoredCat(heldItem)) {
-      return;
-    }
-
-    if (event.getTargetEntity() != null) {
-      return;
-    }
-
-    InteractionType actionType = event.getActionType();
-    LOGGER.at(Level.INFO).log(
-        "Carrier release event: actionType=%s, targetBlock=%s", actionType, event.getTargetBlock());
-
-    Player player = event.getPlayer();
-    Store<EntityStore> store = event.getPlayerRef().getStore();
-
-    Vector3d targetPos = null;
-    Vector3i targetBlock = event.getTargetBlock();
-    if (targetBlock != null) {
-      targetPos = new Vector3d(targetBlock.x, targetBlock.y, targetBlock.z);
-    }
-
-    boolean consumed = handleRelease(store, player, heldItem, targetPos);
-    if (consumed) {
-      event.setCancelled(true);
+      hotbar.getInventory().removeItemStackFromSlot(activeSlot, 1);
+      hotbar.getInventory().addItemStackToSlot(activeSlot, newItem);
     }
   }
 }

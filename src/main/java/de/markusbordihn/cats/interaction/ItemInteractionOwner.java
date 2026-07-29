@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.player.PlayerFeedback;
 
 public class ItemInteractionOwner {
 
@@ -60,18 +61,18 @@ public class ItemInteractionOwner {
       String catName = nameplate != null ? nameplate.getText() : null;
 
       if (catName != null && !catName.isEmpty()) {
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.item.unknown.named")
-                    .param("catName", catName)
-                    .color(Constants.COLOR_SOFT_ORANGE));
+        PlayerFeedback.sendMessage(
+            store,
+            player,
+            Message.translation("cats.interactions.item.unknown.named")
+                .param("catName", catName)
+                .color(Constants.COLOR_SOFT_ORANGE));
       } else {
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.item.unknown")
-                    .color(Constants.COLOR_SOFT_ORANGE));
+        PlayerFeedback.sendMessage(
+            store,
+            player,
+            Message.translation("cats.interactions.item.unknown")
+                .color(Constants.COLOR_SOFT_ORANGE));
       }
     }
 

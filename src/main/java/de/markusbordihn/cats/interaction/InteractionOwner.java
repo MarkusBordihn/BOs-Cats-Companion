@@ -36,6 +36,7 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.player.PlayerFeedback;
 import de.markusbordihn.cats.ui.CatActionWheelPage;
 import java.time.Duration;
 
@@ -80,11 +81,11 @@ public class InteractionOwner {
     Alarm petAlarm = npcEntity.getAlarmStore().get(npcEntity, PET_COOLDOWN_ALARM);
     WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
     if (petAlarm.isSet() && !petAlarm.hasPassed(worldTimeResource.getGameTime())) {
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.owner.petting.cooldown")
-                  .color(Constants.COLOR_LIGHT_GRAY));
+      PlayerFeedback.sendMessage(
+          store,
+          player,
+          Message.translation("cats.interactions.owner.petting.cooldown")
+              .color(Constants.COLOR_LIGHT_GRAY));
       return true;
     }
 
@@ -104,15 +105,14 @@ public class InteractionOwner {
           InventoryHelper.giveItem(player, itemId);
         }
 
-        player
-            .getPlayerRef()
-            .sendMessage(
-                Message.translation("cats.interactions.owner.gift")
-                    .param("name", catName)
-                    .param(
-                        "gift",
-                        itemId != null ? itemId : gift.name().toLowerCase().replace('_', ' '))
-                    .color(Constants.COLOR_GOLD));
+        PlayerFeedback.sendMessage(
+            store,
+            player,
+            Message.translation("cats.interactions.owner.gift")
+                .param("name", catName)
+                .param(
+                    "gift", itemId != null ? itemId : gift.name().toLowerCase().replace('_', ' '))
+                .color(Constants.COLOR_GOLD));
 
         role.getStateSupport().setState(entityRef, "Pet", "Happy", store);
         petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);

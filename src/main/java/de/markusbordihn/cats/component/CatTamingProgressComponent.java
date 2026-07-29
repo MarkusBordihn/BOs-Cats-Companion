@@ -37,10 +37,6 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   public static final String CURRENT_PROGRESS_TAG = "CurrentProgress";
   public static final String REQUIRED_PROGRESS_TAG = "RequiredProgress";
   public static final String LAST_FED_TIMESTAMP_TAG = "LastFedTimestamp";
-  private static final Random RANDOM = new Random();
-  private static final int MIN_REQUIRED_FISH = 2;
-  private static final int MAX_REQUIRED_FISH = 5;
-
   @Nonnull
   public static final BuilderCodec<CatTamingProgressComponent> CODEC =
       BuilderCodec.builder(CatTamingProgressComponent.class, CatTamingProgressComponent::new)
@@ -63,7 +59,9 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
           .documentation("The timestamp when the cat was last fed.")
           .add()
           .build();
-
+  private static final Random RANDOM = new Random();
+  private static final int MIN_REQUIRED_FISH = 2;
+  private static final int MAX_REQUIRED_FISH = 5;
   private int currentProgress;
   private int requiredProgress;
   private long lastFedTimestamp;

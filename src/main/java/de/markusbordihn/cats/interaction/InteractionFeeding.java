@@ -37,6 +37,7 @@ import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
+import de.markusbordihn.cats.player.PlayerFeedback;
 import java.time.Duration;
 import java.util.logging.Level;
 
@@ -71,11 +72,11 @@ public class InteractionFeeding {
       Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
       if (treatAlarm.isSet() && !treatAlarm.hasPassed(worldTime.getGameTime())) {
         if (player != null) {
-          player
-              .getPlayerRef()
-              .sendMessage(
-                  Message.translation("cats.interactions.feeding.treat.cooldown")
-                      .color(Constants.COLOR_INFO));
+          PlayerFeedback.sendMessage(
+              store,
+              player,
+              Message.translation("cats.interactions.feeding.treat.cooldown")
+                  .color(Constants.COLOR_INFO));
         }
         return true;
       }
@@ -148,7 +149,8 @@ public class InteractionFeeding {
             isTreat
                 ? "cats.interactions.feeding.treat.full_health"
                 : "cats.interactions.feeding.full_health";
-        player.getPlayerRef().sendMessage(Message.translation(msgKey).color(Constants.COLOR_INFO));
+        PlayerFeedback.sendMessage(
+            store, player, Message.translation(msgKey).color(Constants.COLOR_INFO));
       }
       return;
     }
@@ -163,14 +165,14 @@ public class InteractionFeeding {
     if (player != null) {
       String msgKey =
           isTreat ? "cats.interactions.feeding.treat.healed" : "cats.interactions.feeding.healed";
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation(msgKey)
-                  .param("amount", String.valueOf((int) healedAmount))
-                  .param("health", String.valueOf((int) newHealth))
-                  .param("maxHealth", String.valueOf((int) maxHealth))
-                  .color(Constants.COLOR_SUCCESS));
+      PlayerFeedback.sendMessage(
+          store,
+          player,
+          Message.translation(msgKey)
+              .param("amount", String.valueOf((int) healedAmount))
+              .param("health", String.valueOf((int) newHealth))
+              .param("maxHealth", String.valueOf((int) maxHealth))
+              .color(Constants.COLOR_SUCCESS));
     }
   }
 }

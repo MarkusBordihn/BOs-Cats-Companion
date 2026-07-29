@@ -31,7 +31,6 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.modules.entity.AllLegacyLivingEntityTypesQuery;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
@@ -58,7 +57,7 @@ public class CatDamageFilterSystem extends DamageEventSystem {
   @Override
   @Nonnull
   public Query<EntityStore> getQuery() {
-    return AllLegacyLivingEntityTypesQuery.INSTANCE;
+    return CatOwnerComponent.getComponentType();
   }
 
   @Override

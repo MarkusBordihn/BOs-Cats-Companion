@@ -2,10 +2,20 @@
 
 ## Note
 
-This change log includes the summarized changes.
-For the full changelog, please go to the [GitHub History][history] instead.
+This change log includes the summarized changes. For the full changelog, please go to
+the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
+
+### 3.2.0
+
+- Fixed cats losing their cooldown and alarm state when carried in the cat carrier.
+- Fixed extinguished campfires counting as a warmth source for the happiness system.
+- Changed cat bed occupancy to be checked once per search instead of once per bed, which noticeably
+  reduces the cost of the "go to bed" behavior in worlds with many cats.
+- Removed a redundant cat carrier release handler that the server never triggered; releasing a cat
+  continues to work through the carrier item interaction.
+- Migrated to Hytale 0.5.7
 
 ### 3.1.0
 
@@ -83,8 +93,8 @@ Note: Please always back up your world before updating to a new version!
 
 ### 2.10.0
 
-- Migrated to Hytale 2026.03.26-89796e57b with updated APIs and systems.
-  (Navigation and Pathfinding is currently broken !!!)
+- Migrated to Hytale 2026.03.26-89796e57b with updated APIs and systems. (Navigation and Pathfinding
+  is currently broken !!!)
 - Fixed yarn ball from placeable block to throwable item with projectile interaction.
 - Fixed wild cats moving without animation ("statue" movement) after waking from sleep or exiting
   idle flavor animations (Sit, Lick, Search).
@@ -135,8 +145,8 @@ Note: Please always back up your world before updating to a new version!
 
 ### 2.5.0
 
-- Added Action Wheel UI (press F on tamed cat) with follow, stop, pet, play, sleep, wander, bed,
-  and rename. Slot labels adapt to the current cat state.
+- Added Action Wheel UI (press F on tamed cat) with follow, stop, pet, play, sleep, wander, bed, and
+  rename. Slot labels adapt to the current cat state.
 - Added Name Input UI for renaming cats directly from the action wheel.
 - Added Taming Success screen showing breed, personality, mood, name input, and interaction tips.
 - Added UI localization for English (en-US) and German (de-DE).
@@ -145,8 +155,8 @@ Note: Please always back up your world before updating to a new version!
 
 ### 2.4.0
 
-- Fixed black lines in water caused by incorrect `Transparent` opacity on Cat Bed and Cat Yarn
-  Ball block definitions.
+- Fixed black lines in water caused by incorrect `Transparent` opacity on Cat Bed and Cat Yarn Ball
+  block definitions.
 - Removed `/cat attack` command (replaced by `/cat pounce`).
 - Added personality system: each tamed cat receives a primary and secondary personality type
   (`LAZY`, `PLAYFUL`, `SHY`, `BRAVE`, `CURIOUS`, `CUDDLY`, `INDEPENDENT`, `MISCHIEVOUS`)
@@ -178,8 +188,8 @@ Note: Please always back up your world before updating to a new version!
 
 ### 2.2.1
 
-- Fixed cats moving around while stuck in sitting animation after being fed, petted, or playing
-  with yarn ball (added animation reset before state transition).
+- Fixed cats moving around while stuck in sitting animation after being fed, petted, or playing with
+  yarn ball (added animation reset before state transition).
 - Fixed Cat Carrier recipe using non-existent `Ingredient_Leather` (changed to
   `Ingredient_Leather_Soft`).
 - Improved cat sounds by replacing leopard/wolf sounds with more cat-appropriate vanilla sounds:
@@ -196,8 +206,8 @@ Note: Please always back up your world before updating to a new version!
 - Fixed alerted timeout too short for food attraction to trigger (5–8 s → 15–25 s).
 - Added basic Cat Carrier item to pick up and transport tamed cats (recipe: 2x Wood Planks + 1x
   Leather + 1x White Wool + 1x Red Wool at Farming Workbench).
-- Added server-side config files (`mods/Cats/`): `general.cfg` (cat limit), `protection.cfg` (
-  damage filters), `spawn.cfg` (spawn enable/weight).
+- Added server-side config files (`mods/Cats/`): `general.cfg` (cat limit), `protection.cfg` (damage
+  filters), `spawn.cfg` (spawn enable/weight).
 - Added `/cat reload` command to reload config files without a server restart.
 - Added damage filter system for tamed cats: configurable protection from owner, other players, and
   mobs (default: protected from players, vulnerable to mobs).
@@ -222,11 +232,10 @@ Note: Please always back up your world before updating to a new version!
 #### ⚠️ MAJOR UPDATE - BREAKING CHANGES
 
 After updating from v1.8.x or earlier, your tamed cats will despawn due to the role system changes
-below.
-However, all cat data (owner, name, breed) are safely stored in `CatsData.json`.
+below. However, all cat data (owner, name, breed) are safely stored in `CatsData.json`.
 
-Simply use `/cat spawn` to respawn your cats, they will keep their owner, name, and breed.
-Use `/cat list` to see all your cats and their status.
+Simply use `/cat spawn` to respawn your cats, they will keep their owner, name, and breed. Use
+`/cat list` to see all your cats and their status.
 
 - Added separate NPC roles for each cat breed: `Cats_<Breed>_Wild` and `Cats_<Breed>_Tamed`.
 - Added cats kitten memories category.

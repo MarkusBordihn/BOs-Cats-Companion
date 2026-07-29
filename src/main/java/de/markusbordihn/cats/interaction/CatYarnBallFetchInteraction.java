@@ -36,6 +36,7 @@ import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
@@ -75,15 +76,15 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
   public CatYarnBallFetchInteraction() {}
 
   @Nullable
-  static Player resolveThrowingPlayer(
+  static UUID resolveThrowingPlayerUuid(
       @Nonnull InteractionContext context,
       @Nonnull CommandBuffer<EntityStore> commandBuffer,
       @Nonnull Store<EntityStore> store) {
     Ref<EntityStore> ownerRef = context.getOwningEntity();
     if (ownerRef != null && ownerRef.isValid()) {
-      Player player = commandBuffer.getComponent(ownerRef, Player.getComponentType());
-      if (player != null) {
-        return player;
+      PlayerRef ownerPlayerRef = commandBuffer.getComponent(ownerRef, PlayerRef.getComponentType());
+      if (ownerPlayerRef != null && ownerPlayerRef.getUuid() != null) {
+        return ownerPlayerRef.getUuid();
       }
     }
 
@@ -101,7 +102,9 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       return null;
     }
 
-    return commandBuffer.getComponent(playerRef, Player.getComponentType());
+    return commandBuffer.getComponent(playerRef, PlayerRef.getComponentType()) != null
+        ? recentUuid
+        : null;
   }
 
   @Nullable
@@ -174,6 +177,12 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       return false;
     }
 
+    Ref<EntityStore> playerEntityRef = store.getExternalData().getRefFromUUID(ownerUuid);
+    PlayerRef playerRef =
+        playerEntityRef != null
+            ? store.getComponent(playerEntityRef, PlayerRef.getComponentType())
+            : null;
+
     ComponentType<EntityStore, CatYarnBallProjectileComponent> projectileType =
         CatYarnBallProjectileComponent.getComponentType();
     if (projectileType != null) {
@@ -186,7 +195,6 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       }
     }
 
-    Ref<EntityStore> playerEntityRef = store.getExternalData().getRefFromUUID(ownerUuid);
     TransformComponent playerTransform =
         playerEntityRef != null
             ? store.getComponent(playerEntityRef, TransformComponent.getComponentType())
@@ -203,11 +211,11 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       if (projectileRef.isValid()) {
         commandBuffer.removeEntity(projectileRef, RemoveReason.REMOVE);
       }
-      player
-          .getPlayerRef()
-          .sendMessage(
-              Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
-                  .color(Constants.COLOR_SOFT_ORANGE));
+      if (playerRef != null) {
+        playerRef.sendMessage(
+            Message.translation("cats.interactions.yarn_ball.no_cat_nearby")
+                .color(Constants.COLOR_SOFT_ORANGE));
+      }
       return false;
     }
 
@@ -227,7 +235,9 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     if (catName != null) {
       thrownMessage = thrownMessage.param("catName", catName);
     }
-    player.getPlayerRef().sendMessage(thrownMessage);
+    if (playerRef != null) {
+      playerRef.sendMessage(thrownMessage);
+    }
     return true;
   }
 
@@ -351,14 +361,9 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
         landingPosition.z,
         context.getOwningEntity() != null ? "present" : "null");
 
-    Player player = resolveThrowingPlayer(context, commandBuffer, store);
-    if (player == null) {
-      LOGGER.at(Level.WARNING).log("firstRun: could not resolve throwing player");
-      return;
-    }
-
-    UUID ownerUuid = player.getUuid();
+    UUID ownerUuid = resolveThrowingPlayerUuid(context, commandBuffer, store);
     if (ownerUuid == null) {
+      LOGGER.at(Level.WARNING).log("firstRun: could not resolve throwing player");
       return;
     }
 

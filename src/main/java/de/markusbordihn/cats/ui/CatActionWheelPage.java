@@ -230,7 +230,7 @@ public final class CatActionWheelPage
         this.close();
       }
       case "play" -> {
-        UUID ownerUuid = this.player.getUuid();
+        UUID ownerUuid = this.playerRef.getUuid();
         if (ownerUuid == null || !CatActionHelper.fetchGroundBall(this.catRef, ownerUuid, store)) {
           CatActionHelper.play(this.catRef, store);
         }

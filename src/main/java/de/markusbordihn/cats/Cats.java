@@ -23,7 +23,6 @@ import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.event.events.player.PlayerInteractEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.server.OpenCustomUIInteraction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -49,7 +48,6 @@ import de.markusbordihn.cats.config.ProtectionConfig;
 import de.markusbordihn.cats.config.SpawnConfig;
 import de.markusbordihn.cats.handler.DamageSetupHandler;
 import de.markusbordihn.cats.handler.NPCSetupHandler;
-import de.markusbordihn.cats.interaction.CatCarrierInteraction;
 import de.markusbordihn.cats.interaction.CatYarnBallFetchInteraction;
 import de.markusbordihn.cats.interaction.CatYarnBallSpawnInteraction;
 import de.markusbordihn.cats.interaction.CatYarnBallThrowInteraction;
@@ -214,8 +212,6 @@ public class Cats extends JavaPlugin {
             LoadedAssetsEvent.class,
             WorldNPCSpawn.class,
             CatSpawnConfigSystem::onWorldNPCSpawnsLoaded);
-    getEventRegistry()
-        .registerGlobal(PlayerInteractEvent.class, CatCarrierInteraction::onPlayerInteract);
     OpenCustomUIInteraction.registerSimple(
         this, CatBedSpawnPage.class, "CatBedSpawn", CatBedSpawnPage::new);
   }

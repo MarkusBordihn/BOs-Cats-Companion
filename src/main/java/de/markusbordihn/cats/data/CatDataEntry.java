@@ -54,27 +54,6 @@ public record CatDataEntry(
     float playNeed,
     long lastNeedUpdate) {
 
-  private static final String UUID_TAG = "UUID";
-  private static final String OWNER_UUID_TAG = "OwnerUUID";
-  private static final String OWNER_NAME_TAG = "OwnerName";
-  private static final String TYPE_TAG = "Type";
-  private static final String NAME_TAG = "Name";
-  private static final String STATE_TAG = "State";
-  private static final String POSITION_TAG = "Position";
-  private static final String STATUS_TAG = "Status";
-  private static final String PERSONALITY_TAG = "Personality";
-  private static final String SECONDARY_PERSONALITY_TAG = "SecondaryPersonality";
-  private static final String PERSONALITY_PROGRESS_TAG = "PersonalityProgress";
-  private static final String HAPPINESS_TAG = "Happiness";
-  private static final String LAST_MOOD_UPDATE_TAG = "LastMoodUpdate";
-  private static final String LAST_GIFT_TIME_TAG = "LastGiftTime";
-  private static final String TOTAL_GIFTS_TAG = "TotalGifts";
-  private static final String REST_NEED_TAG = "RestNeed";
-  private static final String SOCIAL_NEED_TAG = "SocialNeed";
-  private static final String PLAY_NEED_TAG = "PlayNeed";
-  private static final String LAST_NEED_UPDATE_TAG = "LastNeedUpdate";
-  private static final UUIDBinaryCodec UUID_CODEC = new UUIDBinaryCodec();
-  private static final StringCodec STRING_CODEC = new StringCodec();
   public static final Codec<CatDataEntry> CODEC =
       new Codec<>() {
         @Override
@@ -180,6 +159,27 @@ public record CatDataEntry(
           return Schema.anyOf();
         }
       };
+  private static final String UUID_TAG = "UUID";
+  private static final String OWNER_UUID_TAG = "OwnerUUID";
+  private static final String OWNER_NAME_TAG = "OwnerName";
+  private static final String TYPE_TAG = "Type";
+  private static final String NAME_TAG = "Name";
+  private static final String STATE_TAG = "State";
+  private static final String POSITION_TAG = "Position";
+  private static final String STATUS_TAG = "Status";
+  private static final String PERSONALITY_TAG = "Personality";
+  private static final String SECONDARY_PERSONALITY_TAG = "SecondaryPersonality";
+  private static final String PERSONALITY_PROGRESS_TAG = "PersonalityProgress";
+  private static final String HAPPINESS_TAG = "Happiness";
+  private static final String LAST_MOOD_UPDATE_TAG = "LastMoodUpdate";
+  private static final String LAST_GIFT_TIME_TAG = "LastGiftTime";
+  private static final String TOTAL_GIFTS_TAG = "TotalGifts";
+  private static final String REST_NEED_TAG = "RestNeed";
+  private static final String SOCIAL_NEED_TAG = "SocialNeed";
+  private static final String PLAY_NEED_TAG = "PlayNeed";
+  private static final String LAST_NEED_UPDATE_TAG = "LastNeedUpdate";
+  private static final UUIDBinaryCodec UUID_CODEC = new UUIDBinaryCodec();
+  private static final StringCodec STRING_CODEC = new StringCodec();
 
   public CatDataEntry(
       @Nonnull UUID uuid,

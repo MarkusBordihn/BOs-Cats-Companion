@@ -27,11 +27,9 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.BlockPosition;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.entity.EntityUtils;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.entity.LivingEntity;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.Inventory;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInteraction;
@@ -96,12 +94,6 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
       return;
     }
 
-    if (!(EntityUtils.getEntity(ref, commandBuffer) instanceof LivingEntity livingEntity)) {
-      context.getState().state = InteractionState.Failed;
-      super.tick0(firstRun, time, type, context, cooldownHandler);
-      return;
-    }
-
     Player player = commandBuffer.getComponent(ref, Player.getComponentType());
     if (player == null) {
       context.getState().state = InteractionState.Failed;
@@ -109,8 +101,15 @@ public class UseCatCarrierInteraction extends SimpleInteraction {
       return;
     }
 
-    Inventory inventory = livingEntity.getInventory();
-    ItemStack heldItem = inventory.getActiveHotbarItem();
+    InventoryComponent.Hotbar hotbar =
+        commandBuffer.getComponent(ref, InventoryComponent.Hotbar.getComponentType());
+    if (hotbar == null) {
+      context.getState().state = InteractionState.Failed;
+      super.tick0(firstRun, time, type, context, cooldownHandler);
+      return;
+    }
+
+    ItemStack heldItem = hotbar.getActiveItem();
     if (heldItem == null || !CatCarrierInteraction.hasStoredCat(heldItem)) {
       context.getState().state = InteractionState.Failed;
       super.tick0(firstRun, time, type, context, cooldownHandler);

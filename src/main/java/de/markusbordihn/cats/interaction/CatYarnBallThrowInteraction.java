@@ -24,9 +24,9 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
@@ -57,11 +57,11 @@ public class CatYarnBallThrowInteraction extends SimpleInstantInteraction {
       return;
     }
 
-    Player player = commandBuffer.getComponent(playerEntityRef, Player.getComponentType());
-    if (player == null || player.getUuid() == null) {
+    PlayerRef playerRef = commandBuffer.getComponent(playerEntityRef, PlayerRef.getComponentType());
+    if (playerRef == null || playerRef.getUuid() == null) {
       return;
     }
 
-    YarnBallThrowRegistry.register(player.getUuid());
+    YarnBallThrowRegistry.register(playerRef.getUuid());
   }
 }

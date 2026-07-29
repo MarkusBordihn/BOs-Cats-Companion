@@ -97,7 +97,7 @@ in the IntelliJ run configuration. No need to copy JAR files manually during dev
 
 ## License
 
-This project is open source under the MIT License (source code only).
-Assets (models, textures, sounds) are excluded from the license.
+This project is open source under the MIT License (source code only). Assets (models, textures,
+sounds) are excluded from the license.
 
 See [LICENSE.md](LICENSE.md) for full details.

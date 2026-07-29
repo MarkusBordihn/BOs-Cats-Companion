@@ -22,8 +22,8 @@ personality-driven moods, and cozy home features like beds, carriers, toys, and 
 The mod is built first and foremost for players who want lively companions in their world, while
 still offering enough systems and polish to stand out as a Hytale New Worlds Contest project.
 
-You can explore for wild cats, slowly earn their trust with fish, give them a name, open the
-Action Wheel with `F`, and build a little home routine around play, sleep, and companionship.
+You can explore for wild cats, slowly earn their trust with fish, give them a name, open the Action
+Wheel with `F`, and build a little home routine around play, sleep, and companionship.
 
 ![Several tamed cats resting in cat beds inside a cozy player-built room.](examples/ingame/cat_bed.png)
 
@@ -49,8 +49,8 @@ If you just want to jump in and start playing with cats, this is the fastest pat
 * Each cat belongs to one player only once tamed.
 * In Creative Mode, enable `Allow NPC Detection` in the quick settings to interact more reliably.
 
-The taming flow also ends with a custom screen that shows mood, personality, and lets you set a
-real name for your new companion right away.
+The taming flow also ends with a custom screen that shows mood, personality, and lets you set a real
+name for your new companion right away.
 
 ![Cat Tamed screen showing personality, mood, and name input after taming.](examples/ingame/cat_taming_screen.png)
 
@@ -74,8 +74,8 @@ cats.
 
 When you use a Cat Bed, the mod finds the nearest bed in range and opens the **Cat Bed** screen.
 That screen shows your owned cats, their current status, and the actions that make sense for them:
-**Spawn**, **Call**, or **Wake Up**. If a cat is already resting there, you can also use
-**Empty Bed** to clear sleeping cats near that bed.
+**Spawn**, **Call**, or **Wake Up**. If a cat is already resting there, you can also use **Empty
+Bed** to clear sleeping cats near that bed.
 
 This makes the bed useful even when a cat is currently despawned, already in the world, or asleep.
 It also pairs naturally with `/cat bed`, which sends a nearby tamed cat to the nearest available
@@ -83,8 +83,8 @@ bed.
 
 ### Cat Bed Screen
 
-The Cat Bed screen is one of the most useful management tools in the mod, especially once you
-start owning multiple cats with different states.
+The Cat Bed screen is one of the most useful management tools in the mod, especially once you start
+owning multiple cats with different states.
 
 ![Cat Bed management screen with cat states such as despawned, sleeping, waiting, and going to bed.](examples/ingame/cat_bed_menu.png)
 
@@ -164,8 +164,8 @@ screen.
 * 3x Fiber
 
 Place the bed and interact with it to open the **Cat Bed** screen. You can also use `/cat bed` to
-send a nearby tamed cat to the nearest available bed and manage despawned, sleeping, or waiting
-cats from one place.
+send a nearby tamed cat to the nearest available bed and manage despawned, sleeping, or waiting cats
+from one place.
 
 ### Cat Yarn Ball
 
@@ -276,16 +276,15 @@ instructions, build tasks, and contribution guidelines.
 
 Forks and variants of this project are welcome.
 
-The source code in this repository is licensed under the MIT License.
-The MIT License applies only to the source code and does not apply to non-code assets unless
-explicitly stated otherwise.
+The source code in this repository is licensed under the MIT License. The MIT License applies only
+to the source code and does not apply to non-code assets unless explicitly stated otherwise.
 
-Non-code assets include, but are not limited to, textures, models, animations, sounds, music,
-icons, logos, user interface artwork, promotional images, screenshots, videos, written lore, story
-content, and other creative assets.
+Non-code assets include, but are not limited to, textures, models, animations, sounds, music, icons,
+logos, user interface artwork, promotional images, screenshots, videos, written lore, story content,
+and other creative assets.
 
-All rights to these non-code assets are reserved by the author.
-The original project name, logo, and branding are also excluded from the MIT License.
+All rights to these non-code assets are reserved by the author. The original project name, logo, and
+branding are also excluded from the MIT License.
 
 If you build your own fork or variant of this project, please use your own name, branding, and
 assets unless you have explicit permission to use the original ones.

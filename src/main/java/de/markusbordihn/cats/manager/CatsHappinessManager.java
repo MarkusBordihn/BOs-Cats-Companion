@@ -22,14 +22,9 @@ package de.markusbordihn.cats.manager;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.server.core.asset.type.blocktype.config.BlockType;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.chunk.BlockComponentChunk;
-import com.hypixel.hytale.server.core.universe.world.chunk.WorldChunk;
-import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
@@ -37,16 +32,14 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.data.MoodData;
 import de.markusbordihn.cats.data.PersonalityType;
+import de.markusbordihn.cats.world.NearbyBlockEntities;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.joml.Vector3d;
-import org.joml.Vector3i;
 
 public class CatsHappinessManager {
 
@@ -55,8 +48,8 @@ public class CatsHappinessManager {
 
   private static final double OWNER_PROXIMITY_RADIUS_SQ = 16.0 * 16.0;
   private static final double WARMTH_RADIUS = 5.0;
-  private static final Set<String> WARMTH_BLOCK_IDS =
-      Set.of("Campfire", "Flame", "Torch", "Brazier");
+  private static final Set<String> WARMTH_BLOCK_IDS = Set.of("Campfire", "Torch", "Brazier");
+  private static final String EXTINGUISHED_SUFFIX = "_Off";
 
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -65,6 +58,21 @@ public class CatsHappinessManager {
     double dy = b.y - a.y;
     double dz = b.z - a.z;
     return dx * dx + dy * dy + dz * dz;
+  }
+
+  private static boolean isWarmthSource(@Nonnull String blockTypeId) {
+    // Extinguished variants such as Deco_Campfire_Off share the lit block's name.
+    if (blockTypeId.endsWith(EXTINGUISHED_SUFFIX)) {
+      return false;
+    }
+
+    for (String warmthId : WARMTH_BLOCK_IDS) {
+      if (blockTypeId.contains(warmthId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public void adjustHappiness(
@@ -185,73 +193,21 @@ public class CatsHappinessManager {
       return false;
     }
 
-    Vector3d center = transform.getPosition();
-    double radiusSq = WARMTH_RADIUS * WARMTH_RADIUS;
-    int centerChunkX = (int) Math.floor(center.x) >> ChunkUtil.BITS;
-    int centerChunkZ = (int) Math.floor(center.z) >> ChunkUtil.BITS;
-    int chunkRadius = (int) Math.ceil(WARMTH_RADIUS / ChunkUtil.SIZE) + 1;
-
-    for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
-      for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
-        int chunkX = centerChunkX + dx;
-        int chunkZ = centerChunkZ + dz;
-        long chunkIndex =
-            ChunkUtil.indexChunkFromBlock(chunkX << ChunkUtil.BITS, chunkZ << ChunkUtil.BITS);
-
-        Ref<ChunkStore> chunkRef = world.getChunkStore().getChunkReference(chunkIndex);
-        if (chunkRef == null) {
-          continue;
-        }
-
-        Store<ChunkStore> chunkStore = chunkRef.getStore();
-        WorldChunk worldChunk = chunkStore.getComponent(chunkRef, WorldChunk.getComponentType());
-        if (worldChunk == null) {
-          continue;
-        }
-
-        BlockComponentChunk blockComponentChunk =
-            chunkStore.getComponent(chunkRef, BlockComponentChunk.getComponentType());
-        if (blockComponentChunk == null) {
-          continue;
-        }
-
-        Int2ReferenceMap<Ref<ChunkStore>> entityRefs = blockComponentChunk.getEntityReferences();
-        if (entityRefs == null || entityRefs.isEmpty()) {
-          continue;
-        }
-
-        for (Entry<Ref<ChunkStore>> entry : entityRefs.int2ReferenceEntrySet()) {
-          int blockIndex = entry.getIntKey();
-          int localX = ChunkUtil.xFromIndex(blockIndex);
-          int localY = blockIndex / (ChunkUtil.SIZE * ChunkUtil.SIZE);
-          int localZ = ChunkUtil.zFromColumn(blockIndex % ChunkUtil.SIZE_COLUMNS);
-          int worldX = (chunkX << ChunkUtil.BITS) + localX;
-          int worldZ = (chunkZ << ChunkUtil.BITS) + localZ;
-
-          BlockType blockType = worldChunk.getBlockType(new Vector3i(worldX, localY, worldZ));
-          if (blockType == null) {
-            continue;
+    boolean[] foundWarmth = {false};
+    NearbyBlockEntities.forEachWithinRadius(
+        world,
+        transform.getPosition(),
+        WARMTH_RADIUS,
+        (blockTypeId, blockPosition, distanceSquared) -> {
+          if (!isWarmthSource(blockTypeId)) {
+            return true;
           }
 
-          String blockTypeId = blockType.getId();
-          if (blockTypeId == null) {
-            continue;
-          }
+          foundWarmth[0] = true;
+          return false;
+        });
 
-          for (String warmthId : WARMTH_BLOCK_IDS) {
-            if (blockTypeId.contains(warmthId)) {
-              Vector3d blockPos = new Vector3d(worldX + 0.5, localY, worldZ + 0.5);
-              if (distanceSq(center, blockPos) <= radiusSq) {
-                return true;
-              }
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    return false;
+    return foundWarmth[0];
   }
 
   @Nullable
