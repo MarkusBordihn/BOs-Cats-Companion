@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
@@ -103,21 +103,24 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
       if (roll < cumulative) {
         return "Licking";
       }
+
       cumulative += sittingWeight;
       if (roll < cumulative) {
         return "Sitting";
       }
+
       cumulative += stretchingWeight;
       if (roll < cumulative) {
         return "Stretching";
       }
+
       return "Playing";
     }
 
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -127,11 +130,11 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      if (role == null) {
+      if (executionSupport == null) {
         return true;
       }
 
@@ -160,7 +163,7 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
       CatNeedType criticalNeed = catsManager.getCriticalNeed(entityRef, store);
 
       if (criticalNeed != CatNeedType.NONE) {
-        StateSupport stateSupport = role.getStateSupport();
+        StateSupport stateSupport = executionSupport.getStateSupport();
         String overrideState =
             switch (criticalNeed) {
               case REST -> {
@@ -195,7 +198,7 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
           if (catStateForOverride != null) {
             catsManager.updateCatState(entityRef, catStateForOverride, store);
           }
-          role.getStateSupport().setState(entityRef, "Pet", overrideState, store);
+          executionSupport.getStateSupport().setState(entityRef, "Pet", overrideState, store);
           return true;
         }
       }
@@ -206,7 +209,7 @@ public class BuilderActionCatIdleChoice extends BuilderActionBase {
                   catData.personalityType(),
                   catData.secondaryPersonality(),
                   moodComponent != null ? moodComponent.getLevel() : null));
-      role.getStateSupport().setState(entityRef, "Pet", chosen, store);
+      executionSupport.getStateSupport().setState(entityRef, "Pet", chosen, store);
       return true;
     }
   }

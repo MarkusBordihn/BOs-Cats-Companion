@@ -59,7 +59,7 @@ final class CatWanderCommand extends CatCommand {
                 .color(Constants.COLOR_SUCCESS));
       } else {
         context.sendMessage(
-            Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
+            Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
       }
     } else {
       context.sendMessage(

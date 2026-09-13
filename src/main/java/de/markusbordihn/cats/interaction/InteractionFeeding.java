@@ -30,10 +30,11 @@ import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
+import com.hypixel.hytale.server.npc.storage.AlarmStore;
 import com.hypixel.hytale.server.npc.util.Alarm;
 import de.markusbordihn.cats.Constants;
+import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.inventory.InventoryHelper;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -53,7 +54,6 @@ public class InteractionFeeding {
 
   public static boolean handle(
       Ref<EntityStore> entityRef,
-      Role role,
       Store<EntityStore> store,
       Player player,
       ItemStack heldItem,
@@ -61,15 +61,16 @@ public class InteractionFeeding {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     boolean isTreat = Constants.CAT_TREATS_ITEM.equals(itemName);
 
-    NPCEntity npcEntity = null;
+    AlarmStore alarmStore = null;
     WorldTimeResource worldTime = null;
     if (isTreat) {
-      npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-      worldTime = npcEntity != null ? store.getResource(WorldTimeResource.getResourceType()) : null;
+      alarmStore = AlarmStore.get(entityRef, store);
+      worldTime =
+          alarmStore != null ? store.getResource(WorldTimeResource.getResourceType()) : null;
     }
 
-    if (npcEntity != null) {
-      Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
+    if (alarmStore != null) {
+      Alarm treatAlarm = alarmStore.get(TREAT_COOLDOWN_ALARM);
       if (treatAlarm.isSet() && !treatAlarm.hasPassed(worldTime.getGameTime())) {
         if (player != null) {
           PlayerFeedback.sendMessage(
@@ -82,20 +83,17 @@ public class InteractionFeeding {
       }
     }
 
-    if (role == null) {
-      return false;
-    }
-    role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
+    StateSupport.get(entityRef, store).setState(entityRef, "Feeding", "Default", store);
 
     if (isOwner) {
       float healAmount = isTreat ? TREAT_HEALING_AMOUNT : HEALING_AMOUNT_PER_FEEDING;
       boolean wasFullHealth = isTreat && isAtFullHealth(entityRef, store);
       healCat(entityRef, store, player, healAmount, isTreat);
 
-      if (npcEntity != null) {
+      if (alarmStore != null) {
         Duration cooldown =
             wasFullHealth ? TREAT_COOLDOWN_FULL_HEALTH_DURATION : TREAT_COOLDOWN_DURATION;
-        Alarm treatAlarm = npcEntity.getAlarmStore().get(npcEntity, TREAT_COOLDOWN_ALARM);
+        Alarm treatAlarm = alarmStore.get(TREAT_COOLDOWN_ALARM);
         treatAlarm.set(entityRef, worldTime.getGameTime().plus(cooldown), store);
       }
 
@@ -104,7 +102,7 @@ public class InteractionFeeding {
         catsManager.boostHappiness(
             entityRef, isTreat ? HappinessSource.TREAT : HappinessSource.FEEDING, store);
         catsManager.satisfyNeed(
-            entityRef, de.markusbordihn.cats.data.CatNeedType.SOCIAL, 8f, store);
+            entityRef, CatNeedType.SOCIAL, 8f, store);
       }
     }
 
@@ -118,6 +116,7 @@ public class InteractionFeeding {
     if (statMap == null) {
       return false;
     }
+
     EntityStatValue healthStat = statMap.get(DefaultEntityStatTypes.getHealth());
     return healthStat != null && healthStat.get() >= healthStat.getMax();
   }

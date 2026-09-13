@@ -155,48 +155,6 @@ public record CatBehaviorProfile(
         idleDurationSeconds);
   }
 
-  public CatBehaviorProfile withOwnerAffinity(float newOwnerAffinity) {
-    return new CatBehaviorProfile(
-        activityWeight,
-        socialWeight,
-        playWeight,
-        restWeight,
-        newOwnerAffinity,
-        strangerDistance,
-        bedPreference,
-        giftChance,
-        wanderRadius,
-        idleDurationSeconds);
-  }
-
-  public CatBehaviorProfile withStrangerDistance(float newStrangerDistance) {
-    return new CatBehaviorProfile(
-        activityWeight,
-        socialWeight,
-        playWeight,
-        restWeight,
-        ownerAffinity,
-        newStrangerDistance,
-        bedPreference,
-        giftChance,
-        wanderRadius,
-        idleDurationSeconds);
-  }
-
-  public CatBehaviorProfile withBedPreference(float newBedPreference) {
-    return new CatBehaviorProfile(
-        activityWeight,
-        socialWeight,
-        playWeight,
-        restWeight,
-        ownerAffinity,
-        strangerDistance,
-        newBedPreference,
-        giftChance,
-        wanderRadius,
-        idleDurationSeconds);
-  }
-
   public CatBehaviorProfile withGiftChance(float newGiftChance) {
     return new CatBehaviorProfile(
         activityWeight,
@@ -211,31 +169,4 @@ public record CatBehaviorProfile(
         idleDurationSeconds);
   }
 
-  public CatBehaviorProfile withWanderRadius(float newWanderRadius) {
-    return new CatBehaviorProfile(
-        activityWeight,
-        socialWeight,
-        playWeight,
-        restWeight,
-        ownerAffinity,
-        strangerDistance,
-        bedPreference,
-        giftChance,
-        newWanderRadius,
-        idleDurationSeconds);
-  }
-
-  public CatBehaviorProfile withIdleDurationSeconds(float newIdleDurationSeconds) {
-    return new CatBehaviorProfile(
-        activityWeight,
-        socialWeight,
-        playWeight,
-        restWeight,
-        ownerAffinity,
-        strangerDistance,
-        bedPreference,
-        giftChance,
-        wanderRadius,
-        newIdleDurationSeconds);
-  }
 }

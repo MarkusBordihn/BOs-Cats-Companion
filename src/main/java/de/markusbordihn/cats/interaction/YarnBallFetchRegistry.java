@@ -24,7 +24,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public final class YarnBallFetchRegistry {
 
@@ -47,26 +46,14 @@ public final class YarnBallFetchRegistry {
     if (entry == null) {
       return false;
     }
+
     if (!entry.catRef.isValid()
         || System.currentTimeMillis() - entry.registeredAt > MAX_LOCK_AGE_MS) {
       activeFetchers.remove(ownerUuid);
       return false;
     }
-    return true;
-  }
 
-  @Nullable
-  public static Ref<EntityStore> getFetchingCat(@Nonnull UUID ownerUuid) {
-    Entry entry = activeFetchers.get(ownerUuid);
-    if (entry == null) {
-      return null;
-    }
-    if (!entry.catRef.isValid()
-        || System.currentTimeMillis() - entry.registeredAt > MAX_LOCK_AGE_MS) {
-      activeFetchers.remove(ownerUuid);
-      return null;
-    }
-    return entry.catRef;
+    return true;
   }
 
   private record Entry(@Nonnull Ref<EntityStore> catRef, long registeredAt) {}

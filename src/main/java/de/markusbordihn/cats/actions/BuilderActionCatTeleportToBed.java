@@ -29,7 +29,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
 import de.markusbordihn.cats.data.CatState;
@@ -85,7 +85,7 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -97,7 +97,7 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -106,6 +106,7 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
       if (bedTarget == null || !bedTarget.hasTarget()) {
         return false;
       }
+
       Vector3d targetPos = bedTarget.getTargetPosition();
 
       TransformComponent currentTransform =
@@ -121,8 +122,8 @@ public class BuilderActionCatTeleportToBed extends BuilderActionBase {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
       }
 
-      if (role != null && role.getStateSupport() != null) {
-        role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+      if (executionSupport != null && executionSupport.getStateSupport() != null) {
+        executionSupport.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
       }
 
       var bedTargetType = CatBedTargetComponent.getComponentType();

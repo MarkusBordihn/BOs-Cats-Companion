@@ -69,9 +69,8 @@ final class CatNameCommand extends CatCommand {
       return;
     }
 
-    Nameplate nameplate = store.ensureAndGetComponent(entityRef, Nameplate.getComponentType());
-    String formerCatName = nameplate.getText();
-    nameplate.setText(catName);
+    Nameplate nameplate = store.getComponent(entityRef, Nameplate.getComponentType());
+    String formerCatName = nameplate != null ? nameplate.getText() : null;
 
     CatsManager.getInstance().updateCatName(entityRef, catName, store);
 

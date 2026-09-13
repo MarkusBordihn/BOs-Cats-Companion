@@ -38,7 +38,6 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
@@ -173,8 +172,8 @@ public final class CatActionWheelPage
     this.openedAt = System.currentTimeMillis();
     commandBuilder.append(Constants.UI_ACTION_WHEEL);
     commandBuilder.set(UI_WHEEL + ".Visible", true);
-    commandBuilder.set(UI_TITLE + ".Text", getCatDisplayName(store));
-    commandBuilder.set(UI_SUBTITLE + ".Text", resolveMoodText(store));
+    commandBuilder.set(UI_TITLE + ".Text", this.getCatDisplayName(store));
+    commandBuilder.set(UI_SUBTITLE + ".Text", this.resolveMoodText(store));
     CatsManager catsManagerForUuid = CatsManager.getInstance();
     if (catsManagerForUuid != null) {
       UUID catUuid = catsManagerForUuid.getUuid(this.catRef, store);
@@ -187,8 +186,8 @@ public final class CatActionWheelPage
         UI_STATUS_HEADER + ".Text", Message.translation("cats.ui.wheel.status_header"));
     commandBuilder.set(UI_CENTER_TEXT + ".Text", resolveStateText(this.currentState));
 
-    buildCommandButtons(commandBuilder, eventBuilder);
-    buildInfoPanel(commandBuilder, eventBuilder, store);
+    this.buildCommandButtons(commandBuilder, eventBuilder);
+    this.buildInfoPanel(commandBuilder, eventBuilder, store);
     eventBuilder.addEventBinding(
         CustomUIEventBindingType.Activating,
         UI_CENTER_BUTTON,
@@ -196,7 +195,7 @@ public final class CatActionWheelPage
         false);
     this.cachedStore = store;
     this.lastRefreshedState = this.currentState;
-    scheduleRefresh(this.world);
+    this.scheduleRefresh(this.world);
   }
 
   @Override
@@ -223,10 +222,7 @@ public final class CatActionWheelPage
         this.close();
       }
       case "pet" -> {
-        NPCEntity npc = store.getComponent(this.catRef, NPCEntity.getComponentType());
-        if (npc != null && npc.getRole() != null) {
-          InteractionOwner.pet(this.catRef, npc.getRole(), store, this.player);
-        }
+        InteractionOwner.pet(this.catRef, store, this.player);
         this.close();
       }
       case "play" -> {
@@ -261,7 +257,7 @@ public final class CatActionWheelPage
         this.close();
       }
       case "rename" -> {
-        String currentName = getCatDisplayName(store);
+        String currentName = this.getCatDisplayName(store);
         CatNameInputPage namePage =
             new CatNameInputPage(this.playerRef, this.catRef, currentName, null, null);
         this.player.getPageManager().openCustomPage(this.playerEntityRef, store, namePage);
@@ -272,13 +268,13 @@ public final class CatActionWheelPage
 
   @Override
   public void close() {
-    cleanupRefresh();
+    this.cleanupRefresh();
     super.close();
   }
 
   @Override
   public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
-    cleanupRefresh();
+    this.cleanupRefresh();
     if (System.currentTimeMillis() - this.openedAt < PAGE_CONFLICT_THRESHOLD_MS) {
       LOGGER.at(Level.WARNING).log(
           "[Cats] Action wheel for %s was dismissed within %dms of opening - "
@@ -368,7 +364,7 @@ public final class CatActionWheelPage
       commandBuilder.set(buttonId + ".Visible", true);
       commandBuilder.set(buttonId + ".Text", "");
       commandBuilder.set(labelId + ".Visible", true);
-      commandBuilder.set(labelId + ".Text", resolveSlotLabel(i));
+      commandBuilder.set(labelId + ".Text", this.resolveSlotLabel(i));
       eventBuilder.addEventBinding(
           CustomUIEventBindingType.Activating, buttonId, EventData.of(KEY_CMD, SLOT_IDS[i]), false);
     }
@@ -405,10 +401,12 @@ public final class CatActionWheelPage
     if (catsManager == null) {
       return Message.raw("");
     }
+
     HappinessLevel level = catsManager.getHappinessLevel(this.catRef, store);
     if (level == null) {
       return Message.raw("");
     }
+
     return switch (level) {
       case ECSTATIC -> Message.translation("cats.ui.mood.ecstatic");
       case HAPPY -> Message.translation("cats.ui.mood.happy");
@@ -440,10 +438,10 @@ public final class CatActionWheelPage
     commandBuilder.set(UI_PANEL_GIFTS + ".Visible", true);
     commandBuilder.set(
         UI_PANEL_PERSONALITY_HEADER + ".Text", Message.translation("cats.ui.panel.personality"));
-    commandBuilder.set(UI_PANEL_PERSONALITY + ".Text", formatPersonality(primary));
+    commandBuilder.set(UI_PANEL_PERSONALITY + ".Text", this.formatPersonality(primary));
     commandBuilder.set(
         UI_PANEL_SECONDARY_HEADER + ".Text", Message.translation("cats.ui.panel.secondary"));
-    commandBuilder.set(UI_PANEL_SECONDARY + ".Text", formatPersonality(secondary));
+    commandBuilder.set(UI_PANEL_SECONDARY + ".Text", this.formatPersonality(secondary));
     commandBuilder.set(UI_PANEL_GIFTS_HEADER + ".Text", Message.translation("cats.ui.panel.gifts"));
     commandBuilder.set(UI_PANEL_GIFTS + ".Text", String.valueOf(gifts));
 

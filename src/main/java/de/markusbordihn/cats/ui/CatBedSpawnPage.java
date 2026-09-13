@@ -31,7 +31,6 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
-import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -41,6 +40,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.DisplayNameSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatOwnerComponent;
@@ -281,7 +281,7 @@ public final class CatBedSpawnPage
     }
 
     if (ACTION_EMPTY.equals(data.command)) {
-      handleEmptyBed(ref, catsManager, store);
+      this.handleEmptyBed(ref, catsManager, store);
       this.close();
       return;
     }
@@ -331,13 +331,14 @@ public final class CatBedSpawnPage
                 this.playerRef,
                 catData.displayName(),
                 null,
-                () -> handleSpawnCat(catData, store, player));
+                () -> this.handleSpawnCat(catData, store, player));
         player.getPageManager().openCustomPage(ref, store, confirmPage);
         return;
       }
-      case ACTION_CALL -> handleCallCat(catData, catUuid, catsManager, store);
-      case ACTION_SPAWN -> handleSpawnCat(catData, store, player);
-      case ACTION_WAKEUP -> handleWakeUpCat(catUuid, catsManager, store);
+
+      case ACTION_CALL -> this.handleCallCat(catData, catUuid, catsManager, store);
+      case ACTION_SPAWN -> this.handleSpawnCat(catData, store, player);
+      case ACTION_WAKEUP -> this.handleWakeUpCat(catUuid, catsManager, store);
       default -> LOGGER.at(Level.WARNING).log("Unknown bed spawn action: %s", action);
     }
 
@@ -449,7 +450,7 @@ public final class CatBedSpawnPage
             "State mismatch for cat %s: alive in world but DESPAWNED — auto-resolving",
             catData.uuid());
         catsManager.registerCat(existingCatRef, store);
-        handleCallCat(catData, catData.uuid(), catsManager, store);
+        this.handleCallCat(catData, catData.uuid(), catsManager, store);
         return;
       }
     }
@@ -505,7 +506,7 @@ public final class CatBedSpawnPage
       }
 
       if (catData.name() != null && !catData.name().isEmpty()) {
-        store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catData.name());
+        DisplayNameSupport.setDisplayName(catRef, catData.name(), store);
       }
 
       NPCEntity spawnedNpcEntity = spawnResult.right();

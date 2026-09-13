@@ -43,9 +43,7 @@ import javax.annotation.Nullable;
 public class CatsDataResource implements Resource<EntityStore> {
 
   public static final String ID = "CatsData";
-
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-
   public static final BuilderCodec<CatsDataResource> CODEC =
       BuilderCodec.builder(CatsDataResource.class, CatsDataResource::new)
           .append(
@@ -62,7 +60,6 @@ public class CatsDataResource implements Resource<EntityStore> {
               })
           .add()
           .build();
-
   @Nonnull private Map<UUID, CatDataEntry> cats = new HashMap<>();
 
   public CatsDataResource() {}
@@ -73,17 +70,17 @@ public class CatsDataResource implements Resource<EntityStore> {
   }
 
   public void addCat(@Nonnull CatDataEntry catDataEntry) {
-    cats.put(catDataEntry.uuid(), catDataEntry);
+    this.cats.put(catDataEntry.uuid(), catDataEntry);
     LOGGER.at(Level.INFO).log("Added cat: %s", catDataEntry);
   }
 
   public void updateCat(@Nonnull UUID catUuid, @Nonnull CatDataEntry catDataEntry) {
-    cats.put(catUuid, catDataEntry);
+    this.cats.put(catUuid, catDataEntry);
     LOGGER.at(Level.FINE).log("Updated cat: %s", catDataEntry);
   }
 
   public void removeCat(@Nonnull UUID catUuid) {
-    CatDataEntry removed = cats.remove(catUuid);
+    CatDataEntry removed = this.cats.remove(catUuid);
     if (removed != null) {
       LOGGER.at(Level.INFO).log("Removed cat: %s", removed);
     }
@@ -91,58 +88,59 @@ public class CatsDataResource implements Resource<EntityStore> {
 
   @Nullable
   public CatDataEntry getCat(@Nonnull UUID catUuid) {
-    return cats.get(catUuid);
+    return this.cats.get(catUuid);
   }
 
   @Nonnull
   public Set<UUID> getAllCatUuids() {
-    return Collections.unmodifiableSet(cats.keySet());
+    return Collections.unmodifiableSet(this.cats.keySet());
   }
 
   @Nonnull
   public Collection<CatDataEntry> getAllCats() {
-    return Collections.unmodifiableCollection(cats.values());
+    return Collections.unmodifiableCollection(this.cats.values());
   }
 
   @Nonnull
   public Set<CatDataEntry> getCatsByOwner(@Nonnull UUID ownerUuid) {
-    return cats.values().stream()
+    return this.cats.values().stream()
         .filter(cat -> ownerUuid.equals(cat.ownerUuid()))
         .collect(Collectors.toUnmodifiableSet());
   }
 
   @Nonnull
   public Set<CatDataEntry> getCatsWithoutOwner() {
-    return cats.values().stream()
+    return this.cats.values().stream()
         .filter(cat -> !cat.hasOwner())
         .collect(Collectors.toUnmodifiableSet());
   }
 
   @Nonnull
   public Set<CatDataEntry> getSpawnedCats() {
-    return cats.values().stream()
+    return this.cats.values().stream()
         .filter(CatDataEntry::isSpawned)
         .collect(Collectors.toUnmodifiableSet());
   }
 
   @Nonnull
   public Set<CatDataEntry> getDespawnedCats() {
-    return cats.values().stream()
+    return this.cats.values().stream()
         .filter(cat -> cat.status() == CatStatus.DESPAWNED)
         .collect(Collectors.toUnmodifiableSet());
   }
 
   public int getTotalCatCount() {
-    return cats.size();
+    return this.cats.size();
   }
 
   public int getOwnedCatCount(@Nonnull UUID ownerUuid) {
-    return (int) cats.values().stream().filter(cat -> ownerUuid.equals(cat.ownerUuid())).count();
+    return (int)
+        this.cats.values().stream().filter(cat -> ownerUuid.equals(cat.ownerUuid())).count();
   }
 
   @Nullable
   public UUID findOwnerOfCat(@Nonnull UUID catUuid) {
-    CatDataEntry catDataEntry = cats.get(catUuid);
+    CatDataEntry catDataEntry = this.cats.get(catUuid);
     return catDataEntry != null ? catDataEntry.ownerUuid() : null;
   }
 

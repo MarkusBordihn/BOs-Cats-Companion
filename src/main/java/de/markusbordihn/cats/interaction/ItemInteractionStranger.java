@@ -24,7 +24,6 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.role.Role;
 import java.util.Set;
 
 public class ItemInteractionStranger {
@@ -45,16 +44,12 @@ public class ItemInteractionStranger {
           "Fish_Minnow_Item");
 
   public static boolean handle(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
 
     String itemName = heldItem != null ? heldItem.getItemId() : null;
 
     if (itemName != null && FOOD_ITEMS.contains(itemName)) {
-      return InteractionFeeding.handle(entityRef, role, store, player, heldItem, false);
+      return InteractionFeeding.handle(entityRef, store, player, heldItem, false);
     }
 
     return false;

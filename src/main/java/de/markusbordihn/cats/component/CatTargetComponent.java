@@ -64,7 +64,7 @@ public class CatTargetComponent implements Component<EntityStore> {
 
   @Nullable
   public UUID getTargetEntityUUID() {
-    return targetEntityUUID;
+    return this.targetEntityUUID;
   }
 
   public void setTargetEntityUUID(@Nullable UUID targetEntityUUID) {
@@ -72,17 +72,17 @@ public class CatTargetComponent implements Component<EntityStore> {
   }
 
   public boolean hasTarget() {
-    return targetEntityUUID != null;
+    return this.targetEntityUUID != null;
   }
 
   @Override
   @Nonnull
   public CatTargetComponent clone() {
-    return new CatTargetComponent(targetEntityUUID);
+    return new CatTargetComponent(this.targetEntityUUID);
   }
 
   @Override
   public String toString() {
-    return "CatTargetComponent{targetEntityUUID=" + targetEntityUUID + '}';
+    return "CatTargetComponent{targetEntityUUID=" + this.targetEntityUUID + '}';
   }
 }

@@ -102,29 +102,29 @@ public class CatBedTargetComponent implements Component<EntityStore> {
 
   @Nonnull
   public Vector3d getTargetPosition() {
-    return new Vector3d(x, y, z);
+    return new Vector3d(this.x, this.y, this.z);
   }
 
   public double getX() {
-    return x;
+    return this.x;
   }
 
   public double getY() {
-    return y;
+    return this.y;
   }
 
   public double getZ() {
-    return z;
+    return this.z;
   }
 
   public boolean hasTarget() {
-    return hasTarget;
+    return this.hasTarget;
   }
 
   @Override
   @Nonnull
   public CatBedTargetComponent clone() {
-    CatBedTargetComponent clone = new CatBedTargetComponent(x, y, z);
+    CatBedTargetComponent clone = new CatBedTargetComponent(this.x, this.y, this.z);
     clone.hasTarget = this.hasTarget;
     return clone;
   }

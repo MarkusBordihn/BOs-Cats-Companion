@@ -29,8 +29,8 @@ import com.hypixel.hytale.server.npc.asset.builder.holder.FloatHolder;
 import com.hypixel.hytale.server.npc.asset.builder.holder.StringHolder;
 import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.data.CatBehaviorProfile;
@@ -119,10 +119,10 @@ public class BuilderSensorCatPersonalityWeight extends BuilderSensorBase {
     @Override
     public boolean matches(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         double dt,
         @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
+      if (!super.matches(entityRef, executionSupport, dt, store)) {
         return false;
       }
 
@@ -146,7 +146,7 @@ public class BuilderSensorCatPersonalityWeight extends BuilderSensorBase {
               moodComponent != null ? moodComponent.getLevel() : null);
 
       float profileWeight =
-          switch (weightField.toLowerCase()) {
+          switch (this.weightField.toLowerCase()) {
             case "play" -> profile.playWeight();
             case "rest" -> profile.restWeight();
             case "social" -> profile.socialWeight();
@@ -154,7 +154,7 @@ public class BuilderSensorCatPersonalityWeight extends BuilderSensorBase {
           };
 
       float randomBand = 0.8f + ThreadLocalRandom.current().nextFloat() * 0.4f;
-      return profileWeight > threshold * randomBand;
+      return profileWeight > this.threshold * randomBand;
     }
 
     @Override

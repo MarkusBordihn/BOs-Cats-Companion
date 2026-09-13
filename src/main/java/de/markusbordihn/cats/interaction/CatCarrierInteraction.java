@@ -37,7 +37,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.metadata.CapturedNPCMetadata;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.DisplayNameSupport;
 import com.hypixel.hytale.server.npc.storage.AlarmStore;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
@@ -69,7 +69,6 @@ public class CatCarrierInteraction {
 
   public static boolean handleCapture(
       @Nonnull Ref<EntityStore> entityRef,
-      @Nonnull Role role,
       @Nonnull Store<EntityStore> store,
       @Nonnull Player player,
       @Nonnull ItemStack heldItem) {
@@ -146,8 +145,9 @@ public class CatCarrierInteraction {
         capturedMeta.setNpcNameKey(displayName);
       }
       capturedMeta.setFullItemIcon(FULL_CARRIER_ICON);
-      if (npcEntity != null) {
-        capturedMeta.setAlarmStore(npcEntity.getAlarmStore());
+      AlarmStore alarmStore = AlarmStore.get(entityRef, store);
+      if (alarmStore != null) {
+        capturedMeta.setAlarmStore(alarmStore);
       }
 
       updatedItem = updatedItem.withMetadata(CapturedNPCMetadata.KEYED_CODEC, capturedMeta);
@@ -309,6 +309,7 @@ public class CatCarrierInteraction {
     if (heldItem == null) {
       return false;
     }
+
     return heldItem.getFromMetadataOrNull(META_CAT_UUID, UUID_CODEC) != null;
   }
 
@@ -370,7 +371,8 @@ public class CatCarrierInteraction {
               null,
               alarmStore == null
                   ? null
-                  : (spawnedNpc, holder, spawnStore) -> spawnedNpc.setAlarmStore(alarmStore),
+                  : (spawnedNpc, holder, spawnStore) ->
+                      holder.putComponent(AlarmStore.getComponentType(), alarmStore),
               null);
 
       if (spawnResult == null || spawnResult.left() == null || !spawnResult.left().isValid()) {
@@ -398,7 +400,7 @@ public class CatCarrierInteraction {
       }
 
       if (catData.name() != null && !catData.name().isEmpty()) {
-        store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catData.name());
+        DisplayNameSupport.setDisplayName(catRef, catData.name(), store);
       }
 
       if (catData.state() != null) {

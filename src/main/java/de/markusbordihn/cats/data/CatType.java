@@ -77,23 +77,23 @@ public enum CatType {
 
   @Nonnull
   public String getTamedRoleName() {
-    return tamedRoleName;
+    return this.tamedRoleName;
   }
 
   @Nonnull
   public String getWildRoleName() {
-    return wildRoleName;
+    return this.wildRoleName;
   }
 
   @Nonnull
   public String getRoleName(boolean isTamed) {
-    return isTamed ? tamedRoleName : wildRoleName;
+    return isTamed ? this.tamedRoleName : this.wildRoleName;
   }
 
   @Nonnull
   @Deprecated
   public String getRoleName() {
-    return tamedRoleName;
+    return this.tamedRoleName;
   }
 
   @Override

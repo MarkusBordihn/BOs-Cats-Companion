@@ -42,11 +42,13 @@ public class DamageSetupHandler {
     if (this.registered) {
       return true;
     }
+
     DamageModule damageModule = DamageModule.get();
     if (damageModule == null || damageModule.getFilterDamageGroup() == null) {
       return false;
     }
-    entityStoreRegistry.registerSystem(new CatDamageFilterSystem());
+
+    this.entityStoreRegistry.registerSystem(new CatDamageFilterSystem());
     this.registered = true;
     LOGGER.at(Level.INFO).log("Cat damage filter system registered");
     return true;
@@ -54,7 +56,7 @@ public class DamageSetupHandler {
 
   public void onPluginSetup(PluginSetupEvent event) {
     if (!this.registered && event.getPlugin() instanceof DamageModule) {
-      entityStoreRegistry.registerSystem(new CatDamageFilterSystem());
+      this.entityStoreRegistry.registerSystem(new CatDamageFilterSystem());
       this.registered = true;
       LOGGER.at(Level.INFO).log("Cat damage filter system registered (deferred)");
     }

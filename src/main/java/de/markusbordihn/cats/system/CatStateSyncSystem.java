@@ -29,7 +29,6 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.component.CatMoodComponent;
 import de.markusbordihn.cats.component.CatNeedsComponent;
@@ -68,8 +67,8 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
       return;
     }
 
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return;
     }
 
@@ -79,7 +78,6 @@ public class CatStateSyncSystem extends RefSystem<EntityStore> {
         return;
       }
 
-      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
       String substate =
           switch (state) {
             case ATTACKING -> "Attacking";

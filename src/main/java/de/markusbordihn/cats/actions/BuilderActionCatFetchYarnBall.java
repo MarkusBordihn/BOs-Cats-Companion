@@ -34,7 +34,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatFetchTargetComponent;
@@ -156,7 +156,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
     @Override
     public boolean canExecute(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull InfoProvider infoProvider,
         double deltaTime,
         @Nonnull Store<EntityStore> store) {
@@ -168,7 +168,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
     @Override
     public boolean execute(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull InfoProvider infoProvider,
         double deltaTime,
         @Nonnull Store<EntityStore> store) {
@@ -176,14 +176,14 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       CatFetchTargetComponent fetchTarget =
           store.getComponent(entityRef, CatFetchTargetComponent.getComponentType());
       if (fetchTarget == null || !fetchTarget.hasTarget()) {
-        returnToDefaultState(entityRef, role, store);
+        returnToDefaultState(entityRef, executionSupport, store);
         return false;
       }
 
       TransformComponent catTransform =
           store.getComponent(entityRef, TransformComponent.getComponentType());
       if (catTransform == null) {
-        cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, null, "Default");
+        cleanUp(entityRef, fetchTarget.getOwnerUuid(), executionSupport, store, null, "Default");
         return false;
       }
 
@@ -191,20 +191,21 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (now - fetchTarget.getFetchStartMs() > FETCH_TIMEOUT_MS) {
         LOGGER.at(Level.WARNING).log("FetchYarnBall: timeout after %d ms", FETCH_TIMEOUT_MS);
         Player player = getPlayer(fetchTarget.getOwnerUuid(), store);
-        cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, player, "Default");
+        cleanUp(entityRef, fetchTarget.getOwnerUuid(), executionSupport, store, player, "Default");
         return false;
       }
 
       if (!fetchTarget.isReturningToPlayer()) {
         NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
         if (npcEntity == null) {
-          cleanUp(entityRef, fetchTarget.getOwnerUuid(), role, store, null, "Default");
+          cleanUp(entityRef, fetchTarget.getOwnerUuid(), executionSupport, store, null, "Default");
           return false;
         }
 
-        handleGoToBallPhase(entityRef, fetchTarget, catTransform, npcEntity, role, store);
+        handleGoToBallPhase(
+            entityRef, fetchTarget, catTransform, npcEntity, executionSupport, store);
       } else {
-        handleReturnToPlayerPhase(entityRef, fetchTarget, catTransform, role, store);
+        handleReturnToPlayerPhase(entityRef, fetchTarget, catTransform, executionSupport, store);
       }
 
       return false;
@@ -215,7 +216,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         @Nonnull CatFetchTargetComponent fetchTarget,
         @Nonnull TransformComponent catTransform,
         @Nonnull NPCEntity npcEntity,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store) {
 
       Vector3d ballPos = fetchTarget.getBallPosition();
@@ -240,6 +241,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         store.putComponent(entityRef, CatFetchTargetComponent.getComponentType(), updated);
         return;
       }
+
       if (System.currentTimeMillis() - pickupTime < PICKUP_DELAY_MS) {
         return;
       }
@@ -247,7 +249,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       LOGGER.at(Level.INFO).log("FetchYarnBall: pickup complete, transitioning to return phase");
       clearTransientPath(npcEntity);
 
-      Ref<EntityStore> projectileRef = fetchTarget.getProjectileRef(store);
+      Ref<EntityStore> projectileRef = fetchTarget.getProjectileRef();
       if (projectileRef != null && projectileRef.isValid()) {
         CatYarnBallProjectileComponent projectileComponent =
             store.getComponent(projectileRef, CatYarnBallProjectileComponent.getComponentType());
@@ -271,14 +273,16 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         LOGGER.at(Level.WARNING).log(
             "FetchYarnBall: owner %s not found after pickup, dropping ball", ownerUuid);
         YarnBallGroundRegistry.register(ownerUuid, catTransform.getPosition());
-        cleanUp(entityRef, ownerUuid, role, store, null, "Default");
+        cleanUp(entityRef, ownerUuid, executionSupport, store, null, "Default");
         return;
       }
 
       CatFetchTargetComponent returningTarget = fetchTarget.asReturning();
       returningTarget.clearProjectileRef();
       store.putComponent(entityRef, CatFetchTargetComponent.getComponentType(), returningTarget);
-      role.getStateSupport().setState(entityRef, "ReturningBallToOwner", "Default", store);
+      executionSupport
+          .getStateSupport()
+          .setState(entityRef, "ReturningBallToOwner", "Default", store);
 
       LOGGER.at(Level.INFO).log(
           "FetchYarnBall: returning to owner %s at %.1f/%.1f/%.1f (Seek will handle movement)",
@@ -289,7 +293,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         @Nonnull Ref<EntityStore> entityRef,
         @Nonnull CatFetchTargetComponent fetchTarget,
         @Nonnull TransformComponent catTransform,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store) {
 
       UUID ownerUuid = fetchTarget.getOwnerUuid();
@@ -299,7 +303,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         LOGGER.at(Level.WARNING).log(
             "FetchYarnBall: owner %s offline during return, dropping ball", ownerUuid);
         YarnBallGroundRegistry.register(ownerUuid, catTransform.getPosition());
-        cleanUp(entityRef, ownerUuid, role, store, null, "Default");
+        cleanUp(entityRef, ownerUuid, executionSupport, store, null, "Default");
         return;
       }
 
@@ -312,7 +316,8 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
           deliveryManager.satisfyNeed(entityRef, CatNeedType.PLAY, 10f, store);
           deliveryManager.satisfyNeed(entityRef, CatNeedType.SOCIAL, 15f, store);
         }
-        cleanUp(entityRef, ownerUuid, role, store, getPlayer(ownerUuid, store), "Happy");
+        cleanUp(
+            entityRef, ownerUuid, executionSupport, store, getPlayer(ownerUuid, store), "Happy");
         return;
       }
 
@@ -323,7 +328,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
     private void cleanUp(
         @Nonnull Ref<EntityStore> entityRef,
         @Nullable UUID ownerUuid,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store,
         @Nullable Player player,
         @Nonnull String nextSubState) {
@@ -353,12 +358,12 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (fetchType != null && fetchTarget != null) {
         store.removeComponent(entityRef, fetchType);
       }
-      resetState(entityRef, role, store, nextSubState, previousState);
+      resetState(entityRef, executionSupport, store, nextSubState, previousState);
     }
 
     private void returnToDefaultState(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store) {
       CatFetchTargetComponent fetchTarget =
           store.getComponent(entityRef, CatFetchTargetComponent.getComponentType());
@@ -371,12 +376,12 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
         }
         store.removeComponent(entityRef, CatFetchTargetComponent.getComponentType());
       }
-      resetState(entityRef, role, store, "Default", previousState);
+      resetState(entityRef, executionSupport, store, "Default", previousState);
     }
 
     private void resetState(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store,
         @Nonnull String nextSubState,
         @Nullable CatState previousState) {
@@ -385,7 +390,7 @@ public class BuilderActionCatFetchYarnBall extends BuilderActionBase {
       if (catsManager != null) {
         catsManager.updateCatState(entityRef, stateToRestore, store);
       }
-      role.getStateSupport().setState(entityRef, "Pet", nextSubState, store);
+      executionSupport.getStateSupport().setState(entityRef, "Pet", nextSubState, store);
     }
   }
 }

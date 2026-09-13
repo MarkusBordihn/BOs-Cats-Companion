@@ -78,7 +78,7 @@ public class CatMoodComponent implements Component<EntityStore> {
 
   @Nonnull
   public MoodData getData() {
-    return data;
+    return this.data;
   }
 
   public void setData(@Nonnull MoodData data) {
@@ -86,16 +86,16 @@ public class CatMoodComponent implements Component<EntityStore> {
   }
 
   public int getHappiness() {
-    return data.happiness();
+    return this.data.happiness();
   }
 
   @Nonnull
   public HappinessLevel getLevel() {
-    return data.getLevel();
+    return this.data.getLevel();
   }
 
   public void adjustHappiness(int delta) {
-    this.data = data.adjustHappiness(delta);
+    this.data = this.data.adjustHappiness(delta);
   }
 
   @Override

@@ -50,9 +50,11 @@ final class CatInfoCommand extends CatCommand {
     if (needValue > 70) {
       return needValue + " (!)";
     }
+
     if (needValue > 50) {
       return needValue + " (~)";
     }
+
     return String.valueOf(needValue);
   }
 

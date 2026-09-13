@@ -26,8 +26,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
+import com.hypixel.hytale.server.npc.storage.AlarmStore;
 import com.hypixel.hytale.server.npc.util.Alarm;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.data.CatNeedType;
@@ -46,9 +46,14 @@ public class InteractionOwner {
   private static final Duration PET_COOLDOWN_DURATION = Duration.ofMinutes(5);
 
   public static boolean handle(
-      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
 
-    Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
+      return false;
+    }
+
+    Ref<EntityStore> playerEntityRef = stateSupport.getInteractionIterationTarget();
     if (playerEntityRef == null || !playerEntityRef.isValid()) {
       return false;
     }
@@ -70,15 +75,15 @@ public class InteractionOwner {
     return true;
   }
 
-  public static boolean pet(
-      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+  public static boolean pet(Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
 
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null) {
+    AlarmStore alarmStore = AlarmStore.get(entityRef, store);
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (alarmStore == null || stateSupport == null) {
       return false;
     }
 
-    Alarm petAlarm = npcEntity.getAlarmStore().get(npcEntity, PET_COOLDOWN_ALARM);
+    Alarm petAlarm = alarmStore.get(PET_COOLDOWN_ALARM);
     WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
     if (petAlarm.isSet() && !petAlarm.hasPassed(worldTimeResource.getGameTime())) {
       PlayerFeedback.sendMessage(
@@ -114,13 +119,13 @@ public class InteractionOwner {
                     "gift", itemId != null ? itemId : gift.name().toLowerCase().replace('_', ' '))
                 .color(Constants.COLOR_GOLD));
 
-        role.getStateSupport().setState(entityRef, "Pet", "Happy", store);
+        stateSupport.setState(entityRef, "Pet", "Happy", store);
         petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);
         return false;
       }
     }
 
-    role.getStateSupport().setState(entityRef, "Petting", "Default", store);
+    stateSupport.setState(entityRef, "Petting", "Default", store);
     petAlarm.set(entityRef, worldTimeResource.getGameTime().plus(PET_COOLDOWN_DURATION), store);
 
     return false;

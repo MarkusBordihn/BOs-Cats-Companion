@@ -33,6 +33,8 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.MarkedEntitySupport;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatState;
@@ -91,7 +93,7 @@ final class CatPounceCommand extends CatCommand {
     }
 
     Vector3d targetPos = targetTransform.getPosition();
-    List<Ref<EntityStore>> nearbyCats = findNearbyCats(store, targetPos, playerUuid);
+    List<Ref<EntityStore>> nearbyCats = this.findNearbyCats(store, targetPos, playerUuid);
     if (nearbyCats.isEmpty()) {
       context.sendMessage(
           Message.translation("cats.commands.pounce.no_cats_nearby")
@@ -99,7 +101,7 @@ final class CatPounceCommand extends CatCommand {
       return;
     }
 
-    Ref<EntityStore> selectedCat = selectBestCat(store, nearbyCats, targetPos);
+    Ref<EntityStore> selectedCat = this.selectBestCat(store, nearbyCats, targetPos);
     if (selectedCat == null) {
       context.sendMessage(
           Message.translation("cats.commands.pounce.no_available_cats")
@@ -107,13 +109,15 @@ final class CatPounceCommand extends CatCommand {
       return;
     }
 
-    String targetName = getEntityDisplayName(targetRef, store);
+    String targetName = this.getEntityDisplayName(targetRef, store);
     CatsManager.getInstance().updateCatState(selectedCat, CatState.ATTACKING, store);
 
     NPCEntity npcEntity = store.getComponent(selectedCat, NPCEntity.getComponentType());
-    if (npcEntity != null && npcEntity.getRole() != null) {
-      npcEntity.getRole().getStateSupport().setState(selectedCat, "Pet", "Attacking", store);
-      npcEntity.getRole().getMarkedEntitySupport().setMarkedEntity("LockedTarget", targetRef);
+    StateSupport stateSupport = StateSupport.get(selectedCat, store);
+    MarkedEntitySupport markedEntitySupport = MarkedEntitySupport.get(selectedCat, store);
+    if (npcEntity != null && stateSupport != null && markedEntitySupport != null) {
+      stateSupport.setState(selectedCat, "Pet", "Attacking", store);
+      markedEntitySupport.setMarkedEntity("LockedTarget", targetRef);
 
       TransientPath path = new TransientPath();
       path.addWaypoint(
@@ -140,7 +144,7 @@ final class CatPounceCommand extends CatCommand {
       TransformComponent catTransform =
           store.getComponent(entityRef, TransformComponent.getComponentType());
       if (catTransform != null
-          && calculateDistance(catTransform.getPosition(), targetPos) <= POUNCE_RANGE) {
+          && this.calculateDistance(catTransform.getPosition(), targetPos) <= POUNCE_RANGE) {
         nearbyCats.add(entityRef);
       }
     }
@@ -172,7 +176,7 @@ final class CatPounceCommand extends CatCommand {
         continue;
       }
 
-      double distance = calculateDistance(catTransform.getPosition(), targetPos);
+      double distance = this.calculateDistance(catTransform.getPosition(), targetPos);
 
       if (state == CatState.FOLLOWING) {
         if (distance < minFollowingDistance) {

@@ -45,7 +45,7 @@ public enum CatState {
 
   @Nonnull
   public String getTranslationKey() {
-    return translationKey;
+    return this.translationKey;
   }
 
   public boolean isSleepingState() {

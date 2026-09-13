@@ -135,8 +135,9 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     }
 
     NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
-      LOGGER.at(Level.WARNING).log("startFetch: cat has no NPCEntity or Role");
+    StateSupport stateSupport = StateSupport.get(catRef, store);
+    if (npcEntity == null || stateSupport == null) {
+      LOGGER.at(Level.WARNING).log("startFetch: cat has no NPCEntity or StateSupport");
       return false;
     }
 
@@ -154,7 +155,7 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
     YarnBallFetchRegistry.register(ownerUuid, catRef);
     commandBuffer.putComponent(catRef, fetchTargetType, fetchTarget);
     commandBuffer.putComponent(catRef, catStateType, new CatStateComponent(CatState.FETCHING));
-    npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
+    stateSupport.setState(catRef, "FetchingYarnBall", "Default", store);
     TransientPath path = new TransientPath();
     path.addWaypoint(landingPosition, new Rotation3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(null);
@@ -304,15 +305,11 @@ public class CatYarnBallFetchInteraction extends SimpleInstantInteraction {
       return true;
     }
 
-    NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-    if (npcEntity != null && npcEntity.getRole() != null) {
-      StateSupport stateSupport = npcEntity.getRole().getStateSupport();
-      return stateSupport.inState("Pet", "PrepareSleep")
-          || stateSupport.inState("Pet", "Sleeping")
-          || stateSupport.inState("Pet", "GoingToBed");
-    }
-
-    return false;
+    StateSupport stateSupport = StateSupport.get(catRef, store);
+    return stateSupport != null
+        && (stateSupport.inState("Pet", "PrepareSleep")
+            || stateSupport.inState("Pet", "Sleeping")
+            || stateSupport.inState("Pet", "GoingToBed"));
   }
 
   @Nullable

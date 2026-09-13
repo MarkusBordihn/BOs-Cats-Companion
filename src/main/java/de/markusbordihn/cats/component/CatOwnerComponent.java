@@ -84,7 +84,7 @@ public class CatOwnerComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatOwnerData getData() {
-    return data;
+    return this.data;
   }
 
   public void setData(@Nonnull CatOwnerData data) {
@@ -92,29 +92,29 @@ public class CatOwnerComponent implements Component<EntityStore> {
   }
 
   public boolean hasOwner() {
-    return data.hasOwner();
+    return this.data.hasOwner();
   }
 
   @Nullable
   public UUID getOwnerUUID() {
-    return data.ownerId();
+    return this.data.ownerId();
   }
 
   public void setOwnerId(@Nullable UUID ownerId) {
-    this.data = data.withOwnerId(ownerId);
+    this.data = this.data.withOwnerId(ownerId);
   }
 
   @Nullable
   public String getOwnerName() {
-    return data.ownerName();
+    return this.data.ownerName();
   }
 
   public void setOwnerName(@Nullable String ownerName) {
-    this.data = data.withOwnerName(ownerName);
+    this.data = this.data.withOwnerName(ownerName);
   }
 
   public long getTamedTimestamp() {
-    return data.tamedTimestamp();
+    return this.data.tamedTimestamp();
   }
 
   public void setOwner(UUID ownerId, String ownerName) {

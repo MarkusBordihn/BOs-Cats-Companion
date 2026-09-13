@@ -44,10 +44,6 @@ public final class YarnBallThrowRegistry {
             new Entry(entry != null ? entry.timestamp : System.currentTimeMillis(), projectileRef));
   }
 
-  public static void complete(UUID playerUuid) {
-    pendingThrows.remove(playerUuid);
-  }
-
   public static void complete(@Nonnull UUID playerUuid, @Nonnull Ref<EntityStore> projectileRef) {
     pendingThrows.computeIfPresent(
         playerUuid,
@@ -61,15 +57,10 @@ public final class YarnBallThrowRegistry {
       if (now - entry.getValue().timestamp <= maxAgeMs) {
         return entry.getKey();
       }
+
       pendingThrows.remove(entry.getKey(), entry.getValue());
     }
     return null;
-  }
-
-  public static boolean isCurrentProjectile(
-      @Nonnull UUID playerUuid, @Nonnull Ref<EntityStore> projectileRef) {
-    Entry entry = pendingThrows.get(playerUuid);
-    return entry != null && isSameProjectile(entry.projectileRef, projectileRef);
   }
 
   private static boolean isSameProjectile(

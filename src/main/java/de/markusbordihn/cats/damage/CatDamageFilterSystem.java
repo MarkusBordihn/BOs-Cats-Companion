@@ -67,10 +67,12 @@ public class CatDamageFilterSystem extends DamageEventSystem {
     if (damageModule == null) {
       return Set.of();
     }
+
     SystemGroup<EntityStore> gatherGroup = damageModule.getGatherDamageGroup();
     if (gatherGroup == null) {
       return Set.of();
     }
+
     return Set.of(new SystemGroupDependency<>(Order.AFTER, gatherGroup));
   }
 
@@ -110,8 +112,8 @@ public class CatDamageFilterSystem extends DamageEventSystem {
 
         Ref<EntityStore> shooterRef = projectileSource.getRef();
         if (shooterRef != null && shooterRef.isValid()) {
-          if (isPlayerEntity(shooterRef, store)) {
-            UUID shooterUuid = getEntityUuid(shooterRef, store);
+          if (this.isPlayerEntity(shooterRef, store)) {
+            UUID shooterUuid = this.getEntityUuid(shooterRef, store);
             if (shooterUuid != null && shooterUuid.equals(ownerUuid)) {
               if (!ProtectionConfig.DAMAGE_FROM_OWNER) {
                 damage.setCancelled(true);
@@ -129,8 +131,8 @@ public class CatDamageFilterSystem extends DamageEventSystem {
       case Damage.EntitySource entitySource -> {
         Ref<EntityStore> attackerRef = entitySource.getRef();
         if (attackerRef != null && attackerRef.isValid()) {
-          if (isPlayerEntity(attackerRef, store)) {
-            UUID attackerUuid = getEntityUuid(attackerRef, store);
+          if (this.isPlayerEntity(attackerRef, store)) {
+            UUID attackerUuid = this.getEntityUuid(attackerRef, store);
             if (attackerUuid != null && attackerUuid.equals(ownerUuid)) {
               if (!ProtectionConfig.DAMAGE_FROM_OWNER) {
                 damage.setCancelled(true);

@@ -29,7 +29,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.component.CatStateComponent;
 import de.markusbordihn.cats.data.CatBedInfo;
 import de.markusbordihn.cats.data.CatState;
-import de.markusbordihn.cats.world.NearbyBlockEntities;
+import de.markusbordihn.cats.world.NearbyBlocks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,6 +41,7 @@ public final class CatBed {
   public static final double DEFAULT_SEARCH_RADIUS = 50.0;
   public static final double BED_OCCUPIED_RADIUS = 1.0;
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+  private static final String CAT_BED_BLOCK_ID_PART = "Cat_Bed";
   private static final double BED_OCCUPIED_RADIUS_SQ = BED_OCCUPIED_RADIUS * BED_OCCUPIED_RADIUS;
   private static final double[] NEAREST_BED_SEARCH_RADII = {
     1.0, 2.0, 3.0, 5.0, 10.0, 15.0, 25.0, 50.0
@@ -65,15 +66,12 @@ public final class CatBed {
   public static List<CatBedInfo> findCatBeds(
       @Nonnull World world, @Nonnull Vector3d searchCenter, double searchRadius) {
     List<CatBedInfo> beds = new ArrayList<>();
-    NearbyBlockEntities.forEachWithinRadius(
+    NearbyBlocks.forEachWithinRadius(
         world,
         searchCenter,
         searchRadius,
+        blockTypeId -> blockTypeId.contains(CAT_BED_BLOCK_ID_PART),
         (blockTypeId, blockPosition, distanceSquared) -> {
-          if (!blockTypeId.contains("Cat_Bed")) {
-            return true;
-          }
-
           double distance = Math.sqrt(distanceSquared);
           LOGGER.at(Level.FINE).log(
               "Found cat bed '%s' at (%.1f, %.1f, %.1f) distance %.1f blocks",

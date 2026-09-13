@@ -36,6 +36,8 @@ import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.DisplayNameSupport;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.actions.BuilderActionCatMoodParticles;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
@@ -87,7 +89,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   @Nonnull
   @Override
   public Query<EntityStore> getQuery() {
-    return componentType;
+    return this.componentType;
   }
 
   @Override
@@ -96,9 +98,9 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull AddReason reason,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    UUID entityUuid = getUuid(ref, store);
+    UUID entityUuid = this.getUuid(ref, store);
     if (entityUuid != null) {
-      catRefCache.put(entityUuid, ref);
+      this.catRefCache.put(entityUuid, ref);
       CatOwnerComponent ownerComponent =
           store.getComponent(ref, CatOwnerComponent.getComponentType());
       if (ownerComponent != null) {
@@ -113,7 +115,7 @@ public class CatsManager extends RefSystem<EntityStore> {
 
         CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
         if (resource.getCat(entityUuid) == null) {
-          registerCat(ref, store);
+          this.registerCat(ref, store);
           LOGGER.at(Level.INFO).log(
               "Auto-registered missing cat entry for UUID %s (Owner: %s)",
               entityUuid, ownerComponent.getOwnerName());
@@ -128,9 +130,9 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull RemoveReason reason,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    UUID entityUuid = getUuid(ref, store);
+    UUID entityUuid = this.getUuid(ref, store);
     if (entityUuid != null) {
-      catRefCache.remove(entityUuid);
+      this.catRefCache.remove(entityUuid);
       BuilderActionCatMoodParticles.ActionCatMoodParticles.clearEntity(ref);
       CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
       CatDataEntry catData = resource.getCat(entityUuid);
@@ -145,17 +147,18 @@ public class CatsManager extends RefSystem<EntityStore> {
   @Nullable
   public Ref<EntityStore> getCatByUuid(
       @Nonnull UUID entityUuid, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> cached = catRefCache.get(entityUuid);
+    Ref<EntityStore> cached = this.catRefCache.get(entityUuid);
     if (cached != null) {
       if (cached.isValid()) {
         return cached;
       }
-      catRefCache.remove(entityUuid);
+
+      this.catRefCache.remove(entityUuid);
     }
 
     Ref<EntityStore> resolved = store.getExternalData().getRefFromUUID(entityUuid);
     if (resolved != null && resolved.isValid()) {
-      catRefCache.put(entityUuid, resolved);
+      this.catRefCache.put(entityUuid, resolved);
       return resolved;
     }
 
@@ -170,7 +173,7 @@ public class CatsManager extends RefSystem<EntityStore> {
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     for (CatDataEntry catDataEntry : resource.getCatsByOwner(ownerUuid)) {
       if (catDataEntry.isSpawned()) {
-        Ref<EntityStore> catRef = getCatByUuid(catDataEntry.uuid(), store);
+        Ref<EntityStore> catRef = this.getCatByUuid(catDataEntry.uuid(), store);
         if (catRef != null && catRef.isValid()) {
           catRefs.add(catRef);
         }
@@ -187,7 +190,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull UUID newOwnerUuid,
       @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       LOGGER.at(Level.WARNING).log("Cat UUID not found for %s", catRef);
       return;
@@ -201,7 +204,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   }
 
   public void removeCatData(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
@@ -213,7 +216,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   }
 
   public void registerCat(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       LOGGER.at(Level.WARNING).log("Cannot register cat - cat has no UUID");
       return;
@@ -256,7 +259,7 @@ public class CatsManager extends RefSystem<EntityStore> {
               catType,
               catName,
               catState,
-              getPosition(catRef, store),
+              this.getPosition(catRef, store),
               CatStatus.SPAWNED);
       resource.addCat(newEntry);
     }
@@ -270,7 +273,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nullable String targetState,
       @Nonnull Store<EntityStore> store) {
 
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       LOGGER.at(Level.WARNING).log("Cannot assign owner - cat has no UUID");
       return;
@@ -280,34 +283,34 @@ public class CatsManager extends RefSystem<EntityStore> {
         catRef, CatOwnerComponent.getComponentType(), new CatOwnerComponent(ownerUuid, ownerName));
 
     if (catName != null && !catName.isEmpty()) {
-      store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catName);
+      DisplayNameSupport.setDisplayName(catRef, catName, store);
     }
 
     store.putComponent(
         catRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.FOLLOWING));
-    registerOwner(catRef, ownerUuid, store);
+    this.registerOwner(catRef, ownerUuid, store);
 
     if (targetState != null) {
-      NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-      if (npcEntity != null && npcEntity.getRole() != null) {
-        npcEntity.getRole().getStateSupport().setState(catRef, targetState, "Default", store);
+      StateSupport stateSupport = StateSupport.get(catRef, store);
+      if (stateSupport != null) {
+        stateSupport.setState(catRef, targetState, "Default", store);
       }
     }
 
-    registerCat(catRef, store);
-    assignPersonality(catRef, store);
+    this.registerCat(catRef, store);
+    this.assignPersonality(catRef, store);
   }
 
   public void updateCatName(
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull String catName,
       @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
 
-    store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catName);
+    DisplayNameSupport.setDisplayName(catRef, catName, store);
 
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
@@ -322,7 +325,7 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull CatState state,
       @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
@@ -366,7 +369,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   @Nonnull
   public String getCatDisplayName(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    String name = getCatName(catRef, store);
+    String name = this.getCatName(catRef, store);
     return name != null ? name : "Cat";
   }
 
@@ -379,8 +382,8 @@ public class CatsManager extends RefSystem<EntityStore> {
   @Nullable
   public CatDataEntry getCatData(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
-    return catUuid != null ? getCatData(catUuid, store) : null;
+    UUID catUuid = this.getUuid(catRef, store);
+    return catUuid != null ? this.getCatData(catUuid, store) : null;
   }
 
   @Nonnull
@@ -391,12 +394,12 @@ public class CatsManager extends RefSystem<EntityStore> {
   }
 
   public void despawnCat(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
 
-    Vector3i position = getPosition(catRef, store);
+    Vector3i position = this.getPosition(catRef, store);
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
       CatDataEntry catData = resource.getCat(catUuid);
@@ -408,12 +411,12 @@ public class CatsManager extends RefSystem<EntityStore> {
 
   public void storeCatInCarrier(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
 
-    Vector3i position = getPosition(catRef, store);
+    Vector3i position = this.getPosition(catRef, store);
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     if (resource != null) {
       CatDataEntry catData = resource.getCat(catUuid);
@@ -426,7 +429,7 @@ public class CatsManager extends RefSystem<EntityStore> {
 
   public void updateCatUuid(
       @Nonnull UUID oldUuid, @Nonnull UUID newUuid, @Nonnull Store<EntityStore> store) {
-    updateCatUuid(oldUuid, newUuid, null, store);
+    this.updateCatUuid(oldUuid, newUuid, null, store);
   }
 
   public void updateCatUuid(
@@ -440,13 +443,13 @@ public class CatsManager extends RefSystem<EntityStore> {
       if (catData != null) {
         resource.removeCat(oldUuid);
         resource.addCat(catData.withUuid(newUuid).withStatus(CatStatus.SPAWNED));
-        catRefCache.remove(oldUuid);
+        this.catRefCache.remove(oldUuid);
         if (newRef != null && newRef.isValid()) {
-          catRefCache.put(newUuid, newRef);
+          this.catRefCache.put(newUuid, newRef);
         } else {
           Ref<EntityStore> resolved = store.getExternalData().getRefFromUUID(newUuid);
           if (resolved != null && resolved.isValid()) {
-            catRefCache.put(newUuid, resolved);
+            this.catRefCache.put(newUuid, resolved);
           }
         }
       }
@@ -465,7 +468,7 @@ public class CatsManager extends RefSystem<EntityStore> {
   }
 
   public boolean isCatAliveInWorld(@Nonnull UUID catUuid, @Nonnull Store<EntityStore> store) {
-    Ref<EntityStore> catRef = getCatByUuid(catUuid, store);
+    Ref<EntityStore> catRef = this.getCatByUuid(catUuid, store);
     if (catRef == null || !catRef.isValid()) {
       return false;
     }
@@ -481,7 +484,7 @@ public class CatsManager extends RefSystem<EntityStore> {
 
   public void assignPersonality(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
@@ -511,17 +514,17 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull HappinessSource source,
       @Nonnull Store<EntityStore> store) {
-    return happinessManager.boostHappiness(catRef, source, store);
+    return this.happinessManager.boostHappiness(catRef, source, store);
   }
 
   @Nonnull
   public HappinessLevel getHappinessLevel(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return happinessManager.getHappinessLevel(catRef, store);
+    return this.happinessManager.getHappinessLevel(catRef, store);
   }
 
   public boolean updateNeeds(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return needsManager.updateNeeds(catRef, store);
+    return this.needsManager.updateNeeds(catRef, store);
   }
 
   public void satisfyNeed(
@@ -529,18 +532,18 @@ public class CatsManager extends RefSystem<EntityStore> {
       @Nonnull CatNeedType needType,
       float amount,
       @Nonnull Store<EntityStore> store) {
-    needsManager.satisfyNeed(catRef, needType, amount, store);
+    this.needsManager.satisfyNeed(catRef, needType, amount, store);
   }
 
   @Nonnull
   public CatNeedType getCriticalNeed(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return needsManager.getCriticalNeed(catRef, store);
+    return this.needsManager.getCriticalNeed(catRef, store);
   }
 
   public boolean isGiftEligible(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return false;
     }
@@ -561,7 +564,7 @@ public class CatsManager extends RefSystem<EntityStore> {
 
   @Nullable
   public GiftType tryGiveGift(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return null;
     }

@@ -37,6 +37,7 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   public static final String CURRENT_PROGRESS_TAG = "CurrentProgress";
   public static final String REQUIRED_PROGRESS_TAG = "RequiredProgress";
   public static final String LAST_FED_TIMESTAMP_TAG = "LastFedTimestamp";
+
   @Nonnull
   public static final BuilderCodec<CatTamingProgressComponent> CODEC =
       BuilderCodec.builder(CatTamingProgressComponent.class, CatTamingProgressComponent::new)
@@ -59,6 +60,7 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
           .documentation("The timestamp when the cat was last fed.")
           .add()
           .build();
+
   private static final Random RANDOM = new Random();
   private static final int MIN_REQUIRED_FISH = 2;
   private static final int MAX_REQUIRED_FISH = 5;
@@ -78,15 +80,15 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   }
 
   public int getCurrentProgress() {
-    return currentProgress;
+    return this.currentProgress;
   }
 
   public int getRequiredProgress() {
-    return requiredProgress;
+    return this.requiredProgress;
   }
 
   public long getLastFedTimestamp() {
-    return lastFedTimestamp;
+    return this.lastFedTimestamp;
   }
 
   public void incrementProgress() {
@@ -95,11 +97,11 @@ public class CatTamingProgressComponent implements Component<EntityStore> {
   }
 
   public boolean isReadyToTame() {
-    return currentProgress >= requiredProgress;
+    return this.currentProgress >= this.requiredProgress;
   }
 
   public boolean canFeedNow(long cooldownMillis) {
-    return (System.currentTimeMillis() - lastFedTimestamp) >= cooldownMillis;
+    return (System.currentTimeMillis() - this.lastFedTimestamp) >= cooldownMillis;
   }
 
   @Override

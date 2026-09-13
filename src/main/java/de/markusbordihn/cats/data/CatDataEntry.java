@@ -30,6 +30,9 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bson.BsonDocument;
+import org.bson.BsonDouble;
+import org.bson.BsonInt32;
+import org.bson.BsonInt64;
 import org.bson.BsonValue;
 import org.joml.Vector3i;
 
@@ -115,42 +118,57 @@ public record CatDataEntry(
         public BsonValue encode(@Nonnull CatDataEntry entry, @Nonnull ExtraInfo info) {
           BsonDocument bsonDocument = new BsonDocument();
           bsonDocument.put(UUID_TAG, UUID_CODEC.encode(entry.uuid, info));
-          if (entry.ownerUuid != null)
+          if (entry.ownerUuid != null) {
             bsonDocument.put(OWNER_UUID_TAG, UUID_CODEC.encode(entry.ownerUuid, info));
-          if (entry.ownerName != null)
+          }
+          if (entry.ownerName != null) {
             bsonDocument.put(OWNER_NAME_TAG, STRING_CODEC.encode(entry.ownerName, info));
+          }
           bsonDocument.put(TYPE_TAG, CatType.CODEC.encode(entry.catType, info));
-          if (entry.name != null) bsonDocument.put(NAME_TAG, STRING_CODEC.encode(entry.name, info));
+          if (entry.name != null) {
+            bsonDocument.put(NAME_TAG, STRING_CODEC.encode(entry.name, info));
+          }
           bsonDocument.put(STATE_TAG, CatState.CODEC.encode(entry.state, info));
-          if (entry.position != null)
+          if (entry.position != null) {
             bsonDocument.put(POSITION_TAG, Vector3iUtil.CODEC.encode(entry.position, info));
+          }
           bsonDocument.put(STATUS_TAG, CatStatus.CODEC.encode(entry.status, info));
-          if (entry.personalityType != null)
+          if (entry.personalityType != null) {
             bsonDocument.put(
                 PERSONALITY_TAG, PersonalityType.CODEC.encode(entry.personalityType, info));
-          if (entry.secondaryPersonality != null)
+          }
+          if (entry.secondaryPersonality != null) {
             bsonDocument.put(
                 SECONDARY_PERSONALITY_TAG,
                 PersonalityType.CODEC.encode(entry.secondaryPersonality, info));
-          if (entry.personalityProgress != 0)
-            bsonDocument.put(
-                PERSONALITY_PROGRESS_TAG, new org.bson.BsonInt32(entry.personalityProgress));
-          if (entry.happiness != MoodData.DEFAULT_HAPPINESS)
-            bsonDocument.put(HAPPINESS_TAG, new org.bson.BsonInt32(entry.happiness));
-          if (entry.lastMoodUpdate != 0L)
-            bsonDocument.put(LAST_MOOD_UPDATE_TAG, new org.bson.BsonInt64(entry.lastMoodUpdate));
-          if (entry.lastGiftTime != 0L)
-            bsonDocument.put(LAST_GIFT_TIME_TAG, new org.bson.BsonInt64(entry.lastGiftTime));
-          if (entry.totalGifts != 0)
-            bsonDocument.put(TOTAL_GIFTS_TAG, new org.bson.BsonInt32(entry.totalGifts));
-          if (entry.restNeed != CatNeedsData.DEFAULT_REST_NEED)
-            bsonDocument.put(REST_NEED_TAG, new org.bson.BsonDouble(entry.restNeed));
-          if (entry.socialNeed != CatNeedsData.DEFAULT_SOCIAL_NEED)
-            bsonDocument.put(SOCIAL_NEED_TAG, new org.bson.BsonDouble(entry.socialNeed));
-          if (entry.playNeed != CatNeedsData.DEFAULT_PLAY_NEED)
-            bsonDocument.put(PLAY_NEED_TAG, new org.bson.BsonDouble(entry.playNeed));
-          if (entry.lastNeedUpdate != 0L)
-            bsonDocument.put(LAST_NEED_UPDATE_TAG, new org.bson.BsonInt64(entry.lastNeedUpdate));
+          }
+          if (entry.personalityProgress != 0) {
+            bsonDocument.put(PERSONALITY_PROGRESS_TAG, new BsonInt32(entry.personalityProgress));
+          }
+          if (entry.happiness != MoodData.DEFAULT_HAPPINESS) {
+            bsonDocument.put(HAPPINESS_TAG, new BsonInt32(entry.happiness));
+          }
+          if (entry.lastMoodUpdate != 0L) {
+            bsonDocument.put(LAST_MOOD_UPDATE_TAG, new BsonInt64(entry.lastMoodUpdate));
+          }
+          if (entry.lastGiftTime != 0L) {
+            bsonDocument.put(LAST_GIFT_TIME_TAG, new BsonInt64(entry.lastGiftTime));
+          }
+          if (entry.totalGifts != 0) {
+            bsonDocument.put(TOTAL_GIFTS_TAG, new BsonInt32(entry.totalGifts));
+          }
+          if (entry.restNeed != CatNeedsData.DEFAULT_REST_NEED) {
+            bsonDocument.put(REST_NEED_TAG, new BsonDouble(entry.restNeed));
+          }
+          if (entry.socialNeed != CatNeedsData.DEFAULT_SOCIAL_NEED) {
+            bsonDocument.put(SOCIAL_NEED_TAG, new BsonDouble(entry.socialNeed));
+          }
+          if (entry.playNeed != CatNeedsData.DEFAULT_PLAY_NEED) {
+            bsonDocument.put(PLAY_NEED_TAG, new BsonDouble(entry.playNeed));
+          }
+          if (entry.lastNeedUpdate != 0L) {
+            bsonDocument.put(LAST_NEED_UPDATE_TAG, new BsonInt64(entry.lastNeedUpdate));
+          }
           return bsonDocument;
         }
 
@@ -210,18 +228,6 @@ public record CatDataEntry(
         CatNeedsData.DEFAULT_SOCIAL_NEED,
         CatNeedsData.DEFAULT_PLAY_NEED,
         0L);
-  }
-
-  public static CatDataEntry empty() {
-    return new CatDataEntry(
-        UUID.randomUUID(),
-        null,
-        null,
-        CatType.UNKNOWN,
-        null,
-        CatState.WANDERING,
-        null,
-        CatStatus.UNKNOWN);
   }
 
   public boolean hasOwner() {
@@ -316,29 +322,6 @@ public record CatDataEntry(
         newOwnerUuid,
         newOwnerName,
         catType,
-        name,
-        state,
-        position,
-        status,
-        personalityType,
-        secondaryPersonality,
-        personalityProgress,
-        happiness,
-        lastMoodUpdate,
-        lastGiftTime,
-        totalGifts,
-        restNeed,
-        socialNeed,
-        playNeed,
-        lastNeedUpdate);
-  }
-
-  public CatDataEntry withCatType(@Nonnull CatType newCatType) {
-    return new CatDataEntry(
-        uuid,
-        ownerUuid,
-        ownerName,
-        newCatType,
         name,
         state,
         position,
@@ -484,29 +467,6 @@ public record CatDataEntry(
         personalityType,
         newSecondaryPersonality,
         personalityProgress,
-        happiness,
-        lastMoodUpdate,
-        lastGiftTime,
-        totalGifts,
-        restNeed,
-        socialNeed,
-        playNeed,
-        lastNeedUpdate);
-  }
-
-  public CatDataEntry withPersonalityProgress(int newPersonalityProgress) {
-    return new CatDataEntry(
-        uuid,
-        ownerUuid,
-        ownerName,
-        catType,
-        name,
-        state,
-        position,
-        status,
-        personalityType,
-        secondaryPersonality,
-        newPersonalityProgress,
         happiness,
         lastMoodUpdate,
         lastGiftTime,

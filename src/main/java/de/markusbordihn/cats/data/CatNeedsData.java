@@ -25,7 +25,6 @@ public record CatNeedsData(float restNeed, float socialNeed, float playNeed, lon
   public static final float DEFAULT_SOCIAL_NEED = 30f;
   public static final float DEFAULT_PLAY_NEED = 25f;
 
-  private static final float DOMINANT_THRESHOLD = 50f;
   private static final float CRITICAL_THRESHOLD = 70f;
 
   public static CatNeedsData defaultNeeds() {
@@ -60,30 +59,19 @@ public record CatNeedsData(float restNeed, float socialNeed, float playNeed, lon
         newLastNeedUpdate);
   }
 
-  public CatNeedType getHighestNeed() {
-    float maxNeed = Math.max(restNeed, Math.max(socialNeed, playNeed));
-    if (maxNeed < DOMINANT_THRESHOLD) {
-      return CatNeedType.NONE;
-    }
-    if (restNeed == maxNeed) {
-      return CatNeedType.REST;
-    }
-    if (socialNeed == maxNeed) {
-      return CatNeedType.SOCIAL;
-    }
-    return CatNeedType.PLAY;
-  }
-
   public CatNeedType getCriticalNeed() {
     if (restNeed > CRITICAL_THRESHOLD) {
       return CatNeedType.REST;
     }
+
     if (socialNeed > CRITICAL_THRESHOLD) {
       return CatNeedType.SOCIAL;
     }
+
     if (playNeed > CRITICAL_THRESHOLD) {
       return CatNeedType.PLAY;
     }
+
     return CatNeedType.NONE;
   }
 }

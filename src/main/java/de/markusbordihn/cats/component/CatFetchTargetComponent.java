@@ -28,7 +28,6 @@ import com.hypixel.hytale.codec.codecs.simple.LongCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import de.markusbordihn.cats.Cats;
 import de.markusbordihn.cats.data.CatState;
@@ -151,35 +150,35 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatFetchTargetComponent asReturning() {
-    CatFetchTargetComponent updated = clone();
+    CatFetchTargetComponent updated = this.clone();
     updated.returningToPlayer = true;
     return updated;
   }
 
   @Nonnull
   public Vector3d getBallPosition() {
-    return new Vector3d(ballX, ballY, ballZ);
+    return new Vector3d(this.ballX, this.ballY, this.ballZ);
   }
 
   @Nullable
   public UUID getOwnerUuid() {
-    return ownerUuid;
+    return this.ownerUuid;
   }
 
   public boolean isReturningToPlayer() {
-    return returningToPlayer;
+    return this.returningToPlayer;
   }
 
   public boolean hasTarget() {
-    return hasTarget;
+    return this.hasTarget;
   }
 
   public long getFetchStartMs() {
-    return fetchStartMs;
+    return this.fetchStartMs;
   }
 
   public long getPickupTimeMs() {
-    return pickupTimeMs;
+    return this.pickupTimeMs;
   }
 
   public void setPickupTimeMs(long pickupTimeMs) {
@@ -187,7 +186,7 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
   }
 
   public long getLastPathMs() {
-    return lastPathMs;
+    return this.lastPathMs;
   }
 
   public void setLastPathMs(long lastPathMs) {
@@ -195,7 +194,7 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
   }
 
   @Nullable
-  public Ref<EntityStore> getProjectileRef(@Nonnull Store<EntityStore> store) {
+  public Ref<EntityStore> getProjectileRef() {
     return this.projectileRef != null && this.projectileRef.isValid() ? this.projectileRef : null;
   }
 
@@ -205,19 +204,13 @@ public class CatFetchTargetComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatState getPreviousState() {
-    return previousState != null && previousState != CatState.FETCHING
-        ? previousState
+    return this.previousState != null && this.previousState != CatState.FETCHING
+        ? this.previousState
         : CatState.FOLLOWING;
   }
 
   public void setPreviousState(@Nullable CatState previousState) {
     this.previousState = previousState;
-  }
-
-  public void markReturning() {
-    this.returningToPlayer = true;
-    this.pickupTimeMs = 0;
-    this.lastPathMs = 0;
   }
 
   @Override

@@ -89,15 +89,15 @@ public class CatYarnBallProjectileComponent implements Component<EntityStore> {
 
   @Nullable
   public UUID getOwnerUuid() {
-    return ownerUuid;
+    return this.ownerUuid;
   }
 
   public long getSpawnTimeMs() {
-    return spawnTimeMs;
+    return this.spawnTimeMs;
   }
 
   public boolean isFetchTriggered() {
-    return fetchTriggered;
+    return this.fetchTriggered;
   }
 
   public void setFetchTriggered(boolean fetchTriggered) {
@@ -105,7 +105,7 @@ public class CatYarnBallProjectileComponent implements Component<EntityStore> {
   }
 
   public boolean isRemoveRequested() {
-    return removeRequested;
+    return this.removeRequested;
   }
 
   public void setRemoveRequested(boolean removeRequested) {

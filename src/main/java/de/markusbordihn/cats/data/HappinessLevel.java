@@ -42,15 +42,16 @@ public enum HappinessLevel {
     if (happiness < 0) {
       return MISERABLE;
     }
+
     int index = Math.min(happiness / 20, LEVELS.length - 1);
     return LEVELS[index];
   }
 
   public int getMinValue() {
-    return minValue;
+    return this.minValue;
   }
 
   public int getMaxValue() {
-    return maxValue;
+    return this.maxValue;
   }
 }

@@ -45,9 +45,6 @@
     ],
     "HitboxType": "Cat_Bed",
     "VariantRotation": "NESW",
-    "Flags": {
-      "IsUsable": true
-    },
     "Gathering": {
       "Breaking": {
         "GatherType": "Woods"

@@ -50,15 +50,15 @@ public enum PersonalityType {
   }
 
   public float getActivityModifier() {
-    return activityModifier;
+    return this.activityModifier;
   }
 
   public float getPetModifier() {
-    return petModifier;
+    return this.petModifier;
   }
 
   public float getPlayModifier() {
-    return playModifier;
+    return this.playModifier;
   }
 
   public CatBehaviorProfile getBaseProfile() {

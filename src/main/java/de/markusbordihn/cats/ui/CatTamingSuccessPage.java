@@ -105,8 +105,8 @@ public final class CatTamingSuccessPage
         "#CatTamingSuccessCongrats.Text",
         Message.translation("cats.ui.taming_success.congratulations"));
     commandBuilder.set("#CatTamingSuccessBreed.Text", formatCatType(this.catType));
-    commandBuilder.set("#CatTamingSuccessPersonality.Text", resolvePersonalityText());
-    commandBuilder.set("#CatTamingSuccessMood.Text", resolveMoodText());
+    commandBuilder.set("#CatTamingSuccessPersonality.Text", this.resolvePersonalityText());
+    commandBuilder.set("#CatTamingSuccessMood.Text", this.resolveMoodText());
     commandBuilder.set(
         "#CatTamingSuccessNameLabel.Text",
         Message.translation("cats.ui.taming_success.name_label"));

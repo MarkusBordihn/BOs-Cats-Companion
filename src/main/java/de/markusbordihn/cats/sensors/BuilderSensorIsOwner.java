@@ -29,8 +29,8 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -78,14 +78,15 @@ public class BuilderSensorIsOwner extends BuilderSensorBase {
     @Override
     public boolean matches(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         double dt,
         @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
+      if (!super.matches(entityRef, executionSupport, dt, store)) {
         return false;
       }
 
-      Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
+      Ref<EntityStore> playerRef =
+          executionSupport.getStateSupport().getInteractionIterationTarget();
       if (playerRef == null) {
         return false;
       }

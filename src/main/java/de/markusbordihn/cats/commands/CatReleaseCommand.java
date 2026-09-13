@@ -26,12 +26,12 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
-import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.DisplayNameSupport;
 import com.hypixel.hytale.server.npc.systems.RoleChangeSystem;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
@@ -107,7 +107,7 @@ final class CatReleaseCommand extends CatCommand {
     if (bedTargetType != null && store.getComponent(entityRef, bedTargetType) != null) {
       store.removeComponent(entityRef, bedTargetType);
     }
-    store.ensureAndGetComponent(entityRef, Nameplate.getComponentType()).setText("");
+    DisplayNameSupport.setDisplayName(entityRef, null, true, store);
 
     CatsManager catsManager = CatsManager.getInstance();
     if (catsManager != null) {

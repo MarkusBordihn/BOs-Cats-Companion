@@ -27,6 +27,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.MarkedEntitySupport;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
@@ -51,12 +52,11 @@ public final class CatActionHelper {
 
   public static boolean follow(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
-    StateSupport stateSupport = npcEntity.getRole().getStateSupport();
     CatsManager.getInstance().updateCatState(entityRef, CatState.FOLLOWING, store);
     stateSupport.setState(entityRef, "Pet", "PrepareFollow", store);
     return true;
@@ -64,20 +64,21 @@ public final class CatActionHelper {
 
   public static boolean stop(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.WAITING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Waiting", store);
+    stateSupport.setState(entityRef, "Pet", "Waiting", store);
     return true;
   }
 
   public static boolean leaveBed(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (npcEntity == null || stateSupport == null) {
       return false;
     }
 
@@ -97,7 +98,7 @@ public final class CatActionHelper {
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.WANDERING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Wandering", store);
+    stateSupport.setState(entityRef, "Pet", "Wandering", store);
 
     if (origin != null) {
       TransientPath path = new TransientPath();
@@ -109,37 +110,37 @@ public final class CatActionHelper {
 
   public static boolean sit(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.SITTING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Sitting", store);
+    stateSupport.setState(entityRef, "Pet", "Sitting", store);
     return true;
   }
 
   public static boolean sleep(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.SLEEPING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+    stateSupport.setState(entityRef, "Pet", "Sleeping", store);
     return true;
   }
 
   public static boolean play(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.PLAYING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Playing", store);
+    stateSupport.setState(entityRef, "Pet", "Playing", store);
     return true;
   }
 
@@ -160,14 +161,15 @@ public final class CatActionHelper {
     }
 
     NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(catRef, store);
+    if (npcEntity == null || stateSupport == null) {
       YarnBallGroundRegistry.register(ownerUuid, ballPos);
       return false;
     }
 
     store.putComponent(catRef, fetchType, new CatFetchTargetComponent(ballPos, ownerUuid));
     store.putComponent(catRef, stateType, new CatStateComponent(CatState.FETCHING));
-    npcEntity.getRole().getStateSupport().setState(catRef, "FetchingYarnBall", "Default", store);
+    stateSupport.setState(catRef, "FetchingYarnBall", "Default", store);
     TransientPath path = new TransientPath();
     path.addWaypoint(ballPos, new Rotation3f(0, 0, 0));
     npcEntity.getPathManager().setTransientPath(path);
@@ -176,13 +178,13 @@ public final class CatActionHelper {
 
   public static boolean wander(
       @Nonnull Ref<EntityStore> entityRef, @Nonnull Store<EntityStore> store) {
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
       return false;
     }
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.WANDERING, store);
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Wandering", store);
+    stateSupport.setState(entityRef, "Pet", "Wandering", store);
     return true;
   }
 
@@ -208,7 +210,8 @@ public final class CatActionHelper {
     }
 
     NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (npcEntity == null || stateSupport == null) {
       return false;
     }
 
@@ -228,7 +231,7 @@ public final class CatActionHelper {
         entityRef,
         CatStateComponent.getComponentType(),
         new CatStateComponent(CatState.GOING_TO_BED));
-    npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "GoingToBed", store);
+    stateSupport.setState(entityRef, "Pet", "GoingToBed", store);
     return true;
   }
 
@@ -274,9 +277,11 @@ public final class CatActionHelper {
 
     CatsManager.getInstance().updateCatState(selectedCat, CatState.ATTACKING, store);
     NPCEntity npcEntity = store.getComponent(selectedCat, NPCEntity.getComponentType());
-    if (npcEntity != null && npcEntity.getRole() != null) {
-      npcEntity.getRole().getStateSupport().setState(selectedCat, "Pet", "Attacking", store);
-      npcEntity.getRole().getMarkedEntitySupport().setMarkedEntity("LockedTarget", targetRef);
+    StateSupport stateSupport = StateSupport.get(selectedCat, store);
+    MarkedEntitySupport markedEntitySupport = MarkedEntitySupport.get(selectedCat, store);
+    if (npcEntity != null && stateSupport != null && markedEntitySupport != null) {
+      stateSupport.setState(selectedCat, "Pet", "Attacking", store);
+      markedEntitySupport.setMarkedEntity("LockedTarget", targetRef);
       TransientPath path = new TransientPath();
       path.addWaypoint(
           new Vector3d(

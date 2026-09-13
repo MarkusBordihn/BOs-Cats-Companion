@@ -70,7 +70,7 @@ public abstract class CatCommand extends AbstractWorldCommand {
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandContext context) {
 
-    if (hasAdminBypass(context)) {
+    if (this.hasAdminBypass(context)) {
       return true;
     }
 
@@ -81,8 +81,8 @@ public abstract class CatCommand extends AbstractWorldCommand {
       return true;
     }
 
-    UUID executingPlayerUuid = getExecutingPlayerUuid(context);
-    String executingPlayer = getExecutingPlayerName(context);
+    UUID executingPlayerUuid = this.getExecutingPlayerUuid(context);
+    String executingPlayer = this.getExecutingPlayerName(context);
     if (executingPlayerUuid == null && executingPlayer == null) {
       return true;
     }
@@ -115,7 +115,7 @@ public abstract class CatCommand extends AbstractWorldCommand {
         "SECURITY: Player '%s' (%s) attempted to access cat owned by '%s' (%s) (Cat UUID: %s)",
         executingPlayer, executingPlayerUuid, ownerName, ownerUuid, catUuid);
 
-    String catName = getCatDisplayName(entityRef, store);
+    String catName = this.getCatDisplayName(entityRef, store);
     context.sendMessage(
         Message.translation("cats.commands.error.not_owner")
             .param("name", catName)

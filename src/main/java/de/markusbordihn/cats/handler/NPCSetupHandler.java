@@ -87,17 +87,17 @@ public class NPCSetupHandler {
 
   public void onPluginSetup(PluginSetupEvent event) {
     if (event.getPlugin() instanceof NPCPlugin npcPlugin) {
-      onNpcPluginReady(npcPlugin);
+      this.onNpcPluginReady(npcPlugin);
     }
   }
 
   public void onNpcPluginReady(NPCPlugin npcPlugin) {
-    registerCatInteractionActions(npcPlugin);
-    registerCatSensors(npcPlugin);
+    this.registerCatInteractionActions(npcPlugin);
+    this.registerCatSensors(npcPlugin);
   }
 
   private void registerCatInteractionActions(NPCPlugin npcPlugin) {
-    if (actionsRegistered) {
+    if (this.actionsRegistered) {
       LOGGER.at(Level.INFO).log("Custom actions already registered - skipping");
       return;
     }
@@ -193,12 +193,12 @@ public class NPCSetupHandler {
           "Failed to register action: %s", BuilderActionCatIdleChoice.BUILDER_ID, e);
     }
 
-    actionsRegistered = true;
+    this.actionsRegistered = true;
   }
 
   @SuppressWarnings("unchecked")
   private void registerCatSensors(NPCPlugin npcPlugin) {
-    if (sensorsRegistered) {
+    if (this.sensorsRegistered) {
       LOGGER.at(Level.INFO).log("Custom sensors already registered - skipping");
       return;
     }
@@ -219,7 +219,7 @@ public class NPCSetupHandler {
       }
     }
 
-    sensorsRegistered = true;
+    this.sensorsRegistered = true;
     LOGGER.at(Level.INFO).log("Registered %d cat sensors", registeredCount);
   }
 }

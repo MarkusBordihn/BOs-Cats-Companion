@@ -26,34 +26,30 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.role.Role;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.player.PlayerFeedback;
 
 public class ItemInteractionOwner {
 
   public static boolean handle(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
 
     String itemName = heldItem != null ? heldItem.getItemId() : null;
 
     if (itemName != null && Constants.CAT_FOOD_ITEMS.contains(itemName)) {
-      return InteractionFeeding.handle(entityRef, role, store, player, heldItem, true);
+      return InteractionFeeding.handle(entityRef, store, player, heldItem, true);
     }
 
     if (Constants.CAT_YARN_BALL_ITEM.equals(itemName)) {
-      return InteractionPlayingWithYarnBall.handle(entityRef, role, store, player);
+      return InteractionPlayingWithYarnBall.handle(entityRef, store, player);
     }
 
     if (Constants.CAT_CARRIER_ITEM.equals(itemName)) {
       if (CatCarrierInteraction.hasStoredCat(heldItem)) {
         return CatCarrierInteraction.handleRelease(store, player, heldItem);
       }
-      return CatCarrierInteraction.handleCapture(entityRef, role, store, player, heldItem);
+
+      return CatCarrierInteraction.handleCapture(entityRef, store, player, heldItem);
     }
 
     if (player != null) {
@@ -76,6 +72,6 @@ public class ItemInteractionOwner {
       }
     }
 
-    return InteractionOwner.handle(entityRef, role, store, player);
+    return InteractionOwner.handle(entityRef, store, player);
   }
 }

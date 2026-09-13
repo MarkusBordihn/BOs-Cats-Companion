@@ -46,7 +46,7 @@ public class CatStateSystem extends RefSystem<EntityStore> {
   @Nonnull
   @Override
   public Query<EntityStore> getQuery() {
-    return componentType;
+    return this.componentType;
   }
 
   @Override
@@ -55,7 +55,7 @@ public class CatStateSystem extends RefSystem<EntityStore> {
       @Nonnull AddReason reason,
       @Nonnull Store<EntityStore> store,
       @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-    CatStateComponent stateComponent = store.getComponent(ref, componentType);
+    CatStateComponent stateComponent = store.getComponent(ref, this.componentType);
     if (stateComponent != null) {
       LOGGER.at(Level.FINE).log("Cat state initialized: %s", stateComponent.getState());
     }
@@ -70,7 +70,7 @@ public class CatStateSystem extends RefSystem<EntityStore> {
 
   public CatState getState(
       @Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> catRef) {
-    CatStateComponent stateComponent = accessor.getComponent(catRef, componentType);
+    CatStateComponent stateComponent = accessor.getComponent(catRef, this.componentType);
     return stateComponent != null ? stateComponent.getState() : CatState.WANDERING;
   }
 
@@ -79,7 +79,7 @@ public class CatStateSystem extends RefSystem<EntityStore> {
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull CatState state) {
     CatStateComponent component = new CatStateComponent(state);
-    buffer.putComponent(catRef, componentType, component);
+    buffer.putComponent(catRef, this.componentType, component);
     LOGGER.at(Level.FINE).log("Cat state changed to %s", state);
   }
 }

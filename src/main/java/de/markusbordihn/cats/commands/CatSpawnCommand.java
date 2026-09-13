@@ -27,12 +27,12 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
-import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.DisplayNameSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.component.CatStateComponent;
@@ -41,6 +41,7 @@ import de.markusbordihn.cats.data.CatType;
 import de.markusbordihn.cats.manager.CatsManager;
 import it.unimi.dsi.fastutil.Pair;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.annotation.Nonnull;
@@ -62,9 +63,9 @@ final class CatSpawnCommand extends CatCommand {
   }
 
   private static boolean matchesFilter(@Nonnull CatDataEntry cat, @Nonnull String filterLower) {
-    return cat.uuid().toString().toLowerCase(java.util.Locale.ROOT).contains(filterLower)
+    return cat.uuid().toString().toLowerCase(Locale.ROOT).contains(filterLower)
         || (cat.name() != null
-            && cat.name().toLowerCase(java.util.Locale.ROOT).contains(filterLower));
+            && cat.name().toLowerCase(Locale.ROOT).contains(filterLower));
   }
 
   @Override
@@ -87,7 +88,7 @@ final class CatSpawnCommand extends CatCommand {
 
     String filter = this.filterArg.get(context);
     if (filter != null && !filter.isEmpty()) {
-      String filterLower = filter.toLowerCase(java.util.Locale.ROOT);
+      String filterLower = filter.toLowerCase(Locale.ROOT);
 
       Collection<CatDataEntry> allCats = catsManager.getCatDataByOwner(playerUuid, store);
       for (CatDataEntry cat : allCats) {
@@ -131,7 +132,7 @@ final class CatSpawnCommand extends CatCommand {
             .toList();
 
     if (filter != null && !filter.isEmpty()) {
-      String filterLower = filter.toLowerCase(java.util.Locale.ROOT);
+      String filterLower = filter.toLowerCase(Locale.ROOT);
       despawnedCats =
           despawnedCats.stream().filter(cat -> matchesFilter(cat, filterLower)).toList();
 
@@ -170,8 +171,8 @@ final class CatSpawnCommand extends CatCommand {
     Vector3d playerPos = playerTransform.getPosition();
     int spawnedCount = 0;
     for (CatDataEntry catData : despawnedCats) {
-      Vector3d spawnPos = calculateSpawnPosition(catData, playerPos);
-      if (spawnCat(catData, spawnPos, world, store)) {
+      Vector3d spawnPos = this.calculateSpawnPosition(catData, playerPos);
+      if (this.spawnCat(catData, spawnPos, world, store)) {
         spawnedCount++;
       }
     }
@@ -262,7 +263,7 @@ final class CatSpawnCommand extends CatCommand {
       }
 
       if (catData.name() != null && !catData.name().isEmpty()) {
-        store.ensureAndGetComponent(catRef, Nameplate.getComponentType()).setText(catData.name());
+        DisplayNameSupport.setDisplayName(catRef, catData.name(), store);
       }
 
       if (catData.state() != null) {

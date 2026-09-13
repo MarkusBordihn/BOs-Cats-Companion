@@ -29,6 +29,7 @@ import de.markusbordihn.cats.component.CatNeedsComponent;
 import de.markusbordihn.cats.data.CatDataEntry;
 import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.CatNeedsData;
+import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.data.PersonalityType;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class CatNeedsManager {
   private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
   public boolean updateNeeds(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return false;
     }
@@ -68,7 +69,7 @@ public class CatNeedsManager {
     long lastUpdate = catData.lastNeedUpdate();
     if (lastUpdate <= 0) {
       resource.updateCat(catUuid, catData.withLastNeedUpdate(now));
-      syncNeedsComponent(catRef, catData, store);
+      this.syncNeedsComponent(catRef, catData, store);
       return false;
     }
 
@@ -79,19 +80,21 @@ public class CatNeedsManager {
 
     PersonalityType personality = catData.personalityType();
     boolean isSleeping = catData.state().isSleepingState();
-    boolean ownerNearby = isOwnerNearby(catRef, catData, store);
-    boolean companionNearby = hasCompanionNearby(catRef, catUuid, store);
-    float restDecay = REST_DECAY_PER_MIN * getPersonalityModifier(personality, CatNeedType.REST);
+    boolean ownerNearby = this.isOwnerNearby(catRef, catData, store);
+    boolean companionNearby = this.hasCompanionNearby(catRef, catUuid, store);
+    float restDecay =
+        REST_DECAY_PER_MIN * this.getPersonalityModifier(personality, CatNeedType.REST);
     float socialDecay =
-        SOCIAL_DECAY_PER_MIN * getPersonalityModifier(personality, CatNeedType.SOCIAL);
-    float playDecay = PLAY_DECAY_PER_MIN * getPersonalityModifier(personality, CatNeedType.PLAY);
+        SOCIAL_DECAY_PER_MIN * this.getPersonalityModifier(personality, CatNeedType.SOCIAL);
+    float playDecay =
+        PLAY_DECAY_PER_MIN * this.getPersonalityModifier(personality, CatNeedType.PLAY);
     float newRest = catData.restNeed();
     float newSocial = catData.socialNeed();
     float newPlay = catData.playNeed();
 
     if (isSleeping) {
       boolean inBed =
-          catData.state() == de.markusbordihn.cats.data.CatState.SLEEPING
+          catData.state() == CatState.SLEEPING
               && catData.position() != null;
       float restReduce = inBed ? BED_SLEEP_REST_REDUCE_PER_MIN : SLEEP_REST_REDUCE_PER_MIN;
       newRest = Math.clamp(newRest - restReduce * deltaMinutes, 0f, 100f);
@@ -101,7 +104,7 @@ public class CatNeedsManager {
 
     if (ownerNearby || companionNearby) {
       float socialSatisfy = ownerNearby ? SOCIAL_SATISFY_PER_MIN : COMPANION_SOCIAL_SATISFY_PER_MIN;
-      socialSatisfy *= getPersonalityModifier(personality, CatNeedType.SOCIAL);
+      socialSatisfy *= this.getPersonalityModifier(personality, CatNeedType.SOCIAL);
       newSocial = Math.clamp(newSocial - socialSatisfy * deltaMinutes, 0f, 100f);
     } else {
       newSocial = Math.clamp(newSocial + socialDecay * deltaMinutes, 0f, 100f);
@@ -116,7 +119,7 @@ public class CatNeedsManager {
     if (changed) {
       CatDataEntry updated = catData.withNeeds(newRest, newSocial, newPlay, now);
       resource.updateCat(catUuid, updated);
-      syncNeedsComponent(catRef, updated, store);
+      this.syncNeedsComponent(catRef, updated, store);
       LOGGER.at(Level.FINE).log(
           "Cat %s needs updated: rest=%.1f social=%.1f play=%.1f",
           catUuid, newRest, newSocial, newPlay);
@@ -132,7 +135,7 @@ public class CatNeedsManager {
       @Nonnull CatNeedType needType,
       float amount,
       @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
@@ -160,7 +163,7 @@ public class CatNeedsManager {
 
     if (updated != catData) {
       resource.updateCat(catUuid, updated);
-      syncNeedsComponent(catRef, updated, store);
+      this.syncNeedsComponent(catRef, updated, store);
     }
   }
 
@@ -170,14 +173,6 @@ public class CatNeedsManager {
     CatNeedsComponent needsComponent =
         store.getComponent(catRef, CatNeedsComponent.getComponentType());
     return needsComponent != null ? needsComponent.getCriticalNeed() : CatNeedType.NONE;
-  }
-
-  @Nonnull
-  public CatNeedType getHighestNeed(
-      @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    CatNeedsComponent needsComponent =
-        store.getComponent(catRef, CatNeedsComponent.getComponentType());
-    return needsComponent != null ? needsComponent.getHighestNeed() : CatNeedType.NONE;
   }
 
   private float getPersonalityModifier(

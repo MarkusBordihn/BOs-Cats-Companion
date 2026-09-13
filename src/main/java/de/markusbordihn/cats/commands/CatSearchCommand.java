@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.arguments.types.EntityWrappedArg;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.data.CatState;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -59,16 +59,16 @@ final class CatSearchCommand extends CatCommand {
 
     CatsManager.getInstance().updateCatState(entityRef, CatState.SEARCHING, store);
 
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity != null && npcEntity.getRole() != null) {
-      npcEntity.getRole().getStateSupport().setState(entityRef, "Pet", "Searching", store);
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport != null) {
+      stateSupport.setState(entityRef, "Pet", "Searching", store);
       context.sendMessage(
           Message.translation("cats.commands.search.success")
               .param("name", getCatDisplayName(entityRef, store))
               .color(Constants.COLOR_ORANGE));
     } else {
       context.sendMessage(
-          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_INFO));
+          Message.translation("cats.commands.error.no_cat").color(Constants.COLOR_ERROR));
     }
   }
 }

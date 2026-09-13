@@ -32,6 +32,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
@@ -110,7 +111,8 @@ final class CatBedCommand extends CatCommand {
     double distanceToBed = CatBed.distance(catPos, bedPos);
 
     NPCEntity npcEntity = store.getComponent(catRef, NPCEntity.getComponentType());
-    if (npcEntity == null || npcEntity.getRole() == null) {
+    StateSupport stateSupport = StateSupport.get(catRef, store);
+    if (npcEntity == null || stateSupport == null) {
       context.sendMessage(
           Message.translation("cats.commands.error.no_cat")
               .param("name", catName)
@@ -127,7 +129,7 @@ final class CatBedCommand extends CatCommand {
 
     store.putComponent(
         catRef, CatStateComponent.getComponentType(), new CatStateComponent(CatState.GOING_TO_BED));
-    npcEntity.getRole().getStateSupport().setState(catRef, "Pet", "GoingToBed", store);
+    stateSupport.setState(catRef, "Pet", "GoingToBed", store);
     context.sendMessage(
         Message.translation("cats.commands.bed.going_to_bed")
             .param("name", catName)

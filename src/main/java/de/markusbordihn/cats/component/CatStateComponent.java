@@ -69,7 +69,7 @@ public class CatStateComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatStateData getData() {
-    return data;
+    return this.data;
   }
 
   public void setData(@Nonnull CatStateData data) {
@@ -78,11 +78,11 @@ public class CatStateComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatState getState() {
-    return data.state();
+    return this.data.state();
   }
 
   public void setState(@Nonnull CatState state) {
-    this.data = data.withState(state);
+    this.data = this.data.withState(state);
   }
 
   @Override

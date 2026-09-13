@@ -42,6 +42,7 @@ public final class YarnBallGroundRegistry {
     if (entry == null || System.currentTimeMillis() - entry.timestamp > MAX_AGE_MS) {
       return null;
     }
+
     return entry.position;
   }
 

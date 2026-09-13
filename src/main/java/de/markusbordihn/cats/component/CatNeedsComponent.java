@@ -88,37 +88,16 @@ public class CatNeedsComponent implements Component<EntityStore> {
 
   @Nonnull
   public CatNeedsData getData() {
-    return data;
+    return this.data;
   }
 
   public void setData(@Nonnull CatNeedsData data) {
     this.data = data;
   }
 
-  public float getRestNeed() {
-    return data.restNeed();
-  }
-
-  public float getSocialNeed() {
-    return data.socialNeed();
-  }
-
-  public float getPlayNeed() {
-    return data.playNeed();
-  }
-
-  public long getLastNeedUpdate() {
-    return data.lastNeedUpdate();
-  }
-
   @Nonnull
   public CatNeedType getCriticalNeed() {
-    return data.getCriticalNeed();
-  }
-
-  @Nonnull
-  public CatNeedType getHighestNeed() {
-    return data.getHighestNeed();
+    return this.data.getCriticalNeed();
   }
 
   @Override

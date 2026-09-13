@@ -40,6 +40,6 @@ public enum CatStatus {
 
   @Nonnull
   public String getTranslationKey() {
-    return translationKey;
+    return this.translationKey;
   }
 }

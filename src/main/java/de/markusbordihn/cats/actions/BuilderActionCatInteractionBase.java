@@ -30,7 +30,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.EntityPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.IPositionProvider;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
@@ -63,7 +63,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -74,27 +74,33 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       if (entityRef == null || !entityRef.isValid()) {
         return false;
       }
+
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       return ownerComponent != null && ownerComponent.hasOwner();
     }
 
-    protected UUID getPlayerUUID(Role role, Store<EntityStore> store) {
-      if (role == null || role.getStateSupport() == null) {
+    protected UUID getPlayerUUID(ExecutionSupport executionSupport, Store<EntityStore> store) {
+      if (executionSupport == null || executionSupport.getStateSupport() == null) {
         return null;
       }
-      Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+
+      Ref<EntityStore> playerEntityRef =
+          executionSupport.getStateSupport().getInteractionIterationTarget();
       if (playerEntityRef == null || !playerEntityRef.isValid()) {
         return null;
       }
+
       PlayerRef playerRefComponent =
           store.getComponent(playerEntityRef, PlayerRef.getComponentType());
       return playerRefComponent != null ? playerRefComponent.getUuid() : null;
     }
 
-    protected Ref<EntityStore> getPlayerRefFromInfoProvider(Role role, InfoProvider infoProvider) {
-      if (role != null && role.getStateSupport() != null) {
-        Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
+    protected Ref<EntityStore> getPlayerRefFromInfoProvider(
+        ExecutionSupport executionSupport, InfoProvider infoProvider) {
+      if (executionSupport != null && executionSupport.getStateSupport() != null) {
+        Ref<EntityStore> playerRef =
+            executionSupport.getStateSupport().getInteractionIterationTarget();
         if (playerRef != null && playerRef.isValid()) {
           return playerRef;
         }
@@ -114,8 +120,8 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
     }
 
     protected Player getPlayerFromInfoProvider(
-        Role role, InfoProvider infoProvider, Store<EntityStore> store) {
-      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(role, infoProvider);
+        ExecutionSupport executionSupport, InfoProvider infoProvider, Store<EntityStore> store) {
+      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(executionSupport, infoProvider);
       return playerRef != null ? store.getComponent(playerRef, Player.getComponentType()) : null;
     }
 
@@ -137,6 +143,7 @@ public abstract class BuilderActionCatInteractionBase extends BuilderActionBase 
       if (playerUuid == null || entityRef == null || !entityRef.isValid()) {
         return false;
       }
+
       CatOwnerComponent ownerComponent =
           store.getComponent(entityRef, CatOwnerComponent.getComponentType());
       return ownerComponent != null && playerUuid.equals(ownerComponent.getOwnerUUID());

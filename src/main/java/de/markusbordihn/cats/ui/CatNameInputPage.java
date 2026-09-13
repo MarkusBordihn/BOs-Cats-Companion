@@ -99,6 +99,7 @@ public final class CatNameInputPage
       }
       return;
     }
+
     String newName = data.nameInput != null ? data.nameInput.trim() : "";
     if (!newName.isEmpty() && CatsManager.getInstance() != null) {
       CatsManager.getInstance().updateCatName(this.catRef, newName, store);

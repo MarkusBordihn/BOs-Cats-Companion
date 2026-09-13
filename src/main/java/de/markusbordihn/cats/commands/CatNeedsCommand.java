@@ -87,6 +87,7 @@ final class CatNeedsCommand extends CatCommand {
           Message.raw("Invalid value - must be a number (0-100).").color(Constants.COLOR_ERROR));
       return;
     }
+
     value = Math.max(0f, Math.min(100f, value));
 
     Ref<EntityStore> entityRef = entityRefOpt.get();

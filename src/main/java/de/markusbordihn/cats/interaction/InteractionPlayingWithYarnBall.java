@@ -24,10 +24,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.time.WorldTimeResource;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
+import com.hypixel.hytale.server.npc.storage.AlarmStore;
 import com.hypixel.hytale.server.npc.util.Alarm;
 import de.markusbordihn.cats.data.CatDataEntry;
+import de.markusbordihn.cats.data.CatNeedType;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.manager.CatsManager;
 import java.time.Duration;
@@ -38,16 +39,16 @@ public class InteractionPlayingWithYarnBall {
   private static final long BASE_COOLDOWN_MINUTES = 3;
 
   public static boolean handle(
-      Ref<EntityStore> entityRef, Role role, Store<EntityStore> store, Player player) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player) {
 
-    role.getStateSupport().setState(entityRef, "PlayingWithYarnBall", "Default", store);
+    StateSupport.get(entityRef, store).setState(entityRef, "PlayingWithYarnBall", "Default", store);
 
-    NPCEntity npcEntity = store.getComponent(entityRef, NPCEntity.getComponentType());
-    if (npcEntity == null) {
+    AlarmStore alarmStore = AlarmStore.get(entityRef, store);
+    if (alarmStore == null) {
       return false;
     }
 
-    Alarm boostAlarm = npcEntity.getAlarmStore().get(npcEntity, PLAY_BOOST_ALARM);
+    Alarm boostAlarm = alarmStore.get(PLAY_BOOST_ALARM);
     WorldTimeResource worldTimeResource = store.getResource(WorldTimeResource.getResourceType());
     if (boostAlarm.isSet() && !boostAlarm.hasPassed(worldTimeResource.getGameTime())) {
       return false;
@@ -63,7 +64,7 @@ public class InteractionPlayingWithYarnBall {
                 1, (long) (BASE_COOLDOWN_MINUTES / catData.personalityType().getPlayModifier()));
       }
       catsManager.boostHappiness(entityRef, HappinessSource.PLAYING, store);
-      catsManager.satisfyNeed(entityRef, de.markusbordihn.cats.data.CatNeedType.PLAY, 20f, store);
+      catsManager.satisfyNeed(entityRef, CatNeedType.PLAY, 20f, store);
       boostAlarm.set(
           entityRef,
           worldTimeResource.getGameTime().plus(Duration.ofMinutes(cooldownMinutes)),

@@ -7,6 +7,14 @@ the [GitHub History][history] instead.
 
 Note: Please always back up your world before updating to a new version!
 
+### 3.3.0
+
+- Changed cat names to use the game's display name system, so they survive restarts and show up in
+  server messages like the kill feed.
+- Changed cat bed and warmth detection to scan block types directly, which speeds up both searches.
+- Refactored codebase to remove deprecated APIs and improve maintainability.
+- Migrated to Hytale 0.6.5
+
 ### 3.2.0
 
 - Fixed cats losing their cooldown and alarm state when carried in the cat carrier.

@@ -52,7 +52,6 @@ third_party
 # Hytale specific
 *.jar
 *.lpf
-*.bak
 !gradle/wrapper/gradle-wrapper.jar
 auth.json
 auth.enc

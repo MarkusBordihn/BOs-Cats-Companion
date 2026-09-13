@@ -102,25 +102,25 @@ public class Cats extends JavaPlugin {
         getManifest().getDescription());
 
     LOGGER.at(Level.INFO).log("Registering components and resources...");
-    catOwnerComponentType =
+    this.catOwnerComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatOwnerComponent.class, CatOwnerComponent.ID, CatOwnerComponent.CODEC);
-    catStateComponentType =
+    this.catStateComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatStateComponent.class, CatStateComponent.ID, CatStateComponent.CODEC);
-    catBedTargetComponentType =
+    this.catBedTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatBedTargetComponent.class, CatBedTargetComponent.ID, CatBedTargetComponent.CODEC);
-    catFetchTargetComponentType =
+    this.catFetchTargetComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatFetchTargetComponent.class,
                 CatFetchTargetComponent.ID,
                 CatFetchTargetComponent.CODEC);
-    catTamingProgressComponentType =
+    this.catTamingProgressComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatTamingProgressComponent.class,
@@ -130,10 +130,10 @@ public class Cats extends JavaPlugin {
         getEntityStoreRegistry()
             .registerComponent(
                 CatTargetComponent.class, CatTargetComponent.ID, CatTargetComponent.CODEC);
-    catMoodComponentType =
+    this.catMoodComponentType =
         getEntityStoreRegistry()
             .registerComponent(CatMoodComponent.class, CatMoodComponent.ID, CatMoodComponent.CODEC);
-    catNeedsComponentType =
+    this.catNeedsComponentType =
         getEntityStoreRegistry()
             .registerComponent(
                 CatNeedsComponent.class, CatNeedsComponent.ID, CatNeedsComponent.CODEC);
@@ -143,14 +143,14 @@ public class Cats extends JavaPlugin {
                 CatYarnBallProjectileComponent.class,
                 CatYarnBallProjectileComponent.ID,
                 CatYarnBallProjectileComponent.CODEC);
-    catsDataResourceType =
+    this.catsDataResourceType =
         getEntityStoreRegistry()
             .registerResource(CatsDataResource.class, CatsDataResource.ID, CatsDataResource.CODEC);
 
     LOGGER.at(Level.INFO).log("Registering systems...");
-    getEntityStoreRegistry().registerSystem(new CatStateSystem(catStateComponentType));
-    getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(catStateComponentType));
-    getEntityStoreRegistry().registerSystem(new CatsManager(catStateComponentType));
+    getEntityStoreRegistry().registerSystem(new CatStateSystem(this.catStateComponentType));
+    getEntityStoreRegistry().registerSystem(new CatStateSyncSystem(this.catStateComponentType));
+    getEntityStoreRegistry().registerSystem(new CatsManager(this.catStateComponentType));
     getEntityStoreRegistry()
         .registerSystem(
             new CatYarnBallProjectileFallbackSystem(catYarnBallProjectileComponentType));
@@ -203,8 +203,8 @@ public class Cats extends JavaPlugin {
     }
 
     LOGGER.at(Level.INFO).log("Registering commands...");
-    catCommands = new CatCommands();
-    this.getCommandRegistry().registerCommand(catCommands);
+    this.catCommands = new CatCommands();
+    this.getCommandRegistry().registerCommand(this.catCommands);
 
     LOGGER.at(Level.INFO).log("Registering spawn config system...");
     getEventRegistry()
@@ -221,8 +221,8 @@ public class Cats extends JavaPlugin {
     super.start();
     LOGGER.at(Level.INFO).log("Starting Cats Plugin...");
 
-    if (catCommands != null) {
-      PermissionManager.initializeDefaultPermissions(catCommands.buildPlayerPermissionNodes());
+    if (this.catCommands != null) {
+      PermissionManager.initializeDefaultPermissions(this.catCommands.buildPlayerPermissionNodes());
     }
 
     Universe.get().getUniverseReady().thenRun(LuckPermsCompat::detect);

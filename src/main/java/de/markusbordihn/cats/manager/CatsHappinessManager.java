@@ -32,7 +32,7 @@ import de.markusbordihn.cats.data.HappinessLevel;
 import de.markusbordihn.cats.data.HappinessSource;
 import de.markusbordihn.cats.data.MoodData;
 import de.markusbordihn.cats.data.PersonalityType;
-import de.markusbordihn.cats.world.NearbyBlockEntities;
+import de.markusbordihn.cats.world.NearbyBlocks;
 import de.markusbordihn.cats.world.storage.CatsDataResource;
 import java.util.Set;
 import java.util.UUID;
@@ -77,7 +77,7 @@ public class CatsHappinessManager {
 
   public void adjustHappiness(
       @Nonnull Ref<EntityStore> catRef, int delta, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return;
     }
@@ -96,22 +96,22 @@ public class CatsHappinessManager {
         Math.clamp(catData.happiness() + delta, MoodData.MIN_HAPPINESS, MoodData.MAX_HAPPINESS);
     long now = System.currentTimeMillis();
     resource.updateCat(catUuid, catData.withHappiness(newHappiness).withLastMoodUpdate(now));
-    syncMoodComponent(catRef, newHappiness, now, store);
+    this.syncMoodComponent(catRef, newHappiness, now, store);
   }
 
   public int boostHappiness(
       @Nonnull Ref<EntityStore> catRef,
       @Nonnull HappinessSource source,
       @Nonnull Store<EntityStore> store) {
-    CatDataEntry catData = getCatDataEntry(catRef, store);
+    CatDataEntry catData = this.getCatDataEntry(catRef, store);
     PersonalityType personality = catData != null ? catData.personalityType() : null;
     int delta = source.calculateDelta(personality);
-    adjustHappiness(catRef, delta, store);
+    this.adjustHappiness(catRef, delta, store);
     return delta;
   }
 
   public int getHappiness(@Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return MoodData.DEFAULT_HAPPINESS;
     }
@@ -154,10 +154,11 @@ public class CatsHappinessManager {
     if (lastUpdate > 0 && now > lastUpdate) {
       int decayTicks = (int) ((now - lastUpdate) / MOOD_DECAY_INTERVAL_MS);
       if (decayTicks > 0) {
-        if (isNearWarmth(catRef, store)) {
+        if (this.isNearWarmth(catRef, store)) {
           resource.updateCat(catUuid, catData.withLastMoodUpdate(now));
           return catData.happiness();
         }
+
         int decayed =
             Math.max(
                 MoodData.MIN_HAPPINESS, catData.happiness() - (decayTicks * MOOD_DECAY_AMOUNT));
@@ -174,7 +175,7 @@ public class CatsHappinessManager {
   @Nonnull
   public HappinessLevel getHappinessLevel(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    return HappinessLevel.fromValue(getHappiness(catRef, store));
+    return HappinessLevel.fromValue(this.getHappiness(catRef, store));
   }
 
   private boolean isNearWarmth(
@@ -194,15 +195,12 @@ public class CatsHappinessManager {
     }
 
     boolean[] foundWarmth = {false};
-    NearbyBlockEntities.forEachWithinRadius(
+    NearbyBlocks.forEachWithinRadius(
         world,
         transform.getPosition(),
         WARMTH_RADIUS,
+        CatsHappinessManager::isWarmthSource,
         (blockTypeId, blockPosition, distanceSquared) -> {
-          if (!isWarmthSource(blockTypeId)) {
-            return true;
-          }
-
           foundWarmth[0] = true;
           return false;
         });
@@ -213,10 +211,11 @@ public class CatsHappinessManager {
   @Nullable
   private CatDataEntry getCatDataEntry(
       @Nonnull Ref<EntityStore> catRef, @Nonnull Store<EntityStore> store) {
-    UUID catUuid = getUuid(catRef, store);
+    UUID catUuid = this.getUuid(catRef, store);
     if (catUuid == null) {
       return null;
     }
+
     CatsDataResource resource = store.getResource(CatsDataResource.getResourceType());
     return resource != null ? resource.getCat(catUuid) : null;
   }

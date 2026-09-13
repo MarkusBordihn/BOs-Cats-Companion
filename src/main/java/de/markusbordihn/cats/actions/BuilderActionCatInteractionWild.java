@@ -25,7 +25,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.interaction.ItemInteraction;
 import javax.annotation.Nonnull;
@@ -67,7 +67,7 @@ public class BuilderActionCatInteractionWild extends BuilderActionCatInteraction
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -77,18 +77,19 @@ public class BuilderActionCatInteractionWild extends BuilderActionCatInteraction
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(role, infoProvider);
+      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(executionSupport, infoProvider);
       Player player =
           playerRef != null ? store.getComponent(playerRef, Player.getComponentType()) : null;
       ItemStack heldItem = getHeldItem(playerRef, store);
 
       if (heldItem != null && heldItem.isValid()) {
-        return ItemInteraction.handle(entityRef, role, store, player, heldItem);
+        return ItemInteraction.handle(entityRef, store, player, heldItem);
       }
+
       return false;
     }
   }

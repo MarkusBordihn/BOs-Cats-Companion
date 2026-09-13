@@ -40,11 +40,11 @@ public enum HappinessSource {
 
   public int calculateDelta(@Nullable PersonalityType catPersonality) {
     if (catPersonality == null) {
-      return baseDelta;
+      return this.baseDelta;
     }
 
-    if (preferredPersonality != null && catPersonality == preferredPersonality) {
-      return (int) (baseDelta * 1.5f);
+    if (this.preferredPersonality != null && catPersonality == this.preferredPersonality) {
+      return (int) (this.baseDelta * 1.5f);
     }
 
     float modifier =
@@ -53,15 +53,15 @@ public enum HappinessSource {
           case PLAYING, FETCHING -> catPersonality.getPlayModifier();
           case TREAT, FEEDING, SLEEPING, SLEEPING_IN_BED -> catPersonality.getActivityModifier();
         };
-    return Math.max(1, (int) (baseDelta * modifier));
+    return Math.max(1, (int) (this.baseDelta * modifier));
   }
 
   public int getBaseDelta() {
-    return baseDelta;
+    return this.baseDelta;
   }
 
   @Nullable
   public PersonalityType getPreferredPersonality() {
-    return preferredPersonality;
+    return this.preferredPersonality;
   }
 }

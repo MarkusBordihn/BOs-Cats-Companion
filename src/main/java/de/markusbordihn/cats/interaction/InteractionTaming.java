@@ -32,6 +32,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.systems.RoleChangeSystem;
 import de.markusbordihn.cats.Constants;
 import de.markusbordihn.cats.component.CatTamingProgressComponent;
@@ -51,11 +52,7 @@ public class InteractionTaming {
   private static final long FEEDING_COOLDOWN_MS = 5000;
 
   public static boolean handle(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
 
     CatTamingProgressComponent progressComponent =
         store.getComponent(entityRef, CatTamingProgressComponent.getComponentType());
@@ -68,7 +65,7 @@ public class InteractionTaming {
     }
 
     if (!progressComponent.canFeedNow(FEEDING_COOLDOWN_MS)) {
-      role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
+      StateSupport.get(entityRef, store).setState(entityRef, "Rejection", "Default", store);
       if (player != null) {
         PlayerFeedback.sendMessage(
             store,
@@ -95,12 +92,11 @@ public class InteractionTaming {
 
     if (progressComponent.isReadyToTame()) {
       InventoryHelper.consumeActiveHotbarItem(player, heldItem);
-      handleSuccessfulTaming(entityRef, role, store, player, heldItem);
+      handleSuccessfulTaming(entityRef, store, player, heldItem);
       store.removeComponent(entityRef, CatTamingProgressComponent.getComponentType());
     } else {
       handleProgressFeedback(
           entityRef,
-          role,
           store,
           player,
           heldItem,
@@ -113,14 +109,13 @@ public class InteractionTaming {
 
   private static void handleProgressFeedback(
       Ref<EntityStore> entityRef,
-      Role role,
       Store<EntityStore> store,
       Player player,
       ItemStack heldItem,
       long currentProgress,
       long requiredProgress) {
 
-    role.getStateSupport().setState(entityRef, "Feeding", "Default", store);
+    StateSupport.get(entityRef, store).setState(entityRef, "Feeding", "Default", store);
 
     if (player != null) {
       PlayerFeedback.sendMessage(
@@ -151,18 +146,20 @@ public class InteractionTaming {
   }
 
   private static void handleSuccessfulTaming(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     if (player == null) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player is null");
       return;
     }
 
-    Ref<EntityStore> playerEntityRef = role.getStateSupport().getInteractionIterationTarget();
+    StateSupport stateSupport = StateSupport.get(entityRef, store);
+    if (stateSupport == null) {
+      LOGGER.at(Level.WARNING).log("Cannot tame cat - StateSupport is null");
+      return;
+    }
+
+    Ref<EntityStore> playerEntityRef = stateSupport.getInteractionIterationTarget();
     if (playerEntityRef == null || !playerEntityRef.isValid()) {
       LOGGER.at(Level.WARNING).log("Cannot tame cat - player entity ref is null");
       return;
@@ -295,6 +292,7 @@ public class InteractionTaming {
     if (!(player instanceof PermissionHolder permissionHolder)) {
       return Constants.DEFAULT_CAT_LIMIT;
     }
+
     return PermissionManager.getCatLimit(permissionHolder);
   }
 }

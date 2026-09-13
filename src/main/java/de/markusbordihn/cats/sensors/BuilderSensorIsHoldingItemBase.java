@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,14 +49,15 @@ public abstract class BuilderSensorIsHoldingItemBase extends BuilderSensorBase {
     @Override
     public final boolean matches(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         double dt,
         @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
+      if (!super.matches(entityRef, executionSupport, dt, store)) {
         return false;
       }
 
-      Ref<EntityStore> playerRef = role.getStateSupport().getInteractionIterationTarget();
+      Ref<EntityStore> playerRef =
+          executionSupport.getStateSupport().getInteractionIterationTarget();
       if (playerRef == null) {
         return false;
       }

@@ -49,6 +49,7 @@ public abstract class Config {
     if (value == null || value.isBlank()) {
       return defaultValue;
     }
+
     return Boolean.parseBoolean(value.trim());
   }
 
@@ -57,6 +58,7 @@ public abstract class Config {
     if (value == null || value.isBlank()) {
       return defaultValue;
     }
+
     try {
       return Integer.parseInt(value.trim());
     } catch (NumberFormatException e) {
@@ -71,6 +73,7 @@ public abstract class Config {
     if (value == null || value.isBlank()) {
       return defaultValue;
     }
+
     try {
       return Float.parseFloat(value.trim());
     } catch (NumberFormatException e) {
@@ -85,45 +88,46 @@ public abstract class Config {
     if (value == null || value.isBlank()) {
       return defaultValue;
     }
+
     return value.trim();
   }
 
   public Path getConfigPath() {
-    return CONFIG_DIR.resolve(fileName);
+    return CONFIG_DIR.resolve(this.fileName);
   }
 
   protected void init() {
     try {
       Files.createDirectories(CONFIG_DIR);
-      Path configPath = getConfigPath();
+      Path configPath = this.getConfigPath();
       if (!Files.exists(configPath)) {
         LOGGER.at(Level.INFO).log("Creating default config at %s", configPath);
-        writeDefaults(configPath);
+        this.writeDefaults(configPath);
       }
-      load(configPath);
-      loaded = true;
+      this.load(configPath);
+      this.loaded = true;
       LOGGER.at(Level.INFO).log("Config loaded: %s", configPath);
     } catch (IOException e) {
-      LOGGER.at(Level.SEVERE).log("Failed to initialize config: %s", fileName, e);
-      applyDefaults();
-      loaded = true;
+      LOGGER.at(Level.SEVERE).log("Failed to initialize config: %s", this.fileName, e);
+      this.applyDefaults();
+      this.loaded = true;
     }
   }
 
   public void reload() {
     try {
-      Path configPath = getConfigPath();
+      Path configPath = this.getConfigPath();
       if (Files.exists(configPath)) {
-        load(configPath);
+        this.load(configPath);
         LOGGER.at(Level.INFO).log("Config reloaded: %s", configPath);
       }
     } catch (IOException e) {
-      LOGGER.at(Level.SEVERE).log("Failed to reload config: %s", fileName, e);
+      LOGGER.at(Level.SEVERE).log("Failed to reload config: %s", this.fileName, e);
     }
   }
 
   public boolean isLoaded() {
-    return loaded;
+    return this.loaded;
   }
 
   protected abstract LinkedHashMap<String, String> getDefaults();
@@ -137,19 +141,19 @@ public abstract class Config {
   protected abstract void applyDefaults();
 
   private void load(Path configPath) throws IOException {
-    properties.clear();
+    this.properties.clear();
     try (var reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8)) {
-      properties.load(reader);
+      this.properties.load(reader);
     }
-    applyProperties(properties);
+    this.applyProperties(this.properties);
   }
 
   private void writeDefaults(Path configPath) throws IOException {
-    LinkedHashMap<String, String> defaults = getDefaults();
-    LinkedHashMap<String, String> comments = getComments();
+    LinkedHashMap<String, String> defaults = this.getDefaults();
+    LinkedHashMap<String, String> comments = this.getComments();
 
     try (BufferedWriter writer = Files.newBufferedWriter(configPath, StandardCharsets.UTF_8)) {
-      writer.write("# " + getHeader());
+      writer.write("# " + this.getHeader());
       writer.newLine();
       writer.write("# ");
       writer.newLine();

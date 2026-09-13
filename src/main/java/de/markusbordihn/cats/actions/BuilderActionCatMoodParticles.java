@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderDescriptorState;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatMoodComponent;
@@ -126,7 +126,7 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -136,7 +136,7 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
@@ -160,7 +160,7 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
       elapsedByEntity.put(entityRef, 0.0);
 
-      StateSupport stateSupport = role.getStateSupport();
+      StateSupport stateSupport = executionSupport.getStateSupport();
       if (stateSupport.inState("Pet", "Default")
           || stateSupport.inState("Pet", "PrepareSleep")
           || stateSupport.inState("Pet", "PrepareFollow")
@@ -183,7 +183,7 @@ public class BuilderActionCatMoodParticles extends BuilderActionBase {
 
       String moodSubState = toMoodSubState(moodComponent.getLevel(), personality);
       if (moodSubState != null) {
-        role.getStateSupport().setState(entityRef, "Pet", moodSubState, store);
+        executionSupport.getStateSupport().setState(entityRef, "Pet", moodSubState, store);
       }
 
       return true;

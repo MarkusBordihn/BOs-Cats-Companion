@@ -99,18 +99,19 @@ public enum GiftType {
   }
 
   public PersonalityType getAffinityPersonality() {
-    return affinityPersonality;
+    return this.affinityPersonality;
   }
 
   public String getItemId(HappinessLevel level) {
     List<String> items =
-        itemsByLevel.getOrDefault(
+        this.itemsByLevel.getOrDefault(
             level,
-            itemsByLevel.getOrDefault(
-                HappinessLevel.HAPPY, itemsByLevel.get(HappinessLevel.NEUTRAL)));
+            this.itemsByLevel.getOrDefault(
+                HappinessLevel.HAPPY, this.itemsByLevel.get(HappinessLevel.NEUTRAL)));
     if (items == null || items.isEmpty()) {
       return null;
     }
+
     return items.get(ThreadLocalRandom.current().nextInt(items.size()));
   }
 }

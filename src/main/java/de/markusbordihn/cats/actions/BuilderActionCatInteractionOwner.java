@@ -25,7 +25,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.interaction.InteractionOwner;
 import de.markusbordihn.cats.interaction.ItemInteractionOwner;
@@ -68,36 +68,38 @@ public class BuilderActionCatInteractionOwner extends BuilderActionCatInteractio
     @Override
     public boolean canExecute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
       if (!isCatTamed(entityRef, store)) {
         return false;
       }
-      Player player = getPlayerFromInfoProvider(role, infoProvider, store);
+
+      Player player = getPlayerFromInfoProvider(executionSupport, infoProvider, store);
       if (player == null) {
         return false;
       }
-      return isOwner(entityRef, getPlayerUUID(role, store), store);
+
+      return isOwner(entityRef, getPlayerUUID(executionSupport, store), store);
     }
 
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
-      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(role, infoProvider);
+      Ref<EntityStore> playerRef = getPlayerRefFromInfoProvider(executionSupport, infoProvider);
       Player player =
           playerRef != null ? store.getComponent(playerRef, Player.getComponentType()) : null;
       ItemStack heldItem = getHeldItem(playerRef, store);
 
       if (heldItem != null && heldItem.isValid()) {
-        return ItemInteractionOwner.handle(entityRef, role, store, player, heldItem);
+        return ItemInteractionOwner.handle(entityRef, store, player, heldItem);
       } else {
-        return InteractionOwner.handle(entityRef, role, store, player);
+        return InteractionOwner.handle(entityRef, store, player);
       }
     }
   }

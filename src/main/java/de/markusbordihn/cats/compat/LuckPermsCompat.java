@@ -22,7 +22,9 @@ package de.markusbordihn.cats.compat;
 import com.hypixel.hytale.common.plugin.PluginIdentifier;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.PluginManager;
+import java.util.Set;
 import java.util.logging.Level;
+import javax.annotation.Nonnull;
 
 public class LuckPermsCompat {
 
@@ -30,111 +32,70 @@ public class LuckPermsCompat {
   private static final PluginIdentifier LUCKPERMS_ID =
       new PluginIdentifier("LuckPerms", "LuckPerms");
 
-  private static boolean isAvailable = false;
+  private static final String COMMAND_PERMISSION = "markusbordihn.cats.command.cat";
+  private static final int BOX_INNER_WIDTH = 75;
+
+  private static final String[] SUB_COMMANDS = {
+    "bed", "despawn", "follow", "info", "list", "name", "needs", "owner", "play", "pounce",
+    "release", "reload", "search", "sit", "sleep", "spawn", "wait", "wander"
+  };
+  private static final Set<String> OP_SUB_COMMANDS = Set.of("needs", "owner", "reload");
+
   private static boolean isDetected = false;
 
-  private LuckPermsCompat() {
-    // Utility class
-  }
+  private LuckPermsCompat() {}
 
   public static void detect() {
     if (isDetected) {
       return;
     }
+
     isDetected = true;
 
     if (PluginManager.get().getAvailablePlugins().containsKey(LUCKPERMS_ID)) {
-      isAvailable = true;
       logLuckPermsEnabled();
     }
   }
 
-  public static boolean isAvailable() {
-    return isAvailable;
+  private static void logLuckPermsEnabled() {
+    LOGGER.at(Level.INFO).log("=".repeat(BOX_INNER_WIDTH + 4));
+    logBoxLine("[Cats Plugin] LuckPerms detected! Permission checks are ENABLED.");
+    LOGGER.at(Level.INFO).log("|" + "=".repeat(BOX_INNER_WIDTH + 2) + "|");
+    logBoxLine("IMPORTANT: Use wildcard permission to grant access to /cat command");
+    logBoxLine("and all sub-commands (/cat list, /cat info, etc.)");
+    logBoxLine("");
+    logBoxLine("Recommended: Grant wildcard to player or group:");
+    logBoxLine("  /lp user <player> permission set " + COMMAND_PERMISSION + ".* true");
+    logBoxLine("  /lp group default permission set " + COMMAND_PERMISSION + ".* true");
+    logBoxLine("");
+    logBoxLine("Alternative: Grant individual permissions:");
+    logBoxLine("  /lp user <player> permission set " + COMMAND_PERMISSION + " true");
+    logBoxLine("  /lp user <player> permission set " + COMMAND_PERMISSION + ".list true");
+    logBoxLine("  ...and so on for each sub-command");
+    logBoxLine("");
+    logBoxLine("Verify permissions were set:");
+    logBoxLine("  /lp user <player> permission info");
+    logBoxLine("");
+    logBoxLine("Available permissions:");
+    logPermissionLine(COMMAND_PERMISSION, "Base /cat command");
+    logPermissionLine(COMMAND_PERMISSION + ".*", "Wildcard: all sub-commands");
+
+    for (String subCommand : SUB_COMMANDS) {
+      String adminMarker = OP_SUB_COMMANDS.contains(subCommand) ? " (admin)" : "";
+      logPermissionLine(COMMAND_PERMISSION + "." + subCommand, "/cat " + subCommand + adminMarker);
+    }
+
+    logPermissionLine("markusbordihn.cats.admin.bypass", "Bypass ownership checks");
+    logPermissionLine("markusbordihn.cats.limit.unlimited", "Unlimited cat ownership");
+    logPermissionLine("markusbordihn.cats.limit.{number}", "Limit to N cats (e.g. .8-32)");
+    LOGGER.at(Level.INFO).log("=".repeat(BOX_INNER_WIDTH + 4));
   }
 
-  private static void logLuckPermsEnabled() {
-    LOGGER.at(Level.INFO).log(
-        "===============================================================================");
-    LOGGER.at(Level.INFO).log(
-        "| [Cats Plugin] LuckPerms detected! Permission checks are ENABLED.           |");
-    LOGGER.at(Level.INFO).log(
-        "|=============================================================================|");
-    LOGGER.at(Level.INFO).log(
-        "| IMPORTANT: Use wildcard permission to grant access to /cat command         |");
-    LOGGER.at(Level.INFO).log(
-        "| and all sub-commands (/cat list, /cat info, etc.)                          |");
-    LOGGER.at(Level.INFO).log(
-        "|                                                                             |");
-    LOGGER.at(Level.INFO).log(
-        "| Recommended: Grant wildcard to player or group:                            |");
-    LOGGER.at(Level.INFO).log(
-        "|   /lp user <player> permission set markusbordihn.cats.command.cat.* true   |");
-    LOGGER.at(Level.INFO).log(
-        "|   /lp group default permission set markusbordihn.cats.command.cat.* true   |");
-    LOGGER.at(Level.INFO).log(
-        "|                                                                             |");
-    LOGGER.at(Level.INFO).log(
-        "| Alternative: Grant individual permissions:                                 |");
-    LOGGER.at(Level.INFO).log(
-        "|   /lp user <player> permission set markusbordihn.cats.command.cat true     |");
-    LOGGER.at(Level.INFO).log(
-        "|   /lp user <player> permission set markusbordihn.cats.command.cat.list true|");
-    LOGGER.at(Level.INFO).log(
-        "|   ...and so on for each sub-command                                        |");
-    LOGGER.at(Level.INFO).log(
-        "|                                                                             |");
-    LOGGER.at(Level.INFO).log(
-        "| Verify permissions were set:                                               |");
-    LOGGER.at(Level.INFO).log(
-        "|   /lp user <player> permission info                                        |");
-    LOGGER.at(Level.INFO).log(
-        "|                                                                             |");
-    LOGGER.at(Level.INFO).log(
-        "| Available permissions:                                                     |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat          - Base /cat command            |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.*        - Wildcard: all sub-commands   |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.attack   - /cat attack                  |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.bed      - /cat bed                     |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.despawn  - /cat despawn (admin)         |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.follow   - /cat follow                  |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.info     - /cat info                    |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.list     - /cat list                    |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.name     - /cat name                    |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.owner    - /cat owner (admin)           |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.play     - /cat play                    |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.release  - /cat release                 |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.search   - /cat search                  |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.sit      - /cat sit                     |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.sleep    - /cat sleep                   |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.spawn    - /cat spawn (admin)           |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.wait     - /cat wait                    |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.command.cat.wander   - /cat wander                  |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.admin.bypass         - Bypass ownership checks      |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.limit.unlimited      - Unlimited cat ownership      |");
-    LOGGER.at(Level.INFO).log(
-        "|   - markusbordihn.cats.limit.{number}       - Limit to N cats (e.g. .8-32) |");
-    LOGGER.at(Level.INFO).log(
-        "===============================================================================");
+  private static void logPermissionLine(@Nonnull String permission, @Nonnull String description) {
+    logBoxLine(String.format("  - %-40s - %s", permission, description));
+  }
+
+  private static void logBoxLine(@Nonnull String content) {
+    LOGGER.at(Level.INFO).log(String.format("| %-" + BOX_INNER_WIDTH + "s |", content));
   }
 }

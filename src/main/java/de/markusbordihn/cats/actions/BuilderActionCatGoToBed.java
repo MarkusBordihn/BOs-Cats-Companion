@@ -32,7 +32,7 @@ import com.hypixel.hytale.server.npc.asset.builder.BuilderSupport;
 import com.hypixel.hytale.server.npc.corecomponents.ActionBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderActionBase;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.blocks.CatBed;
 import de.markusbordihn.cats.component.CatBedTargetComponent;
@@ -94,13 +94,13 @@ public class BuilderActionCatGoToBed extends BuilderActionBase {
     @Override
     public boolean execute(
         Ref<EntityStore> entityRef,
-        Role role,
+        ExecutionSupport executionSupport,
         InfoProvider infoProvider,
         double deltaTime,
         Store<EntityStore> store) {
 
       CatsManager catsManager = CatsManager.getInstance();
-      if (catsManager == null || role == null) {
+      if (catsManager == null || executionSupport == null) {
         return true;
       }
 
@@ -108,14 +108,14 @@ public class BuilderActionCatGoToBed extends BuilderActionBase {
           store.getComponent(entityRef, TransformComponent.getComponentType());
       if (catTransform == null) {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
-        role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+        executionSupport.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
         return true;
       }
 
       World world = store.getExternalData().getWorld();
       if (world == null) {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
-        role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+        executionSupport.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
         return true;
       }
 
@@ -142,12 +142,12 @@ public class BuilderActionCatGoToBed extends BuilderActionBase {
             CatBedTargetComponent.getComponentType(),
             new CatBedTargetComponent(availableBed.getPosition()));
         catsManager.updateCatState(entityRef, CatState.GOING_TO_BED, store);
-        role.getStateSupport().setState(entityRef, "Pet", "GoingToBed", store);
+        executionSupport.getStateSupport().setState(entityRef, "Pet", "GoingToBed", store);
       } else {
         catsManager.updateCatState(entityRef, CatState.SLEEPING, store);
         catsManager.boostHappiness(entityRef, HappinessSource.SLEEPING, store);
         catsManager.satisfyNeed(entityRef, CatNeedType.REST, 15f, store);
-        role.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
+        executionSupport.getStateSupport().setState(entityRef, "Pet", "Sleeping", store);
       }
 
       return true;

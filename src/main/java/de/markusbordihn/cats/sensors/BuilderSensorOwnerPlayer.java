@@ -30,8 +30,8 @@ import com.hypixel.hytale.server.npc.asset.builder.holder.BooleanHolder;
 import com.hypixel.hytale.server.npc.asset.builder.holder.FloatHolder;
 import com.hypixel.hytale.server.npc.corecomponents.SensorBase;
 import com.hypixel.hytale.server.npc.corecomponents.builders.BuilderSensorBase;
+import com.hypixel.hytale.server.npc.instructions.ExecutionSupport;
 import com.hypixel.hytale.server.npc.instructions.Sensor;
-import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.sensorinfo.InfoProvider;
 import de.markusbordihn.cats.component.CatOwnerComponent;
 import de.markusbordihn.cats.manager.CatsManager;
@@ -115,18 +115,18 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
     }
 
     @Override
-    public void registerWithSupport(@Nonnull Role role) {
-      super.registerWithSupport(role);
-      role.getPositionCache().requirePlayerDistanceSorted(this.range);
+    public void registerWithSupport(@Nonnull ExecutionSupport executionSupport) {
+      super.registerWithSupport(executionSupport);
+      executionSupport.getPositionCache().requirePlayerDistanceSorted(this.range);
     }
 
     @Override
     public boolean matches(
         @Nonnull Ref<EntityStore> entityRef,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         double dt,
         @Nonnull Store<EntityStore> store) {
-      if (!super.matches(entityRef, role, dt, store)) {
+      if (!super.matches(entityRef, executionSupport, dt, store)) {
         return false;
       }
 
@@ -139,7 +139,8 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
       UUID ownerUuid = ownerComponent.getOwnerUUID();
       String ownerName = ownerComponent.getOwnerName();
       if (ownerUuid == null) {
-        ownerUuid = resolveLegacyOwnerUuid(entityRef, ownerComponent, ownerName, role, store);
+        ownerUuid =
+            resolveLegacyOwnerUuid(entityRef, ownerComponent, ownerName, executionSupport, store);
         if (ownerUuid == null) {
           return false;
         }
@@ -147,14 +148,15 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
 
       AtomicReference<Ref<EntityStore>> foundOwner = new AtomicReference<>(null);
       UUID resolvedOwnerUuid = ownerUuid;
-      role.getPositionCache()
+      executionSupport
+          .getPositionCache()
           .processPlayersInRange(
               entityRef,
               0,
               this.range,
               false,
               null,
-              role,
+              executionSupport,
               (sensorOwnerPlayer, playerRef, lambdaRole, playerStore) -> {
                 PlayerRef playerRefComponent =
                     playerStore.getComponent(playerRef, PlayerRef.getComponentType());
@@ -176,7 +178,7 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
       }
 
       if (this.lockOnTarget) {
-        role.getMarkedEntitySupport().setMarkedEntity(OWNER_TARGET_SLOT, ownerRef);
+        executionSupport.getMarkedEntitySupport().setMarkedEntity(OWNER_TARGET_SLOT, ownerRef);
       }
 
       return true;
@@ -191,21 +193,22 @@ public class BuilderSensorOwnerPlayer extends BuilderSensorBase {
         @Nonnull Ref<EntityStore> entityRef,
         @Nonnull CatOwnerComponent ownerComponent,
         String ownerName,
-        @Nonnull Role role,
+        @Nonnull ExecutionSupport executionSupport,
         @Nonnull Store<EntityStore> store) {
       if (ownerName == null || ownerName.isBlank()) {
         return null;
       }
 
       AtomicReference<UUID> matchedOwnerUuid = new AtomicReference<>(null);
-      role.getPositionCache()
+      executionSupport
+          .getPositionCache()
           .processPlayersInRange(
               entityRef,
               0,
               this.range,
               false,
               null,
-              role,
+              executionSupport,
               (sensorOwnerPlayer, playerRef, lambdaRole, playerStore) -> {
                 PlayerRef playerRefComponent =
                     playerStore.getComponent(playerRef, PlayerRef.getComponentType());

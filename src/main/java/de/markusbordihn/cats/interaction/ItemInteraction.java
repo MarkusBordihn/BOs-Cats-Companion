@@ -27,7 +27,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.role.support.StateSupport;
 import de.markusbordihn.cats.Constants;
 import java.util.Set;
 import java.util.logging.Level;
@@ -51,35 +51,26 @@ public class ItemInteraction {
           "Fish_Minnow_Item");
 
   public static boolean handle(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
 
     String itemName = heldItem != null ? heldItem.getItemId() : null;
 
     if (itemName != null && TAMING_ITEMS.contains(itemName)) {
-      return InteractionTaming.handle(entityRef, role, store, player, heldItem);
+      return InteractionTaming.handle(entityRef, store, player, heldItem);
     }
 
-    handleRejection(entityRef, role, store, player, heldItem);
+    handleRejection(entityRef, store, player, heldItem);
     return true;
   }
 
   private static void handleRejection(
-      Ref<EntityStore> entityRef,
-      Role role,
-      Store<EntityStore> store,
-      Player player,
-      ItemStack heldItem) {
+      Ref<EntityStore> entityRef, Store<EntityStore> store, Player player, ItemStack heldItem) {
 
     String itemName = heldItem != null ? heldItem.getItemId() : null;
     String rejectReason = itemName == null ? "empty hand" : itemName;
     LOGGER.at(Level.FINE).log("Wild cat rejected interaction with: %s", rejectReason);
 
-    // Trigger Rejection animation state (angry particles, returns to Wild after 1 second)
-    role.getStateSupport().setState(entityRef, "Rejection", "Default", store);
+    StateSupport.get(entityRef, store).setState(entityRef, "Rejection", "Default", store);
 
     if (player != null && player.getReference() != null) {
       store
